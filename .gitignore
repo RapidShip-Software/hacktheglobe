@@ -5,6 +5,9 @@ _local/
 *.docx
 *.doc
 *.pdf
+CLAUDE_*.md
+/tasks/
+/read_docx.py
 
 # ===========================
 # Environment & Secrets
