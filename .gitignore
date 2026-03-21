@@ -1,0 +1,101 @@
+# ===========================
+# Private / Local Files
+# ===========================
+_local/
+*.docx
+*.doc
+*.pdf
+
+# ===========================
+# Environment & Secrets
+# ===========================
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+!.env.example
+
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.Python
+
+# ===========================
+# Next.js
+# ===========================
+.next/
+out/
+.vercel
+
+# ===========================
+# Python / FastAPI
+# ===========================
+*.egg-info/
+dist/
+build/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===========================
+# IDE & Editor
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# OS Files
+# ===========================
+*.lnk
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ===========================
+# Testing & Coverage
+# ===========================
+coverage/
+.nyc_output/
+htmlcov/
+.pytest_cache/
+.coverage
+*.cover
+
+# ===========================
+# Logs & Debug
+# ===========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===========================
+# Supabase
+# ===========================
+supabase/.branches
+supabase/.temp
+
+# ===========================
+# Misc
+# ===========================
+*.bak
+*.tmp
+*.temp
+.claude/
