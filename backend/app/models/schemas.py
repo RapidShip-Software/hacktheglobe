@@ -105,7 +105,27 @@ class CaregiverNoteCreate(BaseModel):
     content: str
 
 
+class PatientWithRisk(BaseModel):
+    id: str
+    name: str
+    age: int
+    conditions: list[str] = Field(default_factory=list)
+    risk_score: float = 0.0
+    latest_summary: Optional[str] = None
+
+
+class PatientProfile(BaseModel):
+    patient: Patient
+    latest_assessment: Optional[Assessment] = None
+    recent_readings: list[Reading] = Field(default_factory=list)
+    caregiver_notes: list[CaregiverNote] = Field(default_factory=list)
+
+
 class PatientSummary(BaseModel):
     patient: Patient
     latest_assessment: Optional[Assessment] = None
     recent_readings: list[Reading] = Field(default_factory=list)
+
+
+class DischargeCreate(BaseModel):
+    discharge_flag: bool = True
