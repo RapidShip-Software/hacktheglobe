@@ -1,8 +1,8 @@
-# [App Name] - Continuous Remote Care Platform
+# Canopy - Continuous Remote Care Platform
 
 > Hack the Globe 2026 | Health & Humanity | Global Spark | BCG Toronto | March 21-22, 2026
 
-**[App Name]** is a continuous remote care platform that keeps elderly patients healthy at home, gives their families peace of mind, and gives healthcare systems early warning intelligence before a crisis hits.
+**Canopy** is a continuous remote care platform that keeps elderly patients healthy at home, gives their families peace of mind, and gives healthcare systems early warning intelligence before a crisis hits.
 
 ## The Problem
 
