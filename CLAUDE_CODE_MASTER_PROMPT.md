@@ -289,7 +289,7 @@ Then Gemini 2.0 Flash generates a risk_narrative (2-3 sentences) and recommended
 
 Execute these in order. Do not skip ahead. Each phase must be working before starting the next.
 
-### PHASE 1: Foundation (Target: first 2 hours)
+### PHASE 1: Foundation
 1. Set up the Next.js frontend with App Router, TypeScript, Tailwind, Framer Motion
 2. Set up the FastAPI backend with CORS, health check endpoint
 3. Create the Supabase client libraries (frontend + backend)
