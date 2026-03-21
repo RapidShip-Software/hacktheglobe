@@ -20,9 +20,9 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
   const colours = butterflyColours[contact.avatar] || { wing: "#a78bfa", body: "#7c3aed" };
 
   const positionClasses = {
-    left: "left-8 bottom-32",
-    center: "left-1/2 -translate-x-1/2 bottom-28",
-    right: "right-8 bottom-32",
+    left: "left-8 bottom-36 md:bottom-40",
+    center: "left-1/2 -translate-x-1/2 bottom-32 md:bottom-36",
+    right: "right-20 bottom-36 md:bottom-40",
   };
 
   return (
