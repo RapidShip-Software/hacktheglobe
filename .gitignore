@@ -93,6 +93,12 @@ supabase/.branches
 supabase/.temp
 
 # ===========================
+# Scratch / Temp Scripts
+# ===========================
+/read_docx.py
+/tasks/
+
+# ===========================
 # Misc
 # ===========================
 *.bak
