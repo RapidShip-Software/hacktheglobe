@@ -167,10 +167,10 @@ Four-node `StateGraph` processing patient health data:
 
 | Role | Member |
 |------|--------|
-| Full-Stack Lead + AI Engineer | Marco Anthony Ayuste |
-| Frontend + UX Lead | Aahir Chakraborty-Saha |
+| Innovation Engineer | Marco Anthony Ayuste |
+| Innovation Engineer | Aahir Chakraborty-Saha |
 | Innovation Analyst + Product Manager | Christie Ko |
-| Product + Demo Lead | Rojella Santos |
+| Business Strategist | Rojella Santos |
 
 ## License
 
