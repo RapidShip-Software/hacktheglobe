@@ -7,6 +7,7 @@ import type { Contact } from "@/lib/types";
 type ButterflyContactProps = {
   contact: Contact;
   position: "left" | "center" | "right" | "stacked";
+  onClick?: (contact: Contact) => void;
 };
 
 const butterflyColours: Record<string, { wing: string; body: string; wingDark: string; highlight: string }> = {
@@ -15,8 +16,7 @@ const butterflyColours: Record<string, { wing: string; body: string; wingDark: s
   robin_red: { wing: "#fb923c", body: "#ea580c", wingDark: "#f97316", highlight: "#fdba74" },
 };
 
-function ButterflyContact({ contact, position }: ButterflyContactProps) {
-  const [showModal, setShowModal] = useState(false);
+function ButterflyContact({ contact, position, onClick }: ButterflyContactProps) {
   const colours = butterflyColours[contact.avatar] || { wing: "#a78bfa", body: "#7c3aed", wingDark: "#8b5cf6", highlight: "#c4b5fd" };
   const gradId = `bf-grad-${contact.name.replace(/\s/g, "")}`;
 
@@ -34,7 +34,7 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
     <>
       <motion.button
         className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/20 backdrop-blur-2xl backdrop-saturate-150 rounded-xl px-3 py-2 border border-white/40 shadow-xl w-40" : "flex-col items-center gap-1"} cursor-pointer group`}
-        onClick={() => setShowModal(true)}
+        onClick={() => onClick?.(contact)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
           duration: 4 + Math.random() * 2,
@@ -151,65 +151,6 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
           {isStacked && <span className="block text-[10px] font-bold text-slate-700 drop-shadow-sm">{contact.relation}</span>}
         </span>
       </motion.button>
-
-      {/* Call Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div
-              className="absolute inset-0 bg-black/20 backdrop-blur-md"
-              onClick={() => setShowModal(false)}
-            />
-            <motion.div
-              className="relative bg-white/30 backdrop-blur-3xl backdrop-saturate-200 rounded-[2.5rem] p-8 shadow-2xl max-w-sm mx-4 text-center border border-white/40"
-              initial={{ scale: 0.8, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.8, y: 20 }}
-              transition={{ type: "spring", damping: 20 }}
-            >
-              {/* Butterfly icon */}
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: colours.wing + "30" }}
-              >
-                <svg width="36" height="30" viewBox="0 0 60 50">
-                  <ellipse cx="20" cy="22" rx="14" ry="16" fill={colours.wing} opacity={0.85} />
-                  <ellipse cx="40" cy="22" rx="14" ry="16" fill={colours.wing} opacity={0.85} />
-                  <ellipse cx="30" cy="24" rx="3" ry="14" fill={colours.body} />
-                </svg>
-              </div>
-
-              <h3 className="text-2xl font-extrabold text-slate-900 drop-shadow-md mb-1">{contact.name}</h3>
-              <p className="text-sm font-bold text-slate-700 mb-1 drop-shadow-sm">{contact.relation}</p>
-              <p className="text-lg font-bold text-slate-800 mb-6 drop-shadow-sm">{contact.phone}</p>
-
-              <div className="flex gap-3 justify-center">
-                <motion.a
-                  href={`tel:${contact.phone}`}
-                  className="flex-1 py-3 rounded-2xl text-white font-semibold text-lg"
-                  style={{ backgroundColor: colours.body }}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  Call
-                </motion.a>
-                <motion.button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-600 font-semibold text-lg hover:bg-gray-200 transition-colors"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  Close
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

@@ -53,6 +53,7 @@ function GardenPage() {
   const [showBpEntry, setShowBpEntry] = useState(false);
   const [nudgeText, setNudgeText] = useState("Good morning Margaret! Your garden looks lovely today.");
   const [mobilePanel, setMobilePanel] = useState<"none" | "tasks" | "contacts">("none");
+  const [activeContact, setActiveContact] = useState<Contact | null>(null);
 
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
     { id: "med-lisinopril", label: "Lisinopril 10mg", sublabel: "Blood pressure", time: "8:00 AM", icon: "pill", done: false },
@@ -142,10 +143,10 @@ function GardenPage() {
   };
 
   const checklistContent = (
-    <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl border border-slate-200 shadow-xl p-3 md:p-3 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm md:text-base font-bold text-slate-800">Today&apos;s Tasks</h2>
-        <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+    <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-2xl p-4 md:p-5 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base md:text-lg font-extrabold text-slate-900 drop-shadow-md">Today&apos;s Tasks</h2>
+        <span className="text-xs font-extrabold text-slate-700 bg-white/40 border border-white/50 px-3 py-1 rounded-full shadow-sm drop-shadow-sm">
           {completedCount}/{checklist.length}
         </span>
       </div>
@@ -165,10 +166,10 @@ function GardenPage() {
             <motion.button
               key={item.id}
               onClick={() => handleChecklistTap(item)}
-              className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all text-left ${
+              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left border ${
                 item.done
-                  ? "bg-emerald-50 border border-emerald-200"
-                  : "bg-slate-50 border border-slate-200 hover:bg-slate-100 active:scale-[0.97]"
+                  ? "bg-emerald-400/20 border-emerald-300/50 shadow-inner"
+                  : "bg-white/40 border-white/50 shadow hover:bg-white/60 active:scale-[0.98]"
               }`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -186,14 +187,14 @@ function GardenPage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold truncate ${item.done ? "text-emerald-600 line-through" : "text-slate-800"}`}>
+                <p className={`text-sm font-extrabold truncate drop-shadow-sm ${item.done ? "text-emerald-700 line-through" : "text-slate-900"}`}>
                   {item.label}
                 </p>
-                <p className={`text-xs font-medium truncate ${item.done ? "text-emerald-400" : "text-slate-500"}`}>
+                <p className={`text-xs font-bold truncate drop-shadow-sm ${item.done ? "text-emerald-600/80" : "text-slate-700"}`}>
                   {item.sublabel}
                 </p>
               </div>
-              <span className={`text-xs font-medium shrink-0 ${item.done ? "text-emerald-400" : "text-slate-400"}`}>
+              <span className={`text-xs font-bold shrink-0 drop-shadow-sm ${item.done ? "text-emerald-600/80" : "text-slate-700"}`}>
                 {item.time}
               </span>
             </motion.button>
@@ -238,17 +239,19 @@ function GardenPage() {
       </AnimatePresence>
 
       {/* Nudge text (top center) */}
-      <div className="absolute top-4 md:top-6 left-16 md:left-20 right-4 md:right-20 z-20 text-center">
+      <div className="absolute top-4 md:top-6 left-16 md:left-20 right-4 md:right-20 z-20 flex justify-center pointer-events-none">
         <BlurFade delay={0.3} inView>
-          <motion.p
+          <motion.div
             key={nudgeText}
-            className="text-xs md:text-sm font-medium text-white max-w-sm mx-auto bg-slate-900/80 backdrop-blur-sm rounded-2xl px-3 md:px-4 py-2 shadow-lg border border-slate-700/50 line-clamp-2"
+            className="bg-black/40 backdrop-blur-3xl rounded-[2rem] px-5 py-3.5 shadow-2xl border border-white/30 max-w-lg w-full"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {nudgeText.length > 120 ? nudgeText.slice(0, 120) + "..." : nudgeText}
-          </motion.p>
+            <p className="text-sm md:text-base font-extrabold text-white drop-shadow-md text-center leading-snug">
+              {nudgeText}
+            </p>
+          </motion.div>
         </BlurFade>
       </div>
 
@@ -336,10 +339,10 @@ function GardenPage() {
       </div>
 
       {/* === DESKTOP: Right Butterfly Contacts (hidden on mobile) === */}
-      <div className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-8 items-center">
+      <div className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-6 items-center">
         {MARGARET_CONTACTS.map((contact, i) => (
           <BlurFade key={contact.name} delay={0.4 + i * 0.1} inView>
-            <ButterflyContact contact={contact} position="stacked" />
+            <ButterflyContact contact={contact} position="stacked" onClick={setActiveContact} />
           </BlurFade>
         ))}
       </div>
@@ -393,10 +396,10 @@ function GardenPage() {
             exit={{ opacity: 0, y: 40 }}
             transition={{ type: "spring", damping: 25 }}
           >
-            <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-3 space-y-2">
-              <h2 className="text-base font-bold text-slate-800 mb-1">Family Contacts</h2>
+            <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-xl p-4 space-y-3">
+              <h2 className="text-base font-extrabold text-slate-900 drop-shadow-md mb-2">Family Contacts</h2>
               {MARGARET_CONTACTS.map((contact) => (
-                <ButterflyContact key={contact.name} contact={contact} position="stacked" />
+                <ButterflyContact key={contact.name} contact={contact} position="stacked" onClick={setActiveContact} />
               ))}
             </div>
           </motion.div>
@@ -416,6 +419,58 @@ function GardenPage() {
         visible={showBpEntry}
         onClose={() => setShowBpEntry(false)}
       />
+
+      {/* Root-Level Contact Modal (Escapes CSS transforms) */}
+      <AnimatePresence>
+        {activeContact && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div
+              className="absolute inset-0 bg-black/40 backdrop-blur-md"
+              onClick={() => setActiveContact(null)}
+            />
+            <motion.div
+              className="relative bg-white/30 backdrop-blur-3xl backdrop-saturate-200 rounded-[2.5rem] p-8 shadow-2xl max-w-sm w-full mx-4 text-center border border-white/40"
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 20 }}
+              transition={{ type: "spring", damping: 20 }}
+            >
+              {/* Butterfly icon placeholder - styling maintained dynamically */}
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-blue-400/30">
+                <span className="text-3xl">🦋</span>
+              </div>
+
+              <h3 className="text-3xl font-extrabold text-slate-900 drop-shadow-md mb-1">{activeContact.name}</h3>
+              <p className="text-base font-bold text-slate-700 mb-1 drop-shadow-sm">{activeContact.relation}</p>
+              <p className="text-xl font-bold text-slate-800 mb-8 drop-shadow-sm">{activeContact.phone}</p>
+
+              <div className="flex gap-3 justify-center">
+                <motion.a
+                  href={`tel:${activeContact.phone}`}
+                  className="flex-1 py-3.5 rounded-2xl bg-blue-600 shadow-xl border border-blue-400 text-white font-extrabold text-xl"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Call
+                </motion.a>
+                <motion.button
+                  onClick={() => setActiveContact(null)}
+                  className="flex-1 py-3.5 rounded-2xl bg-slate-100 shadow-xl border border-slate-300 text-slate-700 font-extrabold text-xl hover:bg-slate-200 transition-colors"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Close
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AuroraBackground>
   );
 }
