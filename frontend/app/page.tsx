@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { ErrorBoundary } from "@/components/shared/error-boundary";
+import { getCanopyUser } from "@/lib/auth";
 
 type FlyTarget = "garden" | "nest" | "clinical" | "team";
 type FlyToFn = (target: FlyTarget) => Promise<void>;
@@ -77,6 +78,7 @@ function HomePageInner() {
   const flyToRef = useRef<FlyToFn | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
+  const userName = getCanopyUser()?.name?.split(" ")[0] || "there";
 
   const fromParam = searchParams.get("from") as FlyTarget | null;
   const initialFlyFrom = fromParam && ["garden", "nest", "clinical", "team"].includes(fromParam) ? fromParam : undefined;
@@ -156,17 +158,17 @@ function HomePageInner() {
             </span>
           </motion.div>
           <p className="text-sm md:text-base font-extrabold text-white italic tracking-wide -mt-4 text-center w-full drop-shadow-md">
-            shelter for the people you love.
+            Continuous Care, Naturally. Shelter for the people you love.
           </p>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight drop-shadow-2xl flex flex-col items-center">
             <span className="text-white">
-              Continuous Care,
+              Welcome back,
             </span>
             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 bg-clip-text text-transparent mt-1">
-              Naturally
+              {userName}
             </span>
           </h1>
         </BlurFade>
