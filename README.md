@@ -23,9 +23,12 @@ Three interconnected layers, one platform, each with its own immersive 3D island
 | **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a nest in a tree, cat, lighthouse, and nature. |
 | **The Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, real-time monitoring, and discharge planning. Cozy 3D clinic interior with glassmorphism dashboard. |
 
-### Live Demo
+### Links
 
-**[hacktheglobe.vercel.app](https://hacktheglobe.vercel.app)**
+- **Live Demo:** [hacktheglobe.vercel.app](https://hacktheglobe.vercel.app)
+- **Devpost:** [devpost.com/software/canopy-a0qp35](https://devpost.com/software/canopy-a0qp35)
+- **Pitch Deck:** [Canva Slides](https://www.canva.com/design/DAHEmTBF-Os/Ik3ShWYcP5P5y6_UgCES3w/view)
+- **GitHub:** [RapidShip-Software/hacktheglobe](https://github.com/RapidShip-Software/hacktheglobe)
 
 Demo accounts (login page):
 - **Margaret Santos** (Patient): `margaret@canopy.care` / `garden123`
