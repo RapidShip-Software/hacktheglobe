@@ -6,12 +6,21 @@ import * as THREE from "three";
 type FlyTarget = "garden" | "nest" | "clinical";
 type FlyToFn = (target: FlyTarget) => Promise<void>;
 
+type TimeOfDay = "day" | "sunset" | "night";
+
 type LandingScene3DProps = {
   flyToRef?: React.MutableRefObject<FlyToFn | null>;
   initialFlyFrom?: FlyTarget;
+  timeOfDay?: TimeOfDay;
 };
 
-function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
+const TIME_CONFIGS: Record<TimeOfDay, { sky: number; fog: number; ambient: number; ambientIntensity: number; sun: number; sunIntensity: number; hemiSky: number; hemiGround: number; exposure: number }> = {
+  day: { sky: 0x87ceeb, fog: 0x87ceeb, ambient: 0xfff8e1, ambientIntensity: 0.7, sun: 0xfff4e0, sunIntensity: 1.6, hemiSky: 0xd0eeff, hemiGround: 0xc8f082, exposure: 1.4 },
+  sunset: { sky: 0xff8c5a, fog: 0xe07040, ambient: 0xffbe8a, ambientIntensity: 0.5, sun: 0xff6030, sunIntensity: 1.2, hemiSky: 0xff9060, hemiGround: 0x8a4020, exposure: 1.1 },
+  night: { sky: 0x0a0e2a, fog: 0x080c20, ambient: 0x303860, ambientIntensity: 0.3, sun: 0x6080cc, sunIntensity: 0.4, hemiSky: 0x1a2050, hemiGround: 0x0a1020, exposure: 0.7 },
+};
+
+function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: LandingScene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -19,9 +28,10 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     const container = containerRef.current;
     if (!container) return;
 
+    const tc = TIME_CONFIGS[timeOfDay];
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.FogExp2(0x87ceeb, 0.004);
+    scene.background = new THREE.Color(tc.sky);
+    scene.fog = new THREE.FogExp2(tc.fog, 0.004);
 
     // Camera: aerial view, will orbit. Wider FOV on portrait/mobile to show all islands
     const isPortrait = container.clientHeight > container.clientWidth;
@@ -43,8 +53,8 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     container.appendChild(renderer.domElement);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xfff8e1, 0.7));
-    const sunLight = new THREE.DirectionalLight(0xfff4e0, 1.6);
+    scene.add(new THREE.AmbientLight(tc.ambient, tc.ambientIntensity));
+    const sunLight = new THREE.DirectionalLight(tc.sun, tc.sunIntensity);
     sunLight.position.set(12, 20, 8);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(1024, 1024);
@@ -55,7 +65,8 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     sunLight.shadow.camera.top = 25;
     sunLight.shadow.camera.bottom = -25;
     scene.add(sunLight);
-    scene.add(new THREE.HemisphereLight(0xd0eeff, 0xc8f082, 0.5));
+    scene.add(new THREE.HemisphereLight(tc.hemiSky, tc.hemiGround, 0.5));
+    renderer.toneMappingExposure = tc.exposure;
 
     // === OUTLINE MATERIAL ===
     const outlineMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide });
@@ -1524,7 +1535,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [timeOfDay]);
 
   return <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />;
 }

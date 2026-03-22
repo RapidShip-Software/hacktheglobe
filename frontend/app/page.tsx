@@ -66,11 +66,16 @@ const INTERFACES: Array<{
   },
 ];
 
+type TimeOfDay = "day" | "sunset" | "night";
+const TIME_ICONS: Record<TimeOfDay, string> = { day: "\u2600\uFE0F", sunset: "\u{1F305}", night: "\u{1F319}" };
+const TIME_CYCLE: TimeOfDay[] = ["day", "sunset", "night"];
+
 function HomePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const flyToRef = useRef<FlyToFn | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
 
   const fromParam = searchParams.get("from") as FlyTarget | null;
   const initialFlyFrom = fromParam && ["garden", "nest", "clinical"].includes(fromParam) ? fromParam : undefined;
@@ -89,7 +94,16 @@ function HomePageInner() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Garden Scene Background */}
-      <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} />
+      <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} timeOfDay={timeOfDay} />
+
+      {/* Time of day toggle */}
+      <button
+        onClick={() => setTimeOfDay((prev) => TIME_CYCLE[(TIME_CYCLE.indexOf(prev) + 1) % 3])}
+        className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/30 active:scale-90 transition-all"
+        title={`Switch to ${TIME_CYCLE[(TIME_CYCLE.indexOf(timeOfDay) + 1) % 3]}`}
+      >
+        {TIME_ICONS[timeOfDay]}
+      </button>
 
       {/* White fade overlay during transition */}
       <AnimatePresence>
@@ -126,18 +140,17 @@ function HomePageInner() {
               Canopy
             </span>
           </motion.div>
-          <p className="text-sm md:text-base font-medium text-white/60 italic tracking-wide -mt-4 drop-shadow">
+          <p className="text-sm md:text-base font-extrabold text-white italic tracking-wide -mt-4 text-center w-full drop-shadow-md">
             shelter for the people you love.
           </p>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight">
-            <span className="text-white drop-shadow-xl">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight drop-shadow-2xl flex flex-col items-center">
+            <span className="text-white">
               Continuous Care,
             </span>
-            <br />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-lg">
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 bg-clip-text text-transparent mt-1">
               Naturally
             </span>
           </h1>
