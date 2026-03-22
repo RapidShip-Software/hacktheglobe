@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, SmilePlus, ArrowLeft, Check, Pill, ClipboardList, Users } from "lucide-react";
 import { AuroraBackground } from "@/components/garden/aurora-background";
 import { ButterflyContact } from "@/components/garden/butterfly-contact";
+import { GardenGate } from "@/components/garden/garden-gate";
 import { BpEntryFlow } from "@/components/garden/bp-entry-flow";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { api } from "@/lib/api";
@@ -132,6 +133,7 @@ function GardenPage() {
   const completedCount = checklist.filter((i) => i.done).length;
   const pendingItems = checklist.filter((i) => !i.done);
   const [showBloomTips, setShowBloomTips] = useState(false);
+  const [showFlowerChat, setShowFlowerChat] = useState(false);
 
   const iconMap = {
     pill: Pill,
@@ -250,13 +252,29 @@ function GardenPage() {
         </BlurFade>
       </div>
 
-      {/* Flower health tag (tap to see bloom breakdown) */}
+      {/* Flower interaction area - tap to talk to AI */}
       <motion.div
-        className="absolute left-1/2 -translate-x-1/2 z-20 bottom-[38%] md:bottom-[38%]"
+        className="absolute left-1/2 -translate-x-1/2 z-20 bottom-[36%] md:bottom-[36%] flex flex-col items-center gap-2"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5 }}
       >
+        {/* Tap flower to talk button */}
+        <motion.button
+          onClick={() => setShowFlowerChat(true)}
+          className="flex flex-col items-center gap-1.5 cursor-pointer"
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-pink-400/30 backdrop-blur-sm border-2 border-pink-300/50 flex items-center justify-center shadow-xl shadow-pink-500/30">
+            <span className="text-3xl md:text-4xl">{"\u{1F33A}"}</span>
+          </div>
+          <span className="text-xs md:text-sm text-white/80 font-semibold drop-shadow bg-black/30 backdrop-blur-sm px-3 py-0.5 rounded-full border border-white/15">Talk to me</span>
+        </motion.button>
+
+        {/* Health status + bloom tips */}
         <button
           onClick={() => setShowBloomTips(!showBloomTips)}
           className="inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-black/40 backdrop-blur-sm shadow-lg border border-white/20 cursor-pointer hover:bg-black/50 transition-colors"
@@ -282,7 +300,7 @@ function GardenPage() {
         <AnimatePresence>
           {showBloomTips && (
             <motion.div
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 md:w-64 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 p-3 shadow-xl"
+              className="absolute top-full mt-1 left-1/2 -translate-x-1/2 w-56 md:w-64 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 p-3 shadow-xl"
               initial={{ opacity: 0, y: -5, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -5, scale: 0.95 }}
@@ -385,6 +403,9 @@ function GardenPage() {
         )}
       </AnimatePresence>
 
+
+      {/* AI Chat (triggered by tapping the flower) */}
+      <GardenGate patientName="Margaret" externalOpen={showFlowerChat} onClose={() => setShowFlowerChat(false)} />
 
       {/* Grass / ground */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-600/30 via-green-500/15 to-transparent pointer-events-none" />

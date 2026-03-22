@@ -28,10 +28,17 @@ declare global {
 
 type GardenGateProps = {
   patientName: string;
+  externalOpen?: boolean;
+  onClose?: () => void;
 };
 
-function GardenGate({ patientName }: GardenGateProps) {
-  const [isOpen, setIsOpen] = useState(false);
+function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = externalOpen ?? internalOpen;
+  const setIsOpen = (v: boolean) => {
+    setInternalOpen(v);
+    if (!v && onClose) onClose();
+  };
   const [messages, setMessages] = useState<Array<{ role: "user" | "ai"; text: string }>>([
     { role: "ai", text: `Hello ${patientName}! I'm here to help you with anything you need. How are you feeling today?` },
   ]);
@@ -183,24 +190,26 @@ function GardenGate({ patientName }: GardenGateProps) {
 
   return (
     <>
-      {/* Gate button */}
-      <motion.button
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2"
-        onClick={() => setIsOpen(true)}
-        whileHover={{ scale: 1.1, x: -4 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <motion.div
-          className="w-16 h-20 rounded-t-full border-4 border-amber-700 bg-gradient-to-b from-amber-600 to-amber-800 flex items-end justify-center pb-1.5 shadow-lg"
-          animate={{ rotateY: [0, 5, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
+      {/* Gate button (hidden when externally controlled) */}
+      {externalOpen === undefined && (
+        <motion.button
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2"
+          onClick={() => setIsOpen(true)}
+          whileHover={{ scale: 1.1, x: -4 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <div className="w-2 h-2 rounded-full bg-amber-300" />
-        </motion.div>
-        <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20">
-          Help
-        </span>
-      </motion.button>
+          <motion.div
+            className="w-16 h-20 rounded-t-full border-4 border-amber-700 bg-gradient-to-b from-amber-600 to-amber-800 flex items-end justify-center pb-1.5 shadow-lg"
+            animate={{ rotateY: [0, 5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <div className="w-2 h-2 rounded-full bg-amber-300" />
+          </motion.div>
+          <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20">
+            Help
+          </span>
+        </motion.button>
+      )}
 
       {/* Chat panel */}
       <AnimatePresence>

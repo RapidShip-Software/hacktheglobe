@@ -19,8 +19,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     scene.fog = new THREE.Fog(skyColor, 25, 60);
 
     const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.1, 200);
-    camera.position.set(0, 7, 22);
-    camera.lookAt(0, 1, 0);
+    camera.position.set(0, 5, 14);
+    camera.lookAt(0, 1.5, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -879,8 +879,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
         if (Math.abs(ff.position.z) > 10) ff.userData.driftZ *= -1;
       });
       camera.position.x = Math.sin(time * 0.3) * 0.3;
-      camera.position.y = 7 + Math.sin(time * 0.5) * 0.15;
-      camera.lookAt(0, 1, 0);
+      camera.position.y = 5 + Math.sin(time * 0.5) * 0.15;
+      camera.lookAt(0, 1.5, 0);
       plantGroup.rotation.z = Math.sin(time * 0.8) * 0.015;
       plantGroup.rotation.x = Math.sin(time * 0.6) * 0.008;
       flowerParts.forEach((p, i) => { const s = 1 + Math.sin(time * 2 + i * 0.5) * 0.04; p.scale.x = s; p.scale.z = s * 0.7; });
