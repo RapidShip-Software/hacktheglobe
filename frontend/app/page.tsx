@@ -111,12 +111,12 @@ function HomePageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo.png" alt="Canopy" className="h-14 md:h-16 drop-shadow-xl" />
+            <img src="/logo.png" alt="Canopy" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" />
           </motion.div>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-center mb-3 leading-tight drop-shadow-lg">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-3 leading-tight drop-shadow-lg">
             <span className="text-white">
               Continuous Care,
             </span>
