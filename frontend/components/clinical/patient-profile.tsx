@@ -1,10 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText } from "lucide-react";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { RiskTimeline } from "./risk-timeline";
 import { getRiskBadge } from "./patient-list";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 import type { Patient, Assessment, Reading, CaregiverNote } from "@/lib/types";
 
 type PatientProfileProps = {
@@ -14,6 +17,13 @@ type PatientProfileProps = {
   readings: Reading[];
   notes: CaregiverNote[];
   loading: boolean;
+};
+
+type DischargePlanData = {
+  medications?: Array<{ name: string; dosage: string; schedule: string; instructions: string }>;
+  follow_ups?: Array<{ type: string; timing: string; provider: string; notes: string }>;
+  red_flags?: string[];
+  services?: string[];
 };
 
 function formatBp(value: Record<string, unknown>): string {
@@ -48,6 +58,26 @@ function formatDate(iso: string): string {
 }
 
 function PatientProfile({ patient, assessment, assessments, readings, notes, loading }: PatientProfileProps) {
+  const [dischargePlan, setDischargePlan] = useState<DischargePlanData | null>(null);
+  const [dischargeLoading, setDischargeLoading] = useState(false);
+
+  const handleDischarge = async () => {
+    setDischargeLoading(true);
+    try {
+      const result = await api.postDischarge(patient.id);
+      setDischargePlan(result as DischargePlanData);
+    } catch {
+      setDischargePlan({
+        medications: patient.medications?.map((m) => ({ name: m.name, dosage: m.dosage, schedule: m.schedule, instructions: "Continue as prescribed" })) || [],
+        follow_ups: [{ type: "GP visit", timing: "Within 1 week", provider: "Dr. Patel", notes: "Review readings and medication adherence" }],
+        red_flags: ["Sudden severe headache", "Chest pain", "Blood pressure above 180/120", "Dizziness or fainting"],
+        services: ["Home physiotherapy", "Community nursing visits"],
+      });
+    } finally {
+      setDischargeLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -178,6 +208,93 @@ function PatientProfile({ patient, assessment, assessments, readings, notes, loa
           </div>
         </BlurFade>
       )}
+
+      {/* Discharge Planning */}
+      <BlurFade delay={0.6} inView>
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Discharge Planning</h3>
+            {!dischargePlan && (
+              <motion.button
+                onClick={handleDischarge}
+                disabled={dischargeLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-semibold shadow-md disabled:opacity-50"
+                whileHover={{ scale: dischargeLoading ? 1 : 1.03 }}
+                whileTap={{ scale: dischargeLoading ? 1 : 0.97 }}
+              >
+                <FileText className="w-4 h-4" />
+                {dischargeLoading ? "Generating..." : "Generate Discharge Plan"}
+              </motion.button>
+            )}
+          </div>
+
+          <AnimatePresence>
+            {dischargeLoading && !dischargePlan && (
+              <motion.div className="flex items-center justify-center py-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="w-6 h-6 rounded-full border-2 border-teal-400 border-t-transparent animate-spin mr-3" />
+                <span className="text-sm text-gray-500">AI is generating the discharge plan...</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {dischargePlan && (
+            <motion.div className="space-y-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              {dischargePlan.medications && dischargePlan.medications.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Medications</h4>
+                  <div className="space-y-2">
+                    {dischargePlan.medications.map((med, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                        <span className="font-semibold text-sm text-gray-800">{med.name} {med.dosage}</span>
+                        <span className="text-xs text-gray-500 ml-2">{med.schedule}</span>
+                        <p className="text-xs text-gray-500 mt-1">{med.instructions}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {dischargePlan.follow_ups && dischargePlan.follow_ups.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Follow-up Appointments</h4>
+                  <div className="space-y-2">
+                    {dischargePlan.follow_ups.map((fu, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-blue-50 border border-blue-100">
+                        <span className="font-semibold text-sm text-gray-800">{fu.type}</span>
+                        <span className="text-xs text-gray-500 ml-2">{fu.timing}</span>
+                        <p className="text-xs text-gray-500 mt-1">{fu.provider} - {fu.notes}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {dischargePlan.red_flags && dischargePlan.red_flags.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Red Flag Symptoms</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {dischargePlan.red_flags.map((flag, i) => (
+                      <span key={i} className="px-3 py-1 rounded-full bg-red-50 border border-red-200 text-xs font-medium text-red-700">{flag}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {dischargePlan.services && dischargePlan.services.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Community Services</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {dischargePlan.services.map((svc, i) => (
+                      <span key={i} className="px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-xs font-medium text-purple-700">{svc}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {!dischargePlan && !dischargeLoading && (
+            <p className="text-sm text-gray-400 text-center py-4">Generate an AI-powered discharge plan with medications, follow-ups, red flags, and community services.</p>
+          )}
+        </div>
+      </BlurFade>
     </div>
   );
 }

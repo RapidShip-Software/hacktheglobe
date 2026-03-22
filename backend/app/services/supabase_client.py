@@ -178,4 +178,4 @@ def get_caregiver_notes(patient_id: str, limit: int = 20) -> list[dict]:
         .limit(limit)
         .execute()
     )
-    return resp.data
+    return _fix_rows(resp.data)

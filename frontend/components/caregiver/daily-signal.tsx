@@ -16,24 +16,24 @@ const statusConfig = {
     label: "All Clear",
     gradient: "from-emerald-400 to-green-500",
     shineColours: ["#4ade80", "#22c55e", "#86efac"],
-    bg: "bg-emerald-50",
-    text: "text-emerald-800",
+    bg: "bg-emerald-900/20 backdrop-blur-xl border border-emerald-400/20",
+    text: "text-emerald-300",
   },
   yellow: {
     emoji: "🟡",
     label: "Needs Attention",
     gradient: "from-amber-400 to-yellow-500",
     shineColours: ["#fbbf24", "#f59e0b", "#fde68a"],
-    bg: "bg-amber-50",
-    text: "text-amber-800",
+    bg: "bg-amber-900/20 backdrop-blur-xl border border-amber-400/20",
+    text: "text-amber-300",
   },
   red: {
     emoji: "🔴",
     label: "Alert",
     gradient: "from-red-400 to-rose-500",
     shineColours: ["#f87171", "#ef4444", "#fca5a5"],
-    bg: "bg-red-50",
-    text: "text-red-800",
+    bg: "bg-red-900/20 backdrop-blur-xl border border-red-400/20",
+    text: "text-red-300",
   },
 };
 
@@ -62,14 +62,14 @@ function DailySignal({ status, summary, timestamp, patientName }: DailySignalPro
               <span className={`text-xs font-semibold uppercase tracking-wider ${config.text}`}>
                 {config.label}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-white/40">
                 {timestamp}
               </span>
             </div>
-            <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-2">
+            <h2 className="text-lg md:text-xl font-semibold text-white mb-2 drop-shadow">
               {patientName}&apos;s Daily Update
             </h2>
-            <p className="text-base text-gray-600 leading-relaxed">
+            <p className="text-base text-white/80 leading-relaxed">
               {summary}
             </p>
           </div>

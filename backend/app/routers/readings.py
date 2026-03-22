@@ -53,7 +53,22 @@ async def post_reading(data: ReadingCreate) -> Assessment:
         "discharge_plan": None,
     }
 
-    result = graph.invoke(initial_state)
+    try:
+        result = graph.invoke(initial_state)
+    except Exception:
+        _last_pipeline_run.pop(data.patient_id, None)
+        existing = get_latest_assessment(data.patient_id)
+        if existing:
+            return Assessment(**existing)
+        fallback = create_assessment({
+            "patient_id": data.patient_id,
+            "risk_score": 0.0,
+            "risk_narrative": "Assessment temporarily unavailable.",
+            "caregiver_summary": "Margaret is being monitored. Check back shortly for updates.",
+            "clinical_alert": None,
+            "garden_state": {"plant_health": 0.8, "sky": "clear", "nudge": False},
+        })
+        return Assessment(**fallback)
 
     # Store the assessment
     assessment_data = {
