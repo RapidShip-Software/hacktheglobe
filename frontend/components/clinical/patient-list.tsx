@@ -45,7 +45,7 @@ function PatientList({ patients, selectedId, onSelect, loading }: PatientListPro
             C
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Canopy Clinic</h1>
+            <h1 className="text-lg font-bold text-gray-900">The Clinic</h1>
             <p className="text-xs text-gray-400">Patient monitoring</p>
           </div>
         </div>

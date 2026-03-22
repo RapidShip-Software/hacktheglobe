@@ -21,7 +21,7 @@ Three interconnected layers, one platform, each with its own immersive 3D island
 |-------|-----|-------------|
 | **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Health-reactive 3D scene with flowers, animals, and weather. Zero digital literacy required. |
 | **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a cozy nest, lighthouse, and nature. |
-| **Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
+| **The Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
 
 ### Live Demo
 
