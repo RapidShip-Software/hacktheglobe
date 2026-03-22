@@ -65,18 +65,6 @@ const INTERFACES: Array<{
     border: "hover:border-teal-300/60",
     shadow: "hover:shadow-teal-200/30",
   },
-  {
-    href: "/team",
-    flyTarget: "team",
-    icon: "\u{1F465}",
-    title: "The Team",
-    subtitle: "Meet the people",
-    description: "The humans behind Canopy. Innovation engineers, analysts, and strategists.",
-    gradient: "from-violet-400 to-purple-500",
-    bgHover: "group-hover:bg-violet-50/30",
-    border: "hover:border-violet-300/60",
-    shadow: "hover:shadow-violet-200/30",
-  },
 ];
 
 type TimeOfDay = "day" | "sunset" | "night";
@@ -190,7 +178,7 @@ function HomePageInner() {
         </BlurFade>
 
         {/* Interface Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
           {INTERFACES.map((item, index) => (
             <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
               <motion.div

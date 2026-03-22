@@ -3,8 +3,14 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
 import { BlurFade } from "@/components/shared/blur-fade";
+
+const TeamScene3D = dynamic(
+  () => import("@/components/team/team-scene-3d").then((m) => m.TeamScene3D),
+  { ssr: false }
+);
 
 const TEAM = [
   {
@@ -47,19 +53,9 @@ function TeamPage() {
   }, [router]);
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-gradient-to-br from-violet-950 via-purple-900 to-indigo-950">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full"
-            style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
-            animate={{ y: [0, -30, 0], opacity: [0.1, 0.5, 0.1] }}
-            transition={{ duration: 3 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
-          />
-        ))}
-      </div>
+    <main className="min-h-screen relative overflow-hidden">
+      {/* 3D Campfire Scene */}
+      <TeamScene3D />
 
       {/* Back button */}
       <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20">
