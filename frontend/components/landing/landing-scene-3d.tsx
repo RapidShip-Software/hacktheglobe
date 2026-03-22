@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function LandingScene3D() {
+type FlyToFn = (target: "clinical") => Promise<void>;
+
+type LandingScene3DProps = {
+  flyToRef?: React.MutableRefObject<FlyToFn | null>;
+};
+
+function LandingScene3D({ flyToRef }: LandingScene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -459,6 +465,330 @@ function LandingScene3D() {
     }
 
     scene.add(nestIslandGroup);
+
+    // === CLINICAL ISLAND (third island, hospital) ===
+    const CLINICAL_ISLAND_X = 28;
+    const CLINICAL_ISLAND_Z = 22;
+    const CLINICAL_ISLAND_RADIUS = 10;
+    const clinicalIslandGroup = new THREE.Group();
+    clinicalIslandGroup.position.set(CLINICAL_ISLAND_X, 0, CLINICAL_ISLAND_Z);
+
+    // Island base
+    const clinicalIslandGeo = new THREE.CylinderGeometry(CLINICAL_ISLAND_RADIUS, CLINICAL_ISLAND_RADIUS - 0.8, 1.8, 28, 4);
+    const ciPos = clinicalIslandGeo.attributes.position;
+    for (let i = 0; i < ciPos.count; i++) {
+      const y = ciPos.getY(i);
+      if (y < -0.3) {
+        const x = ciPos.getX(i);
+        const z = ciPos.getZ(i);
+        const dist = Math.sqrt(x * x + z * z);
+        if (dist > CLINICAL_ISLAND_RADIUS * 0.5) {
+          ciPos.setY(i, y - (dist / CLINICAL_ISLAND_RADIUS) * 0.6);
+        }
+      }
+    }
+    clinicalIslandGeo.computeVertexNormals();
+    const clinicalIsland = new THREE.Mesh(clinicalIslandGeo, new THREE.MeshLambertMaterial({ map: grassTex, color: 0x4aba6e }));
+    clinicalIsland.position.y = -0.2;
+    clinicalIsland.receiveShadow = true;
+    clinicalIslandGroup.add(clinicalIsland);
+
+    // Beach ring
+    const clinicalBeach = new THREE.Mesh(
+      new THREE.TorusGeometry(CLINICAL_ISLAND_RADIUS - 0.2, 0.7, 8, 28),
+      new THREE.MeshLambertMaterial({ color: 0xe8d5a3 })
+    );
+    clinicalBeach.rotation.x = -Math.PI / 2;
+    clinicalBeach.position.y = -0.5;
+    clinicalIslandGroup.add(clinicalBeach);
+
+    // === HOSPITAL BUILDING ===
+    const hospitalGroup = new THREE.Group();
+    const creamMat = new THREE.MeshPhongMaterial({ color: 0xfdf0d5, shininess: 15 });
+
+    // Main block
+    const mainBlock = new THREE.Mesh(new THREE.BoxGeometry(5, 3.5, 4), creamMat);
+    mainBlock.position.y = 1.75;
+    mainBlock.castShadow = true;
+    addOutline(mainBlock, 0.02);
+    hospitalGroup.add(mainBlock);
+
+    // Side wing
+    const sideWing = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 3), creamMat);
+    sideWing.position.set(3.5, 1.25, 0.5);
+    sideWing.castShadow = true;
+    addOutline(sideWing, 0.02);
+    hospitalGroup.add(sideWing);
+
+    // Main roof
+    const roofMat = new THREE.MeshPhongMaterial({ color: 0xd4603a, shininess: 20 });
+    const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(3.8, 1.8, 4), roofMat);
+    mainRoof.position.y = 4.4;
+    mainRoof.rotation.y = Math.PI / 4;
+    addOutline(mainRoof, 0.03);
+    hospitalGroup.add(mainRoof);
+
+    // Side wing roof
+    const sideRoof = new THREE.Mesh(new THREE.ConeGeometry(2.5, 1.4, 4), roofMat);
+    sideRoof.position.set(3.5, 3.2, 0.5);
+    sideRoof.rotation.y = Math.PI / 4;
+    addOutline(sideRoof, 0.03);
+    hospitalGroup.add(sideRoof);
+
+    // Windows (glowing)
+    const windowFrameMat = new THREE.MeshPhongMaterial({ color: 0x8B6914, shininess: 15 });
+    const windowGlassMat = new THREE.MeshPhongMaterial({ color: 0xfff9c4, transparent: true, opacity: 0.6, emissive: 0xfff176, emissiveIntensity: 0.4, shininess: 60 });
+    const windowBoxMat = new THREE.MeshLambertMaterial({ color: 0xc0652a });
+    const windowFlowerCols = [0xf472b6, 0xe11d48, 0xfbbf24, 0xfb923c];
+
+    function addWindow(px: number, py: number, pz: number, ry = 0) {
+      const wg = new THREE.Group();
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.85, 0.08), windowFrameMat);
+      addOutline(frame, 0.04);
+      wg.add(frame);
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.7, 0.06), windowGlassMat);
+      glass.position.z = 0.02;
+      wg.add(glass);
+      // Flower box
+      const fb = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.15, 0.25), windowBoxMat);
+      fb.position.set(0, -0.5, 0.1);
+      wg.add(fb);
+      for (let f = 0; f < 3; f++) {
+        const fl = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), new THREE.MeshPhongMaterial({ color: windowFlowerCols[Math.floor(Math.random() * 4)], shininess: 20 }));
+        fl.position.set((f - 1) * 0.25, -0.35, 0.15);
+        wg.add(fl);
+      }
+      wg.position.set(px, py, pz);
+      wg.rotation.y = ry;
+      hospitalGroup.add(wg);
+      // Warm light behind window
+      const wl = new THREE.PointLight(0xfff9c4, 0.6, 6);
+      wl.position.set(px, py, pz);
+      hospitalGroup.add(wl);
+    }
+
+    // Front windows
+    addWindow(-1.2, 2.2, -2.02);
+    addWindow(1.2, 2.2, -2.02);
+    // Side wing window
+    addWindow(3.5, 1.8, -1.52);
+    // Back windows
+    addWindow(-1.2, 2.2, 2.02, Math.PI);
+    addWindow(1.2, 2.2, 2.02, Math.PI);
+
+    // Entrance door
+    const doorMat = new THREE.MeshPhongMaterial({ color: 0x4a7a4a, shininess: 30 });
+    const doorL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, 0.06), doorMat);
+    doorL.position.set(-0.27, 0.6, -2.03);
+    addOutline(doorL, 0.04);
+    hospitalGroup.add(doorL);
+    const doorR = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, 0.06), doorMat);
+    doorR.position.set(0.27, 0.6, -2.03);
+    addOutline(doorR, 0.04);
+    hospitalGroup.add(doorR);
+    // Door arch
+    const doorArch = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.08, 6, 12, Math.PI), windowFrameMat);
+    doorArch.position.set(0, 1.2, -2.04);
+    doorArch.rotation.z = Math.PI;
+    hospitalGroup.add(doorArch);
+    // Door handle
+    const handle = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 4), new THREE.MeshPhongMaterial({ color: 0xc4a000, shininess: 80 }));
+    handle.position.set(0.15, 0.6, -2.08);
+    hospitalGroup.add(handle);
+    // Doorstep
+    const doorstep = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.5), new THREE.MeshLambertMaterial({ color: 0xe8d5a3 }));
+    doorstep.position.set(0, 0.06, -2.3);
+    hospitalGroup.add(doorstep);
+
+    // Red cross on front wall
+    const crossMat = new THREE.MeshPhongMaterial({ color: 0xe11d48, shininess: 20 });
+    const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.0, 0.08), crossMat);
+    crossV.position.set(0, 3.2, -2.02);
+    addOutline(crossV, 0.04);
+    hospitalGroup.add(crossV);
+    const crossH = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.3, 0.08), crossMat);
+    crossH.position.set(0, 3.2, -2.02);
+    addOutline(crossH, 0.04);
+    hospitalGroup.add(crossH);
+
+    // Chimney
+    const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 1.2, 6), new THREE.MeshPhongMaterial({ color: 0xc08040, shininess: 10 }));
+    chimney.position.set(-1.0, 4.8, -0.5);
+    addOutline(chimney, 0.04);
+    hospitalGroup.add(chimney);
+
+    // Smoke puffs
+    const smokePuffs: THREE.Mesh[] = [];
+    const smokeMat = new THREE.MeshLambertMaterial({ color: 0xddd8d0, transparent: true, opacity: 0.5 });
+    for (let i = 0; i < 3; i++) {
+      const puff = new THREE.Mesh(new THREE.SphereGeometry(0.15 + i * 0.08, 6, 5), smokeMat.clone());
+      puff.position.set(-1.0 + (Math.random() - 0.5) * 0.2, 5.5 + i * 0.6, -0.5);
+      hospitalGroup.add(puff);
+      smokePuffs.push(puff);
+    }
+
+    // Welcome sign
+    const signPost = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.2, 5), new THREE.MeshLambertMaterial({ color: 0x6b3e1e }));
+    signPost.position.set(2.8, 0.6, -2.8);
+    hospitalGroup.add(signPost);
+    const signBoard = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 0.06), new THREE.MeshPhongMaterial({ color: 0xfdf0d5, shininess: 10 }));
+    signBoard.position.set(2.8, 1.3, -2.8);
+    addOutline(signBoard, 0.04);
+    hospitalGroup.add(signBoard);
+
+    hospitalGroup.position.set(0, 0, 0);
+    clinicalIslandGroup.add(hospitalGroup);
+
+    // === PARK BENCHES ===
+    function createBench(bx: number, bz: number, ry: number) {
+      const bg = new THREE.Group();
+      const woodMat = new THREE.MeshLambertMaterial({ color: 0x8B6914 });
+      // Seat
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.5), woodMat);
+      seat.position.y = 0.45;
+      addOutline(seat, 0.04);
+      bg.add(seat);
+      // Legs
+      for (const lx of [-0.55, 0.55]) {
+        for (const lz of [-0.15, 0.15]) {
+          const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.08), woodMat);
+          leg.position.set(lx, 0.225, lz);
+          bg.add(leg);
+        }
+      }
+      // Back
+      const back = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 0.08), woodMat);
+      back.position.set(0, 0.75, -0.22);
+      back.rotation.x = -0.15;
+      addOutline(back, 0.04);
+      bg.add(back);
+      bg.position.set(bx, 0, bz);
+      bg.rotation.y = ry;
+      return bg;
+    }
+    clinicalIslandGroup.add(createBench(-2.5, -3.5, 0.3));
+    clinicalIslandGroup.add(createBench(2.5, -4, -0.2));
+
+    // === PEOPLE FIGURES ===
+    function createPerson(px: number, pz: number, facing: number, clothesCol: number, skinCol: number) {
+      const pg = new THREE.Group();
+      // Body
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.22, 7, 6), new THREE.MeshLambertMaterial({ color: clothesCol }));
+      body.position.y = 0.55;
+      body.scale.set(0.6, 1.0, 0.5);
+      addOutline(body, 0.04);
+      pg.add(body);
+      // Head
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 6), new THREE.MeshLambertMaterial({ color: skinCol }));
+      head.position.y = 0.9;
+      addOutline(head, 0.04);
+      pg.add(head);
+      // Arms
+      const armMat = new THREE.MeshLambertMaterial({ color: clothesCol });
+      for (const side of [-1, 1]) {
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.03, 0.35, 5), armMat);
+        arm.position.set(side * 0.18, 0.5, 0);
+        arm.rotation.z = side * 0.3;
+        pg.add(arm);
+      }
+      // Legs
+      const legMat = new THREE.MeshLambertMaterial({ color: 0x4a5568 });
+      for (const side of [-1, 1]) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.04, 0.4, 5), legMat);
+        leg.position.set(side * 0.08, 0.2, 0);
+        pg.add(leg);
+      }
+      pg.position.set(px, 0.05, pz);
+      pg.rotation.y = facing;
+      return pg;
+    }
+    clinicalIslandGroup.add(createPerson(-1.5, -3.0, 0.5, 0x60a5fa, 0xf5d0a9));
+    clinicalIslandGroup.add(createPerson(0.5, -2.8, -0.3, 0xfbbf24, 0xc68642));
+    clinicalIslandGroup.add(createPerson(3.0, -3.5, 0.8, 0xf472b6, 0xf5d0a9));
+
+    // === FOUNTAIN ===
+    const fountainGroup = new THREE.Group();
+    const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 0.3, 16), new THREE.MeshPhongMaterial({ color: 0xe8d5a3, shininess: 10 }));
+    fountainBase.position.y = 0.15;
+    addOutline(fountainBase, 0.03);
+    fountainGroup.add(fountainBase);
+    const fountainWater = new THREE.Mesh(new THREE.CircleGeometry(1.0, 16), new THREE.MeshPhongMaterial({ color: 0x4a90d9, shininess: 80, transparent: true, opacity: 0.7 }));
+    fountainWater.rotation.x = -Math.PI / 2;
+    fountainWater.position.y = 0.31;
+    fountainGroup.add(fountainWater);
+    const fountainPost = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.8, 6), new THREE.MeshPhongMaterial({ color: 0xe8d5a3, shininess: 10 }));
+    fountainPost.position.y = 0.7;
+    fountainGroup.add(fountainPost);
+    const fountainSpray: THREE.Mesh[] = [];
+    for (let i = 0; i < 5; i++) {
+      const drop = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), new THREE.MeshBasicMaterial({ color: 0xc8e8ff, transparent: true, opacity: 0.7 }));
+      drop.position.set((Math.random() - 0.5) * 0.4, 1.1 + i * 0.15, (Math.random() - 0.5) * 0.4);
+      fountainGroup.add(drop);
+      fountainSpray.push(drop);
+    }
+    fountainGroup.position.set(5, 0, 4);
+    clinicalIslandGroup.add(fountainGroup);
+
+    // === CLINICAL ISLAND NATURE ===
+    const clinicalTreeColors = [0x2e8b57, 0x3cb371, 0x4aba6e];
+    const clinicalTreePositions = [
+      { x: 6, z: -3, s: 0.75 }, { x: -7, z: 2, s: 0.8 }, { x: 4, z: 6, s: 0.7 },
+      { x: -5, z: 5, s: 0.65 }, { x: 7, z: 3, s: 0.7 }, { x: -4, z: -5, s: 0.75 },
+      { x: -6, z: -3, s: 0.7 }, { x: 3, z: -7, s: 0.65 },
+    ];
+    clinicalTreePositions.forEach((tp) => {
+      if (Math.sqrt(tp.x * tp.x + tp.z * tp.z) < CLINICAL_ISLAND_RADIUS - 1.5) {
+        clinicalIslandGroup.add(tree(tp.x, tp.z, tp.s, clinicalTreeColors[Math.floor(Math.random() * 3)]));
+      }
+    });
+
+    const clinicalShrubColors = [0x2d7a2d, 0x357a35, 0x3cb371];
+    const clinicalShrubPositions = [
+      { x: -3, z: -5 }, { x: 4, z: -5 }, { x: -6, z: 0 }, { x: 6, z: 0 },
+    ];
+    clinicalShrubPositions.forEach((sp) => {
+      if (Math.sqrt(sp.x * sp.x + sp.z * sp.z) < CLINICAL_ISLAND_RADIUS - 2) {
+        clinicalIslandGroup.add(shrub(sp.x, sp.z, 0.6 + Math.random() * 0.4, clinicalShrubColors[Math.floor(Math.random() * 3)]));
+      }
+    });
+
+    // Flowers around building
+    const clinicalFlowerColors = [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48, 0xffffff];
+    for (let i = 0; i < 20; i++) {
+      const fx = (Math.random() - 0.5) * CLINICAL_ISLAND_RADIUS * 1.4;
+      const fz = (Math.random() - 0.5) * CLINICAL_ISLAND_RADIUS * 1.4;
+      if (Math.sqrt(fx * fx + fz * fz) > CLINICAL_ISLAND_RADIUS - 2) continue;
+      // Skip building area
+      if (Math.abs(fx) < 6 && Math.abs(fz) < 4) continue;
+      const ffg = new THREE.Group();
+      ffg.add(new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.3, 4), new THREE.MeshLambertMaterial({ color: 0x2d7a2d })));
+      ffg.children[0].position.y = 0.15;
+      const fcol = clinicalFlowerColors[Math.floor(Math.random() * clinicalFlowerColors.length)];
+      for (let p = 0; p < 5; p++) {
+        const pa = (p / 5) * Math.PI * 2;
+        const petal = new THREE.Mesh(new THREE.SphereGeometry(0.04, 5, 4), new THREE.MeshPhongMaterial({ color: fcol, shininess: 20 }));
+        petal.position.set(Math.cos(pa) * 0.04, 0.32, Math.sin(pa) * 0.04);
+        petal.scale.set(1.3, 0.3, 0.6);
+        ffg.add(petal);
+      }
+      ffg.position.set(fx, 0, fz);
+      clinicalIslandGroup.add(ffg);
+    }
+
+    // Bunting (colorful triangles)
+    const buntingColors = [0xf472b6, 0xfbbf24, 0x60a5fa, 0x4ade80, 0xfb923c];
+    for (let i = 0; i < 8; i++) {
+      const t = i / 7;
+      const bx = -2.5 + t * 8;
+      const bz = -2.5 - Math.sin(t * Math.PI) * 1.5;
+      const by = 3.0 + Math.sin(t * Math.PI) * 0.8;
+      const flag = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.25, 3), new THREE.MeshLambertMaterial({ color: buntingColors[i % 5] }));
+      flag.position.set(bx, by, bz);
+      flag.rotation.z = Math.PI;
+      clinicalIslandGroup.add(flag);
+    }
+
+    scene.add(clinicalIslandGroup);
 
     // === SUN ===
     const sunPos = new THREE.Vector3(25, 8, 18);
@@ -960,21 +1290,69 @@ function LandingScene3D() {
       scene.add(g);
     });
 
+    // === FLY-TO STATE ===
+    const flyState = {
+      active: false,
+      startPos: new THREE.Vector3(),
+      targetPos: new THREE.Vector3(),
+      startLookAt: new THREE.Vector3(0, 1, 0),
+      targetLookAt: new THREE.Vector3(),
+      duration: 1.8,
+      elapsed: 0,
+      onComplete: null as (() => void) | null,
+    };
+
+    function flyTo(target: "clinical"): Promise<void> {
+      return new Promise((resolve) => {
+        if (target === "clinical") {
+          flyState.targetPos.set(CLINICAL_ISLAND_X + 2, 8, CLINICAL_ISLAND_Z - 10);
+          flyState.targetLookAt.set(CLINICAL_ISLAND_X, 2, CLINICAL_ISLAND_Z);
+        }
+        flyState.active = true;
+        flyState.elapsed = 0;
+        flyState.startPos.copy(camera.position);
+        flyState.startLookAt.set(0, 1, 0);
+        flyState.onComplete = resolve;
+      });
+    }
+
+    if (flyToRef) {
+      flyToRef.current = flyTo;
+    }
+
     // === ANIMATION (orbiting camera) ===
     let time = 0;
     const clock = new THREE.Clock();
+    const currentLookAt = new THREE.Vector3();
 
     function animate() {
       frameRef.current = requestAnimationFrame(animate);
       const delta = clock.getDelta();
       time += delta;
 
-      // Orbit camera
-      const angle = time * ORBIT_SPEED;
-      camera.position.x = Math.cos(angle) * ORBIT_RADIUS;
-      camera.position.z = Math.sin(angle) * ORBIT_RADIUS;
-      camera.position.y = ORBIT_HEIGHT + Math.sin(time * 0.3) * 1.5;
-      camera.lookAt(0, 1, 0);
+      if (flyState.active) {
+        flyState.elapsed += delta;
+        const t = Math.min(flyState.elapsed / flyState.duration, 1);
+        // Cubic ease-in-out
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        camera.position.lerpVectors(flyState.startPos, flyState.targetPos, ease);
+        currentLookAt.lerpVectors(flyState.startLookAt, flyState.targetLookAt, ease);
+        camera.lookAt(currentLookAt);
+
+        if (t >= 1 && flyState.onComplete) {
+          flyState.active = false;
+          flyState.onComplete();
+          flyState.onComplete = null;
+        }
+      } else {
+        // Orbit camera
+        const angle = time * ORBIT_SPEED;
+        camera.position.x = Math.cos(angle) * ORBIT_RADIUS;
+        camera.position.z = Math.sin(angle) * ORBIT_RADIUS;
+        camera.position.y = ORBIT_HEIGHT + Math.sin(time * 0.3) * 1.5;
+        camera.lookAt(0, 1, 0);
+      }
 
       // Animate water
       waterTex.offset.x = time * 0.015;
@@ -1019,6 +1397,23 @@ function LandingScene3D() {
 
       // Lighthouse light pulse
       lighthouseLight.intensity = 1.0 + Math.sin(time * 2) * 0.5;
+
+      // Clinical island: smoke puffs
+      smokePuffs.forEach((puff, i) => {
+        puff.position.y += 0.008;
+        (puff.material as THREE.MeshLambertMaterial).opacity = Math.max(0, 0.5 - (puff.position.y - 5.5) * 0.15);
+        if (puff.position.y > 8) {
+          puff.position.y = 5.5 + i * 0.3;
+          puff.position.x = -1.0 + (Math.random() - 0.5) * 0.3;
+          (puff.material as THREE.MeshLambertMaterial).opacity = 0.5;
+        }
+      });
+
+      // Clinical island: fountain spray
+      fountainSpray.forEach((drop, i) => {
+        drop.position.y = 1.1 + Math.sin(time * 3 + i * 1.2) * 0.2;
+        drop.position.x = Math.sin(time * 2 + i * 0.8) * 0.15;
+      });
 
       // Plant sway
       plantGroup.rotation.z = Math.sin(time * 0.8) * 0.015;

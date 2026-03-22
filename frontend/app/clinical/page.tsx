@@ -2,9 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import { PatientList } from "@/components/clinical/patient-list";
 import { AlertCard } from "@/components/clinical/alert-card";
 import { PatientProfile } from "@/components/clinical/patient-profile";
+
+const ClinicalScene3D = dynamic(
+  () => import("@/components/clinical/clinical-scene-3d").then((m) => m.ClinicalScene3D),
+  { ssr: false }
+);
 import type { PatientWithRisk } from "@/components/clinical/types";
 import { api } from "@/lib/api";
 import { subscribeToTable } from "@/lib/supabase";
@@ -120,41 +126,48 @@ function ClinicalPage() {
   const showAlert = clinicalAlert && (assessment?.risk_score ?? 0) > 40 && !alertDismissed;
 
   return (
-    <main className="min-h-screen bg-clinical-bg flex">
-      <PatientList
-        patients={patients}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        loading={patientsLoading}
-      />
+    <main className="min-h-screen relative overflow-hidden">
+      {/* 3D Cozy Clinic Background */}
+      <ClinicalScene3D />
 
-      <div className="flex-1 overflow-y-auto">
-        {/* Alert banner */}
-        <AnimatePresence>
-          {showAlert && clinicalAlert && (
-            <AlertCard
-              alert={clinicalAlert}
-              onDismiss={() => setAlertDismissed(true)}
-            />
-          )}
-        </AnimatePresence>
-
-        {patient ? (
-          <PatientProfile
-            patient={patient}
-            assessment={assessment}
-            assessments={assessments}
-            readings={readings}
-            notes={notes}
-            loading={detailLoading}
+      <div className="relative z-10 flex h-screen">
+        <div className="bg-white/85 backdrop-blur-md">
+          <PatientList
+            patients={patients}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            loading={patientsLoading}
           />
-        ) : (
-          <div className="flex-1 flex items-center justify-center h-full min-h-[400px]">
-            <p className="text-sm text-gray-400">
-              {patientsLoading ? "Loading..." : "Select a patient to view their profile."}
-            </p>
-          </div>
-        )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto bg-white/75 backdrop-blur-sm">
+          {/* Alert banner */}
+          <AnimatePresence>
+            {showAlert && clinicalAlert && (
+              <AlertCard
+                alert={clinicalAlert}
+                onDismiss={() => setAlertDismissed(true)}
+              />
+            )}
+          </AnimatePresence>
+
+          {patient ? (
+            <PatientProfile
+              patient={patient}
+              assessment={assessment}
+              assessments={assessments}
+              readings={readings}
+              notes={notes}
+              loading={detailLoading}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center h-full min-h-[400px]">
+              <p className="text-sm text-gray-400">
+                {patientsLoading ? "Loading..." : "Select a patient to view their profile."}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
