@@ -21,13 +21,13 @@ Three interconnected layers, one platform, each with its own immersive 3D island
 |-------|-----|-------------|
 | **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Health-reactive 3D scene with flowers, animals, and weather. Zero digital literacy required. |
 | **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a cozy nest, lighthouse, and nature. |
-| **Clinical** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
+| **Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
 
 ### Live Demo
 
 **[hacktheglobe.vercel.app](https://hacktheglobe.vercel.app)**
 
-The landing page features three animated 3D islands (garden, nest, clinic) orbiting on a cel-shaded ocean. Clicking Clinical triggers a cinematic camera fly-to transition into the hospital.
+The landing page features three animated 3D islands (garden, nest, clinic) orbiting on a cel-shaded ocean. Clicking Clinic triggers a cinematic camera fly-to transition into the hospital.
 
 ## Tech Stack
 
@@ -68,7 +68,7 @@ hacktheglobe/
 │   ├── app/
 │   │   ├── garden/             # Patient garden app
 │   │   ├── caregiver/          # Family dashboard (The Nest)
-│   │   ├── clinical/           # Clinical dashboard
+│   │   ├── clinical/           # Clinic dashboard
 │   │   ├── api/chat/           # Groq chatbot API route
 │   │   └── layout.tsx
 │   ├── components/
@@ -144,7 +144,7 @@ CORS_ORIGINS=http://localhost:3000
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_DEMO_PATIENT_ID=margaret-chen-uuid
+NEXT_PUBLIC_DEMO_PATIENT_ID=margaret-santos-uuid
 ```
 
 > Never commit `.env` files. Copy the `.env.example` templates and fill in your own keys.
@@ -164,8 +164,8 @@ All three interfaces feature immersive Three.js 3D scenes with cel-shaded (black
 - **Landing Page** - Three islands orbiting on an ocean: a garden island with flowers/animals, a nest island with lighthouse, and a hospital island with a cozy clinic building. Camera orbits continuously.
 - **The Garden** - Health-reactive 3D garden scene. Sky changes with health status (clear/cloudy/stormy). Plants, flowers, and animals respond to patient wellness.
 - **The Nest** - 3D island with a large nest, lighthouse, trees, and birds. Camera slowly orbits at a comfortable 3/4 angle.
-- **Clinical** - Cozy clinic interior (warm wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Camera gently pans in on page load.
-- **Fly-To Transition** - Clicking the Clinical card on the landing page triggers a 1.8s cinematic camera fly toward the hospital island with cubic ease-in-out, fading to white before entering the clinic interior.
+- **Clinic** - Cozy clinic interior (warm wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Camera gently pans in on page load.
+- **Fly-To Transition** - Clicking the Clinic card on the landing page triggers a 1.8s cinematic camera fly toward the hospital island with cubic ease-in-out, fading to white before entering the clinic interior.
 
 ## Multi-Agent AI Pipeline (LangGraph)
 

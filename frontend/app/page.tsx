@@ -54,7 +54,7 @@ const INTERFACES: Array<{
     href: "/clinical",
     flyTarget: "clinical",
     icon: "\u{1F3E5}",
-    title: "Clinical",
+    title: "Clinic",
     subtitle: "Healthcare intelligence",
     description: "AI risk alerts, patient timelines, and real-time monitoring dashboards.",
     gradient: "from-teal-400 to-cyan-500",
