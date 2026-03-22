@@ -842,8 +842,8 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
     scene.add(clinicalIslandGroup);
 
     // === TEAM ISLAND ===
-    const TEAM_ISLAND_X = -28;
-    const TEAM_ISLAND_Z = 22;
+    const TEAM_ISLAND_X = 15;
+    const TEAM_ISLAND_Z = -25;
     const TEAM_ISLAND_RADIUS = 7;
     const teamIslandGroup = new THREE.Group();
     teamIslandGroup.position.set(TEAM_ISLAND_X, 0, TEAM_ISLAND_Z);
@@ -1469,7 +1469,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       { x: 25, z: 10, angle: 0.8, speed: 0.12, color: 0x8B4513, size: 1.0 },
       { x: -30, z: 5, angle: 4.5, speed: 0.06, color: 0x1a5276, size: 1.1 },
       { x: -20, z: -18, angle: 2.2, speed: 0.08, color: 0x2c3e50, size: 0.8 },
-      { x: 15, z: -25, angle: 1.5, speed: 0.1, color: 0x7f1d1d, size: 0.9 },
+      { x: -28, z: 22, angle: 1.5, speed: 0.1, color: 0x7f1d1d, size: 0.9 },
     ];
     shipConfigs.forEach((cfg) => {
       const ship = makeShip(cfg.color, cfg.size);
