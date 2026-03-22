@@ -169,7 +169,7 @@ python readings_7day.py
 All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outline) art style:
 
 - **Login Page** - Full 3D scene with orbiting islands behind a glassmorphism login card
-- **Landing Page** - Three islands on a cel-shaded ocean: garden (flowers, animals, deer, rabbits), nest (tree with nest, cat, matcha cup, lighthouse), and clinic (hospital with chimney smoke, fountain, people). Sailing ships, underwater fish, and airplanes. Sun with rays orbits the scene. Day/sunset/night mode toggle.
+- **Landing Page** - Four islands on a cel-shaded ocean: garden (flowers, animals, deer, rabbits), nest (tree with nest, cat, matcha cup, lighthouse), clinic (hospital with chimney smoke, fountain, people), and team island. Sailing ships, underwater fish, and airplanes. Sun with rays orbits the scene. Day/sunset/night mode toggle.
 - **The Garden** - Health-reactive scene. Sky changes with health (clear/cloudy/stormy). Central flower opens AI chat with voice (TTS/STT). Bloom breakdown shows what tasks help the flower grow. Health simulation slider for demo.
 - **The Nest** - Island with a large tree, nest with eggs on a branch, grey cat with swaying tail, matcha cup with steam, perched birds, lighthouse. Camera slowly orbits.
 - **The Clinic** - Cozy interior (wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Glassmorphism dashboard overlay.
