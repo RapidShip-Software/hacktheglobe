@@ -339,7 +339,7 @@ function GardenPage() {
       </div>
 
       {/* === DESKTOP: Right Butterfly Contacts (hidden on mobile) === */}
-      <div className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-6 items-center">
+      <div className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-16 items-center">
         {MARGARET_CONTACTS.map((contact, i) => (
           <BlurFade key={contact.name} delay={0.4 + i * 0.1} inView>
             <ButterflyContact contact={contact} position="stacked" onClick={setActiveContact} />
