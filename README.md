@@ -19,15 +19,17 @@ Three interconnected layers, one platform, each with its own immersive 3D island
 
 | Layer | For | What It Does |
 |-------|-----|-------------|
-| **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Health-reactive 3D scene with flowers, animals, and weather. Zero digital literacy required. |
-| **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a cozy nest, lighthouse, and nature. |
-| **The Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
+| **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Health-reactive 3D scene with flowers, animals, and weather. Tap the flower to talk to an AI assistant with voice. Zero digital literacy required. |
+| **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a nest in a tree, cat, lighthouse, and nature. |
+| **The Clinic** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, real-time monitoring, and discharge planning. Cozy 3D clinic interior with glassmorphism dashboard. |
 
 ### Live Demo
 
 **[hacktheglobe.vercel.app](https://hacktheglobe.vercel.app)**
 
-The landing page features three animated 3D islands (garden, nest, clinic) orbiting on a cel-shaded ocean. Clicking Clinic triggers a cinematic camera fly-to transition into the hospital.
+Demo accounts (login page):
+- **Margaret Santos** (Patient): `margaret@canopy.care` / `garden123`
+- **Sarah Santos** (Family): `sarah@canopy.care` / `nest123`
 
 ## Tech Stack
 
@@ -35,7 +37,7 @@ The landing page features three animated 3D islands (garden, nest, clinic) orbit
 |-------|-----------|-----|
 | Frontend | Next.js 15 (App Router), Tailwind CSS, Framer Motion, Three.js | React-based, fast prototyping, SSR, immersive 3D |
 | Backend API | FastAPI (Python) | Async, lightweight, native Python for LangGraph |
-| AI Chat | Groq (Llama 3.3 70B) | Fast, free-tier chatbot for patient conversations |
+| AI Chat | Groq (Llama 3.3 70B) + Web Speech API (TTS/STT) | Fast chatbot with voice input/output for elderly users |
 | Multi-Agent AI | LangGraph + Gemini 2.0 Flash | Stateful agent orchestration with fast inference |
 | Database | Supabase (PostgreSQL + Auth + Realtime) | Real-time subscriptions, RLS, free tier |
 | Deploy (FE) | Vercel | Zero-config Next.js deployment |
@@ -66,18 +68,20 @@ The landing page features three animated 3D islands (garden, nest, clinic) orbit
 hacktheglobe/
 ├── frontend/                   # Next.js (all 3 interfaces)
 │   ├── app/
+│   │   ├── login/              # Login page with demo accounts
 │   │   ├── garden/             # Patient garden app
 │   │   ├── caregiver/          # Family dashboard (The Nest)
 │   │   ├── clinical/           # Clinic dashboard
 │   │   ├── api/chat/           # Groq chatbot API route
 │   │   └── layout.tsx
 │   ├── components/
-│   │   ├── garden/             # GardenScene3D, HealthPlant, Butterfly, Gate
-│   │   ├── nest/               # NestScene3D (3D island with nest + lighthouse)
-│   │   ├── landing/            # LandingScene3D (3-island orbiting scene)
+│   │   ├── garden/             # GardenScene3D, Butterfly, GardenGate (AI chat)
+│   │   ├── nest/               # NestScene3D (tree, nest, cat, lighthouse)
+│   │   ├── landing/            # LandingScene3D (3-island scene, ships, fish, planes)
 │   │   ├── caregiver/          # DailySignal, HistoryView, Notes
 │   │   ├── clinical/           # ClinicalScene3D, PatientList, AlertCard, RiskTimeline
-│   │   └── shared/             # BlurFade, ErrorBoundary
+│   │   └── shared/             # BlurFade, ErrorBoundary, TimeToggle
+│   ├── middleware.ts           # Auth redirect (cookie-based session)
 │   ├── lib/
 │   │   ├── supabase.ts         # Supabase client + Realtime helpers
 │   │   └── api.ts              # FastAPI client wrapper
@@ -159,13 +163,22 @@ python readings_7day.py
 
 ## 3D Visual Experience
 
-All three interfaces feature immersive Three.js 3D scenes with cel-shaded (black outline) art style:
+All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outline) art style:
 
-- **Landing Page** - Three islands orbiting on an ocean: a garden island with flowers/animals, a nest island with lighthouse, and a hospital island with a cozy clinic building. Camera orbits continuously.
-- **The Garden** - Health-reactive 3D garden scene. Sky changes with health status (clear/cloudy/stormy). Plants, flowers, and animals respond to patient wellness.
-- **The Nest** - 3D island with a large nest, lighthouse, trees, and birds. Camera slowly orbits at a comfortable 3/4 angle.
-- **Clinic** - Cozy clinic interior (warm wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Camera gently pans in on page load.
-- **Fly-To Transition** - Clicking the Clinic card on the landing page triggers a 1.8s cinematic camera fly toward the hospital island with cubic ease-in-out, fading to white before entering the clinic interior.
+- **Login Page** - Full 3D scene with orbiting islands behind a glassmorphism login card
+- **Landing Page** - Three islands on a cel-shaded ocean: garden (flowers, animals, deer, rabbits), nest (tree with nest, cat, matcha cup, lighthouse), and clinic (hospital with chimney smoke, fountain, people). Sailing ships, underwater fish, and airplanes. Sun with rays orbits the scene. Day/sunset/night mode toggle.
+- **The Garden** - Health-reactive scene. Sky changes with health (clear/cloudy/stormy). Central flower opens AI chat with voice (TTS/STT). Bloom breakdown shows what tasks help the flower grow. Health simulation slider for demo.
+- **The Nest** - Island with a large tree, nest with eggs on a branch, grey cat with swaying tail, matcha cup with steam, perched birds, lighthouse. Camera slowly orbits.
+- **The Clinic** - Cozy interior (wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Glassmorphism dashboard overlay.
+- **Fly-To Transitions** - All cards trigger cinematic camera fly-to animations toward their island. Back buttons on each page trigger reverse fly-back to orbit. Day/sunset/night mode on all pages.
+
+## Key Features
+
+- **Voice-First AI Chat** - Tap the flower in the garden to talk. Speech-to-text input, text-to-speech output with warm female voice (Microsoft Jenny/Samantha). 300+ fallback responses covering 80+ intent categories.
+- **Real-Time Monitoring** - Supabase Realtime broadcasts assessment updates. Caregiver and clinical dashboards update live.
+- **Health Simulation** - Interactive slider in the garden page for demo: drag to see the plant wilt/grow/bloom in real time.
+- **Discharge Planning** - AI-generated structured recovery plans with medications, follow-ups, red flags, and community services.
+- **Accessible Design** - Solid high-contrast backgrounds, opaque typography, large touch targets. Designed for elderly users with reduced contrast sensitivity.
 
 ## Multi-Agent AI Pipeline (LangGraph)
 
