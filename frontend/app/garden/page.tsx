@@ -331,6 +331,36 @@ function GardenPage() {
         </AnimatePresence>
       </motion.div>
 
+      {/* Health Simulation Slider (for live demo) */}
+      <motion.div
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/20 shadow-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+      >
+        <span className="text-xs font-bold text-white/60 whitespace-nowrap">Health Simulation</span>
+        <div className="relative w-48">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={gardenState.plant_health}
+            onChange={(e) => setGardenState((prev) => ({ ...prev, plant_health: parseFloat(e.target.value) }))}
+            className="w-full h-2 rounded-full appearance-none cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #ef4444 0%, #eab308 40%, #22c55e 70%, #10b981 100%)`,
+            }}
+          />
+          <div className="flex justify-between mt-1 px-0.5">
+            <span className="text-[9px] text-red-300/70">Wilting</span>
+            <span className="text-[9px] text-yellow-300/70">Growing</span>
+            <span className="text-[9px] text-emerald-300/70">Blooming</span>
+          </div>
+        </div>
+        <span className="text-xs font-mono text-white/80 w-8 text-right">{Math.round(gardenState.plant_health * 100)}%</span>
+      </motion.div>
+
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
       <div className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 w-64 lg:w-72 max-h-[80vh]">
         <BlurFade delay={0.2} inView>
