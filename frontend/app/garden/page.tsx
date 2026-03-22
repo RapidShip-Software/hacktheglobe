@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, SmilePlus, ArrowLeft, Check, Pill, ClipboardList, Users } from "lucide-react";
 import { AuroraBackground } from "@/components/garden/aurora-background";
 import { ButterflyContact } from "@/components/garden/butterfly-contact";
-import { GardenGate } from "@/components/garden/garden-gate";
 import { BpEntryFlow } from "@/components/garden/bp-entry-flow";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { api } from "@/lib/api";
@@ -31,6 +30,7 @@ type ChecklistItem = {
   id: string;
   label: string;
   sublabel: string;
+  time: string;
   icon: "pill" | "heart" | "checkin";
   done: boolean;
 };
@@ -54,11 +54,11 @@ function GardenPage() {
   const [mobilePanel, setMobilePanel] = useState<"none" | "tasks" | "contacts">("none");
 
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
-    { id: "med-lisinopril", label: "Lisinopril 10mg", sublabel: "Blood pressure", icon: "pill", done: false },
-    { id: "med-metformin-am", label: "Metformin 500mg", sublabel: "Morning dose", icon: "pill", done: false },
-    { id: "bp", label: "Log Blood Pressure", sublabel: "Tap to record", icon: "heart", done: false },
-    { id: "checkin", label: "Daily Check-in", sublabel: "How are you feeling?", icon: "checkin", done: false },
-    { id: "med-metformin-pm", label: "Metformin 500mg", sublabel: "Evening dose", icon: "pill", done: false },
+    { id: "med-lisinopril", label: "Lisinopril 10mg", sublabel: "Blood pressure", time: "8:00 AM", icon: "pill", done: false },
+    { id: "med-metformin-am", label: "Metformin 500mg", sublabel: "Morning dose", time: "8:30 AM", icon: "pill", done: false },
+    { id: "bp", label: "Log Blood Pressure", sublabel: "Tap to record", time: "9:00 AM", icon: "heart", done: false },
+    { id: "checkin", label: "Daily Check-in", sublabel: "How are you feeling?", time: "10:00 AM", icon: "checkin", done: false },
+    { id: "med-metformin-pm", label: "Metformin 500mg", sublabel: "Evening dose", time: "6:00 PM", icon: "pill", done: false },
   ]);
 
   useEffect(() => {
@@ -130,6 +130,8 @@ function GardenPage() {
   }, [markDone]);
 
   const completedCount = checklist.filter((i) => i.done).length;
+  const pendingItems = checklist.filter((i) => !i.done);
+  const [showBloomTips, setShowBloomTips] = useState(false);
 
   const iconMap = {
     pill: Pill,
@@ -189,6 +191,9 @@ function GardenPage() {
                   {item.sublabel}
                 </p>
               </div>
+              <span className={`text-xs font-medium shrink-0 ${item.done ? "text-emerald-300/50" : "text-white/40"}`}>
+                {item.time}
+              </span>
             </motion.button>
           );
         })}
@@ -245,14 +250,17 @@ function GardenPage() {
         </BlurFade>
       </div>
 
-      {/* Health tag */}
+      {/* Flower health tag (tap to see bloom breakdown) */}
       <motion.div
         className="absolute left-1/2 -translate-x-1/2 z-20 bottom-[38%] md:bottom-[38%]"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5 }}
       >
-        <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-black/40 backdrop-blur-sm shadow-lg border border-white/20">
+        <button
+          onClick={() => setShowBloomTips(!showBloomTips)}
+          className="inline-flex items-center gap-2 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-black/40 backdrop-blur-sm shadow-lg border border-white/20 cursor-pointer hover:bg-black/50 transition-colors"
+        >
           <div
             className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full animate-pulse"
             style={{
@@ -267,7 +275,39 @@ function GardenPage() {
               : gardenState.plant_health > 0.4 ? "Growing"
               : "Wilting"}
           </span>
-        </div>
+          <span className="text-xs text-white/40">{showBloomTips ? "\u25B2" : "\u25BC"}</span>
+        </button>
+
+        {/* Bloom breakdown tooltip */}
+        <AnimatePresence>
+          {showBloomTips && (
+            <motion.div
+              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 md:w-64 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 p-3 shadow-xl"
+              initial={{ opacity: 0, y: -5, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -5, scale: 0.95 }}
+            >
+              <p className="text-xs font-semibold text-white/80 mb-2">
+                {pendingItems.length === 0
+                  ? "Your garden is in full bloom! All tasks complete."
+                  : "Complete these to help your flower bloom:"}
+              </p>
+              {pendingItems.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {pendingItems.map((item) => (
+                    <li key={item.id} className="flex items-center gap-2 text-xs text-white/70">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                      <span className="flex-1">{item.label}</span>
+                      <span className="text-white/40">{item.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-emerald-300/80">Every task is done. Margaret is doing great!</p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
@@ -345,8 +385,6 @@ function GardenPage() {
         )}
       </AnimatePresence>
 
-      {/* Garden Gate (AI Help) */}
-      <GardenGate patientName="Margaret" />
 
       {/* Grass / ground */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-600/30 via-green-500/15 to-transparent pointer-events-none" />
