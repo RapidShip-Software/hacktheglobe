@@ -882,6 +882,84 @@ function LandingScene3D() {
       g.position.set(cd.x, cd.y, cd.z); clouds.push(g); scene.add(g);
     });
 
+    // === CENTRAL CANOPY TREE (the "Canopy" tree - tallest, center of island) ===
+    const canopyTreeGroup = new THREE.Group();
+    const canopyTrunkMat = new THREE.MeshLambertMaterial({ map: barkTex, color: 0x5C3A1E });
+    const canopyTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 8, 8), canopyTrunkMat);
+    canopyTrunk.position.y = 4;
+    canopyTrunk.castShadow = true;
+    addOutline(canopyTrunk, 0.03);
+    canopyTreeGroup.add(canopyTrunk);
+    const canopyFoliageMat = new THREE.MeshLambertMaterial({ color: 0x1a7a1a });
+    const canopyPositions = [
+      { r: 2.5, y: 8.5 }, { r: 3.0, y: 9.5 }, { r: 2.8, y: 10.5 }, { r: 2.0, y: 11.5 },
+      { r: 2.2, y: 9.0 }, { r: 2.6, y: 10.0 }, { r: 1.8, y: 11.0 }, { r: 1.2, y: 12.0 },
+    ];
+    canopyPositions.forEach((cp) => {
+      const f = new THREE.Mesh(new THREE.SphereGeometry(cp.r, 8, 6), canopyFoliageMat);
+      f.position.set((Math.random() - 0.5) * 2, cp.y, (Math.random() - 0.5) * 2);
+      f.castShadow = true;
+      addOutline(f, 0.03);
+      canopyTreeGroup.add(f);
+    });
+    canopyTreeGroup.position.set(0, 0, -2);
+    scene.add(canopyTreeGroup);
+
+    // === POND (off-center on the island) ===
+    const pondGeo = new THREE.CircleGeometry(2.5, 16);
+    const pondMat = new THREE.MeshPhongMaterial({ color: 0x4a90d9, shininess: 100, transparent: true, opacity: 0.75 });
+    const pond = new THREE.Mesh(pondGeo, pondMat);
+    pond.rotation.x = -Math.PI / 2;
+    pond.position.set(5, 0.06, 5);
+    scene.add(pond);
+    // Lily pads
+    const lilyMat = new THREE.MeshLambertMaterial({ color: 0x22c55e });
+    for (let i = 0; i < 4; i++) {
+      const lily = new THREE.Mesh(new THREE.CircleGeometry(0.35 + Math.random() * 0.2, 8), lilyMat);
+      lily.rotation.x = -Math.PI / 2;
+      lily.position.set(5 + (Math.random() - 0.5) * 3, 0.08, 5 + (Math.random() - 0.5) * 3);
+      scene.add(lily);
+    }
+
+    // === 3D BUTTERFLIES ===
+    const butterflies: THREE.Group[] = [];
+    const bfColors = [0x60a5fa, 0x4ade80, 0xfb923c, 0xc084fc, 0xf472b6, 0xfbbf24, 0xe11d48, 0x9b59b6];
+    const bfData = [
+      { col: 0, x: -4, y: 3, z: 3, sp: 0.5, r: 4 },
+      { col: 1, x: 5, y: 2.5, z: -3, sp: 0.6, r: 3 },
+      { col: 2, x: -2, y: 4, z: -5, sp: 0.45, r: 5 },
+      { col: 3, x: 3, y: 3.5, z: 6, sp: 0.55, r: 3.5 },
+      { col: 4, x: -6, y: 2, z: 1, sp: 0.7, r: 2.5 },
+      { col: 5, x: 7, y: 3, z: -1, sp: 0.4, r: 4.5 },
+      { col: 6, x: 0, y: 4, z: -6, sp: 0.65, r: 3 },
+      { col: 7, x: -3, y: 2.5, z: 7, sp: 0.5, r: 2 },
+    ];
+    bfData.forEach((bd) => {
+      const g = new THREE.Group();
+      const col = bfColors[bd.col];
+      const wingMat = new THREE.MeshPhongMaterial({ color: col, shininess: 30, transparent: true, opacity: 0.85, side: THREE.DoubleSide });
+      const bodyMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(col).multiplyScalar(0.6).getHex() });
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 4), bodyMat);
+      body.scale.set(0.5, 0.5, 1.5);
+      g.add(body);
+      for (const side of [-1, 1]) {
+        const upperWing = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5), wingMat);
+        upperWing.position.set(side * 0.08, 0.02, 0);
+        upperWing.scale.set(1.8, 0.15, 1.2);
+        upperWing.userData = { isButterfly: true, side, upper: true };
+        g.add(upperWing);
+        const lowerWing = new THREE.Mesh(new THREE.SphereGeometry(0.08, 5, 4), wingMat);
+        lowerWing.position.set(side * 0.06, -0.01, -0.05);
+        lowerWing.scale.set(1.4, 0.15, 1.0);
+        lowerWing.userData = { isButterfly: true, side, upper: false };
+        g.add(lowerWing);
+      }
+      g.position.set(bd.x, bd.y, bd.z);
+      g.userData = { speed: bd.sp, radius: bd.r, startX: bd.x, startZ: bd.z, phase: Math.random() * Math.PI * 2 };
+      butterflies.push(g);
+      scene.add(g);
+    });
+
     // === ANIMATION (orbiting camera) ===
     let time = 0;
     const clock = new THREE.Clock();
@@ -917,6 +995,24 @@ function LandingScene3D() {
         b.children.forEach((child) => {
           if (child.userData?.isWing) {
             child.rotation.z = Math.sin(time * 12 + b.userData.startX) * 0.6 * child.userData.side;
+          }
+        });
+      });
+
+      // Butterflies: figure-8 flight + wing flap
+      butterflies.forEach((bf) => {
+        const { speed, radius, startX, startZ, phase } = bf.userData;
+        bf.position.x = startX + Math.cos(time * speed + phase) * radius;
+        bf.position.z = startZ + Math.sin(time * speed * 2 + phase) * radius * 0.5;
+        bf.position.y += Math.sin(time * 3 + phase) * 0.003;
+        bf.rotation.y = Math.atan2(
+          -Math.sin(time * speed + phase) * radius * speed,
+          Math.cos(time * speed * 2 + phase) * radius * 0.5 * speed * 2
+        );
+        bf.children.forEach((child) => {
+          if (child.userData?.isButterfly) {
+            const flapSpeed = child.userData.upper ? 8 : 9;
+            child.rotation.z = Math.sin(time * flapSpeed + phase) * 0.7 * child.userData.side;
           }
         });
       });

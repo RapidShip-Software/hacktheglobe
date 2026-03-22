@@ -727,6 +727,104 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       g.position.set(cd.x, cd.y, cd.z); clouds.push(g); scene.add(g);
     });
 
+    // === 3D BUTTERFLIES ===
+    const butterflies: THREE.Group[] = [];
+    const bfColors = [0x60a5fa, 0x4ade80, 0xfb923c, 0xc084fc, 0xf472b6, 0xfbbf24];
+    const bfData = [
+      { col: 0, x: -3, y: 2.5, z: 5, sp: 0.7, r: 3 },
+      { col: 1, x: 4, y: 3, z: 2, sp: 0.5, r: 4 },
+      { col: 2, x: -1, y: 2, z: 8, sp: 0.6, r: 2.5 },
+      { col: 3, x: 2, y: 3.5, z: -1, sp: 0.8, r: 3.5 },
+      { col: 4, x: -5, y: 2.2, z: 3, sp: 0.55, r: 2 },
+      { col: 5, x: 6, y: 2.8, z: 6, sp: 0.65, r: 3 },
+    ];
+    bfData.forEach((bd) => {
+      const g = new THREE.Group();
+      const col = bfColors[bd.col];
+      const wingMat = new THREE.MeshPhongMaterial({ color: col, shininess: 30, transparent: true, opacity: 0.85, side: THREE.DoubleSide });
+      const bodyMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(col).multiplyScalar(0.6).getHex() });
+      // Body
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 4), bodyMat);
+      body.scale.set(0.5, 0.5, 1.5);
+      g.add(body);
+      // Wings (4: upper left, upper right, lower left, lower right)
+      for (const side of [-1, 1]) {
+        const upperWing = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5), wingMat);
+        upperWing.position.set(side * 0.08, 0.02, 0);
+        upperWing.scale.set(1.8, 0.15, 1.2);
+        upperWing.userData = { isButterfly: true, side, upper: true };
+        g.add(upperWing);
+        const lowerWing = new THREE.Mesh(new THREE.SphereGeometry(0.08, 5, 4), wingMat);
+        lowerWing.position.set(side * 0.06, -0.01, -0.05);
+        lowerWing.scale.set(1.4, 0.15, 1.0);
+        lowerWing.userData = { isButterfly: true, side, upper: false };
+        g.add(lowerWing);
+      }
+      // Antennae
+      for (const side of [-1, 1]) {
+        const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.12, 3), bodyMat);
+        ant.position.set(side * 0.02, 0.04, 0.08);
+        ant.rotation.x = -0.4;
+        ant.rotation.z = side * 0.3;
+        g.add(ant);
+        const tip = new THREE.Mesh(new THREE.SphereGeometry(0.012, 4, 3), wingMat);
+        tip.position.set(side * 0.04, 0.09, 0.12);
+        g.add(tip);
+      }
+      g.position.set(bd.x, bd.y, bd.z);
+      g.userData = { speed: bd.sp, radius: bd.r, startX: bd.x, startZ: bd.z, phase: Math.random() * Math.PI * 2 };
+      butterflies.push(g);
+      scene.add(g);
+    });
+
+    // === CANOPY FRAME (overhanging branches at camera edges) ===
+    const canopyLeafMat = new THREE.MeshLambertMaterial({ color: 0x228B22, transparent: true, opacity: 0.7 });
+    const canopyBranchMat = new THREE.MeshLambertMaterial({ color: 0x4a3218 });
+    const canopyLeaves: THREE.Mesh[] = [];
+    // Left canopy branch
+    const lBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.3, 6, 5), canopyBranchMat);
+    lBranch.position.set(-6, 6, 12);
+    lBranch.rotation.z = 0.8;
+    lBranch.rotation.y = 0.3;
+    scene.add(lBranch);
+    for (let i = 0; i < 12; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.6 + Math.random() * 0.4, 6, 5), canopyLeafMat);
+      leaf.position.set(-5 + (Math.random() - 0.5) * 4, 7 + Math.random() * 2, 11 + (Math.random() - 0.5) * 3);
+      leaf.scale.set(1.5, 0.4, 1.0);
+      canopyLeaves.push(leaf);
+      scene.add(leaf);
+    }
+    // Right canopy branch
+    const rBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.25, 5, 5), canopyBranchMat);
+    rBranch.position.set(7, 6.5, 13);
+    rBranch.rotation.z = -0.7;
+    rBranch.rotation.y = -0.2;
+    scene.add(rBranch);
+    for (let i = 0; i < 10; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.5 + Math.random() * 0.3, 6, 5), canopyLeafMat);
+      leaf.position.set(6 + (Math.random() - 0.5) * 3, 7.5 + Math.random() * 1.5, 12 + (Math.random() - 0.5) * 2);
+      leaf.scale.set(1.4, 0.35, 0.9);
+      canopyLeaves.push(leaf);
+      scene.add(leaf);
+    }
+
+    // === FIREFLIES ===
+    const fireflies: THREE.Mesh[] = [];
+    for (let i = 0; i < 15; i++) {
+      const ff = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 5, 4),
+        new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0 })
+      );
+      ff.position.set(
+        (Math.random() - 0.5) * 14,
+        0.5 + Math.random() * 4,
+        (Math.random() - 0.5) * 14 + 2
+      );
+      ff.userData = { phase: Math.random() * Math.PI * 2, driftX: (Math.random() - 0.5) * 0.003, driftZ: (Math.random() - 0.5) * 0.003 };
+      fireflies.push(ff);
+      scene.add(ff);
+    }
+
     // === ANIMATION ===
     let time = 0;
     function animate() {
@@ -744,6 +842,38 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
             child.rotation.z = Math.sin(time * 12 + b.userData.startX) * 0.6 * child.userData.side;
           }
         });
+      });
+      // Butterflies: figure-8 flight + wing flap
+      butterflies.forEach((bf) => {
+        const { speed, radius, startX, startZ, phase } = bf.userData;
+        bf.position.x = startX + Math.cos(time * speed + phase) * radius;
+        bf.position.z = startZ + Math.sin(time * speed * 2 + phase) * radius * 0.5;
+        bf.position.y += Math.sin(time * 3 + phase) * 0.003;
+        bf.rotation.y = Math.atan2(
+          -Math.sin(time * speed + phase) * radius * speed,
+          Math.cos(time * speed * 2 + phase) * radius * 0.5 * speed * 2
+        );
+        bf.children.forEach((child) => {
+          if (child.userData?.isButterfly) {
+            const flapSpeed = child.userData.upper ? 8 : 9;
+            child.rotation.z = Math.sin(time * flapSpeed + phase) * 0.7 * child.userData.side;
+          }
+        });
+      });
+      // Canopy leaf sway
+      canopyLeaves.forEach((leaf, i) => {
+        leaf.rotation.z = Math.sin(time * 0.5 + i * 0.3) * 0.05;
+        leaf.rotation.x = Math.sin(time * 0.3 + i * 0.5) * 0.03;
+      });
+      // Fireflies
+      fireflies.forEach((ff, i) => {
+        const ph = time * 1.5 + ff.userData.phase;
+        (ff.material as THREE.MeshBasicMaterial).opacity = Math.max(0, Math.sin(ph) * 0.6 + 0.1);
+        ff.position.x += ff.userData.driftX;
+        ff.position.z += ff.userData.driftZ;
+        ff.position.y += Math.sin(ph * 0.7) * 0.002;
+        if (Math.abs(ff.position.x) > 8) ff.userData.driftX *= -1;
+        if (Math.abs(ff.position.z) > 10) ff.userData.driftZ *= -1;
       });
       camera.position.x = Math.sin(time * 0.3) * 0.2;
       camera.position.y = 5 + Math.sin(time * 0.5) * 0.1;
