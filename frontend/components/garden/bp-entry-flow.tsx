@@ -49,11 +49,11 @@ function BpEntryFlow({ onSubmit, visible, onClose }: BpEntryFlowProps) {
           exit={{ opacity: 0 }}
         >
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20 backdrop-blur-md"
             onClick={handleClose}
           />
           <motion.div
-            className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl max-w-sm w-full mx-4"
+            className="relative bg-white/30 backdrop-blur-3xl backdrop-saturate-200 rounded-[2.5rem] p-6 shadow-2xl max-w-sm w-full mx-4 border border-white/40"
             initial={{ scale: 0.8, y: 30 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.8, y: 30 }}
@@ -64,12 +64,12 @@ function BpEntryFlow({ onSubmit, visible, onClose }: BpEntryFlowProps) {
               <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center shadow-lg">
                 <span className="text-2xl">❤️</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-800">
+              <h3 className="text-xl font-extrabold text-slate-900 drop-shadow-md">
                 {step === "systolic" && "Top Number (Systolic)"}
                 {step === "diastolic" && "Bottom Number (Diastolic)"}
                 {step === "confirm" && "Confirm Reading"}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm font-bold text-slate-700 mt-1 drop-shadow-sm">
                 {step === "systolic" && "Tap the number closest to your reading"}
                 {step === "diastolic" && "Now tap the bottom number"}
                 {step === "confirm" && "Does this look right?"}

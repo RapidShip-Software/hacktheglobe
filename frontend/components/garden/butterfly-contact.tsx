@@ -33,7 +33,7 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
   return (
     <>
       <motion.button
-        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2.5 border border-slate-200 shadow-lg w-48" : "flex-col items-center gap-1"} cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/20 backdrop-blur-2xl backdrop-saturate-150 rounded-[2rem] px-4 py-2.5 border border-white/40 shadow-xl w-48" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => setShowModal(true)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
@@ -146,9 +146,9 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         </svg>
 
         {/* Name label */}
-        <span className={`font-bold whitespace-nowrap ${isStacked ? "text-sm text-slate-800" : "text-base text-white bg-slate-900 rounded-full px-5 py-2 shadow-lg border border-slate-700"}`}>
+        <span className={`font-extrabold whitespace-nowrap ${isStacked ? "text-sm text-slate-900 drop-shadow-md" : "text-base text-slate-900 drop-shadow-md bg-white/30 backdrop-blur-2xl backdrop-saturate-150 rounded-full px-5 py-2 shadow-xl border border-white/40"}`}>
           {contact.name}
-          {isStacked && <span className="block text-[10px] font-semibold text-slate-500">{contact.relation}</span>}
+          {isStacked && <span className="block text-[10px] font-bold text-slate-700 drop-shadow-sm">{contact.relation}</span>}
         </span>
       </motion.button>
 
@@ -162,11 +162,11 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
             exit={{ opacity: 0 }}
           >
             <div
-              className="absolute inset-0 bg-slate-900/60"
+              className="absolute inset-0 bg-black/20 backdrop-blur-md"
               onClick={() => setShowModal(false)}
             />
             <motion.div
-              className="relative bg-white rounded-3xl p-8 shadow-2xl max-w-sm mx-4 text-center"
+              className="relative bg-white/30 backdrop-blur-3xl backdrop-saturate-200 rounded-[2.5rem] p-8 shadow-2xl max-w-sm mx-4 text-center border border-white/40"
               initial={{ scale: 0.8, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 20 }}
@@ -183,9 +183,9 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
                 </svg>
               </div>
 
-              <h3 className="text-2xl font-bold text-gray-800 mb-1">{contact.name}</h3>
-              <p className="text-sm text-gray-500 mb-1">{contact.relation}</p>
-              <p className="text-lg text-gray-600 mb-6">{contact.phone}</p>
+              <h3 className="text-2xl font-extrabold text-slate-900 drop-shadow-md mb-1">{contact.name}</h3>
+              <p className="text-sm font-bold text-slate-700 mb-1 drop-shadow-sm">{contact.relation}</p>
+              <p className="text-lg font-bold text-slate-800 mb-6 drop-shadow-sm">{contact.phone}</p>
 
               <div className="flex gap-3 justify-center">
                 <motion.a

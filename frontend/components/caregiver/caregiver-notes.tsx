@@ -20,20 +20,20 @@ function CaregiverNotes({ onSubmit }: CaregiverNotesProps) {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/15">
-      <h3 className="text-lg font-semibold text-white drop-shadow mb-3">Add a Note</h3>
-      <p className="text-sm text-white/50 mb-3">Visible to the care team</p>
+    <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-150 rounded-[2rem] p-6 shadow-2xl border border-white/40">
+      <h3 className="text-2xl font-extrabold text-white drop-shadow-lg mb-2">Add a Note</h3>
+      <p className="text-sm font-bold text-white/80 drop-shadow-md mb-4">Visible to the care team</p>
       <textarea
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="e.g. Mum mentioned she had trouble sleeping last night..."
-        className="w-full h-24 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all"
+        className="w-full h-28 px-4 py-3 rounded-2xl bg-black/10 backdrop-blur-md border border-white/20 text-base font-bold text-white placeholder-white/50 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all shadow-inner"
       />
       <div className="flex items-center justify-between mt-3">
         <AnimatePresence>
           {submitted && (
             <motion.span
-              className="text-sm text-emerald-300 font-medium"
+              className="text-sm text-emerald-400 font-extrabold drop-shadow-md"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}

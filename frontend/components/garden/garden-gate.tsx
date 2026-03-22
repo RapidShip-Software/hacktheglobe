@@ -218,7 +218,7 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
           >
             <div className="w-2 h-2 rounded-full bg-amber-300" />
           </motion.div>
-          <span className="text-base font-bold text-white bg-slate-900 rounded-full px-5 py-2 shadow-lg border border-slate-700">
+          <span className="text-base font-extrabold text-slate-900 drop-shadow-md bg-white/30 backdrop-blur-2xl backdrop-saturate-150 rounded-full px-5 py-2 shadow-xl border border-white/40">
             Help
           </span>
         </motion.button>
@@ -234,11 +234,11 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
             exit={{ opacity: 0 }}
           >
             <div
-              className="absolute inset-0 bg-slate-900/60"
+              className="absolute inset-0 bg-black/20 backdrop-blur-md"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              className="relative w-full max-w-md bg-white shadow-2xl flex flex-col"
+              className="relative w-full max-w-md bg-white/30 backdrop-blur-3xl backdrop-saturate-200 border-l border-white/40 shadow-2xl flex flex-col"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -250,8 +250,8 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
                   🌿
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800">Garden Helper</h3>
-                  <p className="text-xs text-gray-400">Always here for you</p>
+                  <h3 className="font-extrabold text-slate-900 drop-shadow-md mb-0.5">Garden Helper</h3>
+                  <p className="text-xs font-semibold text-slate-700">Always here for you</p>
                 </div>
                 {/* Auto-speak toggle */}
                 <button

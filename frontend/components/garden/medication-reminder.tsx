@@ -20,7 +20,7 @@ function MedicationReminder({ medication, onTake, visible }: MedicationReminderP
           exit={{ y: 120, opacity: 0 }}
           transition={{ type: "spring", damping: 20, stiffness: 200 }}
         >
-          <div className="mx-4 mb-4 p-4 bg-white/85 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50">
+          <div className="mx-4 mb-4 p-4 bg-white/30 backdrop-blur-3xl backdrop-saturate-150 rounded-[2rem] shadow-2xl border border-white/50">
             <div className="flex items-center gap-4">
               {/* Pill icon */}
               <motion.div
@@ -33,10 +33,10 @@ function MedicationReminder({ medication, onTake, visible }: MedicationReminderP
 
               {/* Info */}
               <div className="flex-1">
-                <p className="text-lg font-bold text-gray-800">
+                <p className="text-lg font-extrabold text-slate-900 drop-shadow-md">
                   {medication.name} {medication.dosage}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm font-bold text-slate-700 drop-shadow-sm">
                   {medication.purpose}
                 </p>
               </div>
