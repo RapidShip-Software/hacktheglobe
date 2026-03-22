@@ -35,10 +35,10 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
 
     // Camera: aerial view, will orbit. Wider FOV on portrait/mobile to show all islands
     const isPortrait = container.clientHeight > container.clientWidth;
-    const baseFov = isPortrait ? 72 : 45;
+    const baseFov = isPortrait ? 78 : 55;
     const camera = new THREE.PerspectiveCamera(baseFov, container.clientWidth / container.clientHeight, 0.1, 300);
-    const ORBIT_RADIUS = isPortrait ? 45 : 35;
-    const ORBIT_HEIGHT = 40;
+    const ORBIT_RADIUS = isPortrait ? 55 : 48;
+    const ORBIT_HEIGHT = 50;
     const ORBIT_SPEED = 0.15; // radians per second
     camera.position.set(0, ORBIT_HEIGHT, ORBIT_RADIUS);
     camera.lookAt(0, 0, 0);
