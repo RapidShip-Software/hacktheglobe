@@ -142,15 +142,15 @@ function GardenPage() {
   };
 
   const checklistContent = (
-    <div className="bg-white/15 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-3 md:p-4 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
+    <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl border border-slate-200 shadow-xl p-3 md:p-3 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base md:text-lg font-bold text-white drop-shadow">Today&apos;s Tasks</h2>
-        <span className="text-xs font-semibold text-white/60 bg-white/10 px-2.5 py-0.5 rounded-full">
+        <h2 className="text-sm md:text-base font-bold text-slate-800">Today&apos;s Tasks</h2>
+        <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
           {completedCount}/{checklist.length}
         </span>
       </div>
 
-      <div className="w-full h-1.5 bg-white/10 rounded-full mb-3 overflow-hidden">
+      <div className="w-full h-1.5 bg-slate-100 rounded-full mb-2 overflow-hidden">
         <motion.div
           className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
           animate={{ width: `${(completedCount / checklist.length) * 100}%` }}
@@ -158,42 +158,42 @@ function GardenPage() {
         />
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto">
+      <div className="flex-1 space-y-1.5 overflow-y-auto">
         {checklist.map((item, i) => {
           const Icon = iconMap[item.icon];
           return (
             <motion.button
               key={item.id}
               onClick={() => handleChecklistTap(item)}
-              className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl transition-all text-left ${
+              className={`w-full flex items-center gap-2 p-2 rounded-lg transition-all text-left ${
                 item.done
-                  ? "bg-emerald-500/20 border border-emerald-400/30"
-                  : "bg-white/10 border border-white/15 hover:bg-white/20 active:scale-[0.97]"
+                  ? "bg-emerald-50 border border-emerald-200"
+                  : "bg-slate-50 border border-slate-200 hover:bg-slate-100 active:scale-[0.97]"
               }`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 + i * 0.05 }}
             >
-              <div className={`w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center shrink-0 ${
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shrink-0 ${
                 item.done
-                  ? "bg-emerald-500 shadow-lg shadow-emerald-500/30"
-                  : "bg-white/15 border border-white/20"
+                  ? "bg-emerald-500 shadow shadow-emerald-500/30"
+                  : "bg-white border border-slate-300"
               }`}>
                 {item.done ? (
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                  <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
                 ) : (
-                  <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-white/70" />
+                  <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 text-slate-500" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold truncate ${item.done ? "text-emerald-200 line-through" : "text-white"}`}>
+                <p className={`text-sm font-semibold truncate ${item.done ? "text-emerald-600 line-through" : "text-slate-800"}`}>
                   {item.label}
                 </p>
-                <p className={`text-xs truncate ${item.done ? "text-emerald-300/60" : "text-white/50"}`}>
+                <p className={`text-xs font-medium truncate ${item.done ? "text-emerald-400" : "text-slate-500"}`}>
                   {item.sublabel}
                 </p>
               </div>
-              <span className={`text-xs font-medium shrink-0 ${item.done ? "text-emerald-300/50" : "text-white/40"}`}>
+              <span className={`text-xs font-medium shrink-0 ${item.done ? "text-emerald-400" : "text-slate-400"}`}>
                 {item.time}
               </span>
             </motion.button>
@@ -242,7 +242,7 @@ function GardenPage() {
         <BlurFade delay={0.3} inView>
           <motion.p
             key={nudgeText}
-            className="text-xs md:text-lg font-medium text-white/90 max-w-md mx-auto bg-black/30 backdrop-blur-sm rounded-2xl px-3 md:px-5 py-2 md:py-3 shadow-lg border border-white/15"
+            className="text-sm md:text-lg font-medium text-white max-w-md mx-auto bg-slate-900/80 backdrop-blur-sm rounded-2xl px-3 md:px-5 py-2 md:py-3 shadow-lg border border-slate-700/50"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -271,7 +271,7 @@ function GardenPage() {
           <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-pink-400/30 backdrop-blur-sm border-2 border-pink-300/50 flex items-center justify-center shadow-xl shadow-pink-500/30">
             <span className="text-3xl md:text-4xl">{"\u{1F33A}"}</span>
           </div>
-          <span className="text-xs md:text-sm text-white/80 font-semibold drop-shadow bg-black/30 backdrop-blur-sm px-3 py-0.5 rounded-full border border-white/15">Talk to me</span>
+          <span className="text-xs md:text-sm text-white font-semibold drop-shadow bg-slate-900/80 backdrop-blur-sm px-3 py-1 rounded-full border border-slate-700/50">Talk to me</span>
         </motion.button>
 
         {/* Health status + bloom tips */}
@@ -293,19 +293,19 @@ function GardenPage() {
               : gardenState.plant_health > 0.4 ? "Growing"
               : "Wilting"}
           </span>
-          <span className="text-xs text-white/40">{showBloomTips ? "\u25B2" : "\u25BC"}</span>
+          <span className="text-xs text-white/70">{showBloomTips ? "\u25B2" : "\u25BC"}</span>
         </button>
 
         {/* Bloom breakdown tooltip */}
         <AnimatePresence>
           {showBloomTips && (
             <motion.div
-              className="absolute top-full mt-1 left-1/2 -translate-x-1/2 w-56 md:w-64 bg-black/60 backdrop-blur-xl rounded-2xl border border-white/20 p-3 shadow-xl"
+              className="absolute top-full mt-1 left-1/2 -translate-x-1/2 w-56 md:w-64 bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-700/50 p-3 shadow-xl"
               initial={{ opacity: 0, y: -5, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -5, scale: 0.95 }}
             >
-              <p className="text-xs font-semibold text-white/80 mb-2">
+              <p className="text-xs font-semibold text-slate-200 mb-2">
                 {pendingItems.length === 0
                   ? "Your garden is in full bloom! All tasks complete."
                   : "Complete these to help your flower bloom:"}
@@ -313,10 +313,10 @@ function GardenPage() {
               {pendingItems.length > 0 ? (
                 <ul className="space-y-1.5">
                   {pendingItems.map((item) => (
-                    <li key={item.id} className="flex items-center gap-2 text-xs text-white/70">
+                    <li key={item.id} className="flex items-center gap-2 text-xs text-slate-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
                       <span className="flex-1">{item.label}</span>
-                      <span className="text-white/40">{item.time}</span>
+                      <span className="text-slate-400">{item.time}</span>
                     </li>
                   ))}
                 </ul>
@@ -329,14 +329,14 @@ function GardenPage() {
       </motion.div>
 
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
-      <div className="hidden md:block absolute left-3 top-20 bottom-3 z-20 w-64 lg:w-72">
+      <div className="hidden md:block absolute left-2 top-16 bottom-2 z-20 w-56 lg:w-60">
         <BlurFade delay={0.2} inView>
           {checklistContent}
         </BlurFade>
       </div>
 
       {/* === DESKTOP: Right Butterfly Contacts (hidden on mobile) === */}
-      <div className="hidden md:flex absolute right-3 top-20 z-20 flex-col gap-3 items-center">
+      <div className="hidden md:flex absolute right-2 top-16 z-20 flex-col gap-2 items-center">
         {MARGARET_CONTACTS.map((contact, i) => (
           <BlurFade key={contact.name} delay={0.4 + i * 0.1} inView>
             <ButterflyContact contact={contact} position="stacked" />
@@ -345,29 +345,29 @@ function GardenPage() {
       </div>
 
       {/* === MOBILE: Bottom action bar (visible only on mobile) === */}
-      <div className="md:hidden absolute bottom-4 left-4 right-4 z-20 flex gap-2">
+      <div className="md:hidden absolute bottom-3 left-3 right-3 z-20 flex gap-2">
         <motion.button
           onClick={() => setMobilePanel(mobilePanel === "tasks" ? "none" : "tasks")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl backdrop-blur-xl border shadow-lg transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border shadow-lg transition-all ${
             mobilePanel === "tasks"
-              ? "bg-emerald-500/30 border-emerald-400/40 text-emerald-200"
-              : "bg-white/15 border-white/20 text-white"
+              ? "bg-emerald-500 border-emerald-600 text-white"
+              : "bg-white/95 border-slate-200 text-slate-700"
           }`}
           whileTap={{ scale: 0.95 }}
         >
-          <ClipboardList className="w-5 h-5" />
+          <ClipboardList className="w-4 h-4" />
           <span className="text-sm font-semibold">Tasks ({completedCount}/{checklist.length})</span>
         </motion.button>
         <motion.button
           onClick={() => setMobilePanel(mobilePanel === "contacts" ? "none" : "contacts")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl backdrop-blur-xl border shadow-lg transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border shadow-lg transition-all ${
             mobilePanel === "contacts"
-              ? "bg-blue-500/30 border-blue-400/40 text-blue-200"
-              : "bg-white/15 border-white/20 text-white"
+              ? "bg-blue-500 border-blue-600 text-white"
+              : "bg-white/95 border-slate-200 text-slate-700"
           }`}
           whileTap={{ scale: 0.95 }}
         >
-          <Users className="w-5 h-5" />
+          <Users className="w-4 h-4" />
           <span className="text-sm font-semibold">Family</span>
         </motion.button>
       </div>
@@ -376,7 +376,7 @@ function GardenPage() {
       <AnimatePresence>
         {mobilePanel === "tasks" && (
           <motion.div
-            className="md:hidden absolute bottom-20 left-4 right-4 z-30"
+            className="md:hidden absolute bottom-16 left-3 right-3 z-30"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
@@ -387,14 +387,14 @@ function GardenPage() {
         )}
         {mobilePanel === "contacts" && (
           <motion.div
-            className="md:hidden absolute bottom-20 left-4 right-4 z-30"
+            className="md:hidden absolute bottom-16 left-3 right-3 z-30"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ type: "spring", damping: 25 }}
           >
-            <div className="bg-white/15 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-4 space-y-3">
-              <h2 className="text-lg font-bold text-white drop-shadow mb-2">Family Contacts</h2>
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-3 space-y-2">
+              <h2 className="text-base font-bold text-slate-800 mb-1">Family Contacts</h2>
               {MARGARET_CONTACTS.map((contact) => (
                 <ButterflyContact key={contact.name} contact={contact} position="stacked" />
               ))}
