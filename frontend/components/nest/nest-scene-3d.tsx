@@ -112,65 +112,240 @@ function NestScene3D() {
     beach.position.y = -0.5;
     scene.add(beach);
 
-    // === NEST STRUCTURE (foreground, close to camera) ===
-    const nestGroup = new THREE.Group();
+    // === NEST TREE (large tree with nest on a branch) ===
+    const nestTreeGroup = new THREE.Group();
+    const barkMat = new THREE.MeshLambertMaterial({ color: 0x5C3A1E });
 
-    // Nest bowl (woven twigs)
-    const nestBowlGeo = new THREE.TorusGeometry(2.5, 0.6, 8, 16);
+    // Main trunk
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.7, 8, 8), barkMat);
+    trunk.position.y = 4;
+    trunk.castShadow = true;
+    addOutline(trunk, 0.03);
+    nestTreeGroup.add(trunk);
+
+    // Branch holding the nest (extends right)
+    const nestBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 5, 6), barkMat);
+    nestBranch.position.set(2, 7, 0.5);
+    nestBranch.rotation.z = -Math.PI / 3;
+    addOutline(nestBranch, 0.03);
+    nestTreeGroup.add(nestBranch);
+
+    // Other branches
+    const branch2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.2, 3.5, 5), barkMat);
+    branch2.position.set(-1.5, 6.5, -0.5);
+    branch2.rotation.z = Math.PI / 4;
+    nestTreeGroup.add(branch2);
+
+    // Foliage canopy
+    const foliageMat = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+    const canopyPositions = [
+      { x: 0, y: 9, z: 0, r: 2.0 }, { x: 1.5, y: 9.5, z: 1, r: 1.8 },
+      { x: -1.5, y: 9, z: -0.5, r: 1.6 }, { x: 0.5, y: 10, z: -0.5, r: 1.4 },
+      { x: -0.5, y: 8.5, z: 1, r: 1.5 }, { x: 2, y: 8, z: -0.5, r: 1.2 },
+    ];
+    canopyPositions.forEach((cp) => {
+      const f = new THREE.Mesh(new THREE.SphereGeometry(cp.r, 7, 6), foliageMat);
+      f.position.set(cp.x, cp.y, cp.z);
+      f.castShadow = true;
+      addOutline(f, 0.03);
+      nestTreeGroup.add(f);
+    });
+
+    // === SMALL NEST on the branch ===
+    const nestGroup = new THREE.Group();
     const nestMat = new THREE.MeshLambertMaterial({ color: 0x8B6914 });
-    const nestBowl = new THREE.Mesh(nestBowlGeo, nestMat);
+
+    // Nest bowl (smaller)
+    const nestBowl = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.2, 8, 12), nestMat);
     nestBowl.rotation.x = -Math.PI / 2;
     addOutline(nestBowl, 0.04);
     nestGroup.add(nestBowl);
 
-    // Nest inner filling
+    // Nest inner
     const nestInner = new THREE.Mesh(
-      new THREE.CircleGeometry(2.2, 16),
+      new THREE.CircleGeometry(0.6, 12),
       new THREE.MeshLambertMaterial({ color: 0x6B4E2A })
     );
     nestInner.rotation.x = -Math.PI / 2;
-    nestInner.position.y = -0.1;
+    nestInner.position.y = -0.05;
     nestGroup.add(nestInner);
 
-    // Twigs layered around the nest
-    for (let i = 0; i < 20; i++) {
-      const angle = (i / 20) * Math.PI * 2;
-      const twig = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.04, 0.06, 1.5 + Math.random(), 4),
-        new THREE.MeshLambertMaterial({ color: 0x7A5C2E + Math.floor(Math.random() * 0x202020) })
-      );
-      twig.position.set(Math.cos(angle) * 2.2, 0.2, Math.sin(angle) * 2.2);
-      twig.rotation.z = (Math.random() - 0.5) * 0.5;
-      twig.rotation.y = angle + Math.random();
-      nestGroup.add(twig);
-    }
-
-    // Small eggs in nest
+    // Eggs (small)
     const eggMat = new THREE.MeshPhongMaterial({ color: 0xF5F0E8, shininess: 30 });
     for (let i = 0; i < 3; i++) {
-      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 6), eggMat);
+      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5), eggMat);
       egg.scale.set(0.8, 1.0, 0.8);
-      egg.position.set(Math.cos(i * 2.1) * 0.6, 0.1, Math.sin(i * 2.1) * 0.6);
+      egg.position.set(Math.cos(i * 2.1) * 0.25, 0.05, Math.sin(i * 2.1) * 0.25);
       addOutline(egg, 0.05);
       nestGroup.add(egg);
     }
 
     // Spots on eggs
-    const spotMat = new THREE.MeshLambertMaterial({ color: 0xC4A882 });
-    for (let i = 0; i < 8; i++) {
-      const spot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 4, 3), spotMat);
-      spot.position.set(
-        Math.cos(i * 0.8) * 0.7 + (Math.random() - 0.5) * 0.3,
-        0.3,
-        Math.sin(i * 0.8) * 0.7 + (Math.random() - 0.5) * 0.3
-      );
+    for (let i = 0; i < 5; i++) {
+      const spot = new THREE.Mesh(new THREE.SphereGeometry(0.025, 4, 3), new THREE.MeshLambertMaterial({ color: 0xC4A882 }));
+      spot.position.set(Math.cos(i * 1.2) * 0.28, 0.12, Math.sin(i * 1.2) * 0.28);
       nestGroup.add(spot);
     }
 
-    // Scale up the nest for the 3/4 view
-    nestGroup.scale.set(1.8, 1.8, 1.8);
-    nestGroup.position.set(0, 1.2, 2);
-    scene.add(nestGroup);
+    nestGroup.position.set(3.5, 6.8, 0.8);
+    nestTreeGroup.add(nestGroup);
+
+    nestTreeGroup.position.set(2, 0, 3);
+    scene.add(nestTreeGroup);
+
+    // === SCATTERED TWIGS on the ground ===
+    for (let i = 0; i < 15; i++) {
+      const twig = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.02, 0.04, 0.8 + Math.random() * 0.6, 4),
+        new THREE.MeshLambertMaterial({ color: 0x7A5C2E + Math.floor(Math.random() * 0x151515) })
+      );
+      const tx = (Math.random() - 0.5) * 8 + 2;
+      const tz = (Math.random() - 0.5) * 8 + 3;
+      if (Math.sqrt(tx * tx + tz * tz) > ISLAND_RADIUS - 2) continue;
+      twig.position.set(tx, 0.05, tz);
+      twig.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+      twig.rotation.z = Math.random() * Math.PI;
+      scene.add(twig);
+    }
+
+    // === MATCHA CUP on the ground near the tree ===
+    const matchaGroup = new THREE.Group();
+    // Cup body
+    const cup = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.25, 0.2, 0.35, 8),
+      new THREE.MeshPhongMaterial({ color: 0xf5f0e0, shininess: 40 })
+    );
+    cup.position.y = 0.175;
+    addOutline(cup, 0.04);
+    matchaGroup.add(cup);
+    // Cup handle
+    const handle = new THREE.Mesh(
+      new THREE.TorusGeometry(0.1, 0.025, 6, 8, Math.PI),
+      new THREE.MeshPhongMaterial({ color: 0xf5f0e0, shininess: 40 })
+    );
+    handle.position.set(0.28, 0.2, 0);
+    handle.rotation.y = Math.PI / 2;
+    matchaGroup.add(handle);
+    // Matcha liquid (green top)
+    const matcha = new THREE.Mesh(
+      new THREE.CircleGeometry(0.22, 8),
+      new THREE.MeshPhongMaterial({ color: 0x7ab648, shininess: 60 })
+    );
+    matcha.rotation.x = -Math.PI / 2;
+    matcha.position.y = 0.34;
+    matchaGroup.add(matcha);
+    // Steam wisps
+    for (let i = 0; i < 3; i++) {
+      const steam = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 5, 4),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 })
+      );
+      steam.position.set((Math.random() - 0.5) * 0.1, 0.45 + i * 0.08, (Math.random() - 0.5) * 0.1);
+      steam.userData = { steamPhase: Math.random() * Math.PI * 2 };
+      matchaGroup.add(steam);
+    }
+    matchaGroup.position.set(4, 0, 4.5);
+    scene.add(matchaGroup);
+
+    // === CAT sitting near the tree ===
+    const catGroup = new THREE.Group();
+    const catFurMat = new THREE.MeshLambertMaterial({ color: 0x444444 });
+    const catWhiteMat = new THREE.MeshLambertMaterial({ color: 0xeeeeee });
+    // Body
+    const catBody = new THREE.Mesh(new THREE.SphereGeometry(0.3, 7, 6), catFurMat);
+    catBody.position.set(0, 0.3, 0);
+    catBody.scale.set(0.8, 0.7, 1.1);
+    addOutline(catBody, 0.04);
+    catGroup.add(catBody);
+    // Head
+    const catHead = new THREE.Mesh(new THREE.SphereGeometry(0.2, 7, 6), catFurMat);
+    catHead.position.set(0, 0.55, 0.2);
+    addOutline(catHead, 0.04);
+    catGroup.add(catHead);
+    // Ears
+    for (const side of [-1, 1]) {
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.12, 4), catFurMat);
+      ear.position.set(side * 0.12, 0.72, 0.18);
+      ear.rotation.x = -0.2;
+      addOutline(ear, 0.05);
+      catGroup.add(ear);
+      const innerEar = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.08, 4), new THREE.MeshLambertMaterial({ color: 0xffaaaa }));
+      innerEar.position.set(side * 0.12, 0.72, 0.2);
+      innerEar.rotation.x = -0.2;
+      catGroup.add(innerEar);
+    }
+    // Eyes
+    for (const side of [-1, 1]) {
+      const eyeW = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 5), catWhiteMat);
+      eyeW.position.set(side * 0.08, 0.58, 0.36);
+      catGroup.add(eyeW);
+      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.025, 5, 4), new THREE.MeshPhongMaterial({ color: 0x44aa44, shininess: 60 }));
+      pupil.position.set(side * 0.08, 0.58, 0.38);
+      catGroup.add(pupil);
+    }
+    // Nose
+    const catNose = new THREE.Mesh(new THREE.SphereGeometry(0.02, 4, 3), new THREE.MeshLambertMaterial({ color: 0xffaaaa }));
+    catNose.position.set(0, 0.53, 0.39);
+    catGroup.add(catNose);
+    // Tail (curved)
+    const tailCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.25, -0.3),
+      new THREE.Vector3(0.15, 0.4, -0.5),
+      new THREE.Vector3(0.1, 0.6, -0.45),
+      new THREE.Vector3(-0.05, 0.7, -0.35),
+    ]);
+    const tail = new THREE.Mesh(new THREE.TubeGeometry(tailCurve, 8, 0.04, 5, false), catFurMat);
+    addOutline(tail, 0.05);
+    catGroup.add(tail);
+    // Front paws
+    for (const side of [-1, 1]) {
+      const paw = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), catFurMat);
+      paw.position.set(side * 0.1, 0.06, 0.15);
+      paw.scale.set(0.8, 0.5, 1.0);
+      catGroup.add(paw);
+    }
+    catGroup.position.set(5, 0, 3);
+    catGroup.rotation.y = -0.8;
+    scene.add(catGroup);
+
+    // === BIRDIES perched near the nest (on branches/ground) ===
+    function createPerchBird(x: number, y: number, z: number, col: number, facing: number) {
+      const g = new THREE.Group();
+      const bMat = new THREE.MeshLambertMaterial({ color: col });
+      // Body
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5), bMat);
+      body.scale.set(0.8, 0.9, 1.1);
+      addOutline(body, 0.04);
+      g.add(body);
+      // Head
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 5), bMat);
+      head.position.set(0, 0.12, 0.08);
+      addOutline(head, 0.04);
+      g.add(head);
+      // Eye
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.02, 4, 3), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      eye.position.set(0.04, 0.14, 0.14);
+      g.add(eye);
+      // Beak
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.06, 4), new THREE.MeshLambertMaterial({ color: 0xffa000 }));
+      beak.position.set(0, 0.11, 0.18);
+      beak.rotation.x = Math.PI / 2;
+      g.add(beak);
+      // Tail feathers
+      const tailF = new THREE.Mesh(new THREE.SphereGeometry(0.06, 5, 4), bMat);
+      tailF.position.set(0, 0.02, -0.12);
+      tailF.scale.set(0.5, 0.3, 1.5);
+      g.add(tailF);
+      g.position.set(x, y, z);
+      g.rotation.y = facing;
+      return g;
+    }
+    // Bird on branch near nest
+    scene.add(createPerchBird(4.5, 7.2, 1.2, 0xe74c3c, -0.5));
+    // Bird on ground near matcha
+    scene.add(createPerchBird(3.5, 0.15, 5, 0x3498db, 0.3));
+    // Bird on ground near cat
+    scene.add(createPerchBird(6, 0.15, 2.5, 0xf1c40f, -1.2));
 
     // === LIGHTHOUSE ===
     const lhGroup = new THREE.Group();
@@ -369,7 +544,23 @@ function NestScene3D() {
       camera.lookAt(0, 3, 0);
 
       // Nest gentle rock
-      nestGroup.rotation.z = Math.sin(time * 0.5) * 0.02;
+      nestGroup.rotation.z = Math.sin(time * 0.5) * 0.03;
+
+      // Cat tail sway
+      catGroup.children.forEach((child) => {
+        if (child instanceof THREE.Mesh && child.geometry instanceof THREE.TubeGeometry) {
+          child.rotation.y = Math.sin(time * 1.5) * 0.3;
+        }
+      });
+
+      // Matcha steam float
+      matchaGroup.children.forEach((child) => {
+        if (child.userData?.steamPhase !== undefined) {
+          const ph = child.userData.steamPhase;
+          child.position.y = 0.45 + Math.sin(time * 2 + ph) * 0.06;
+          (child as THREE.Mesh).material && ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity !== undefined && (((child as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.15 + Math.sin(time * 1.5 + ph) * 0.15);
+        }
+      });
 
       // Lighthouse light pulse
       lhLight.intensity = 1.0 + Math.sin(time * 2) * 0.5;
