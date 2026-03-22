@@ -1562,80 +1562,122 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       scene.add(fish);
     });
 
-    // === WHALE ===
+    // === WHALE (humpback - wide, rounded, friendly) ===
     const whaleGroup = new THREE.Group();
-    const whaleMat = new THREE.MeshPhongMaterial({ color: 0x2c3e6b, shininess: 40 });
-    const whaleBelly = new THREE.MeshPhongMaterial({ color: 0x8faabe, shininess: 30 });
-    // Body
-    const whaleBody = new THREE.Mesh(new THREE.SphereGeometry(2.5, 10, 8), whaleMat);
-    whaleBody.scale.set(2.2, 0.8, 0.9);
+    const whaleMat = new THREE.MeshPhongMaterial({ color: 0x2c4a6b, shininess: 40 });
+    const whaleBellyMat = new THREE.MeshPhongMaterial({ color: 0xb0c8d8, shininess: 30 });
+    // Main body (wide oval, not elongated)
+    const whaleBody = new THREE.Mesh(new THREE.SphereGeometry(2.0, 10, 8), whaleMat);
+    whaleBody.scale.set(1.6, 1.0, 1.2);
+    addOutline(whaleBody, 0.02);
     whaleGroup.add(whaleBody);
-    // Belly
-    const wBelly = new THREE.Mesh(new THREE.SphereGeometry(2.3, 8, 6), whaleBelly);
-    wBelly.scale.set(2.0, 0.5, 0.7);
-    wBelly.position.y = -0.5;
+    // Belly (white underside)
+    const wBelly = new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 6), whaleBellyMat);
+    wBelly.scale.set(1.4, 0.6, 1.0);
+    wBelly.position.y = -0.6;
     whaleGroup.add(wBelly);
-    // Head
-    const whaleHead = new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 7), whaleMat);
-    whaleHead.position.set(4, 0.2, 0);
-    whaleHead.scale.set(1.2, 0.7, 0.8);
+    // Head bump (rounded forehead)
+    const whaleHead = new THREE.Mesh(new THREE.SphereGeometry(1.4, 8, 7), whaleMat);
+    whaleHead.position.set(2.8, 0.3, 0);
+    whaleHead.scale.set(0.8, 0.8, 0.9);
     whaleGroup.add(whaleHead);
-    // Eye
-    const whaleEye = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 5), new THREE.MeshBasicMaterial({ color: 0x111111 }));
-    whaleEye.position.set(5, 0.5, 1.2);
-    whaleGroup.add(whaleEye);
-    // Tail fluke
+    // Mouth line
+    const mouthLine = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: 0x1a2a3a }));
+    mouthLine.position.set(3.2, -0.1, 0.8);
+    whaleGroup.add(mouthLine);
+    // Eyes (both sides)
     for (const side of [-1, 1]) {
-      const fluke = new THREE.Mesh(new THREE.SphereGeometry(1.0, 6, 5), whaleMat);
-      fluke.position.set(-5, 0.3, side * 1.2);
-      fluke.scale.set(1.5, 0.15, 0.8);
+      const whaleEye = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 5), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      whaleEye.position.set(3.2, 0.5, side * 1.1);
+      whaleGroup.add(whaleEye);
+    }
+    // Pectoral fins (wide, swept back)
+    for (const side of [-1, 1]) {
+      const pFin = new THREE.Mesh(new THREE.SphereGeometry(0.8, 6, 5), whaleMat);
+      pFin.position.set(0.5, -0.5, side * 1.8);
+      pFin.scale.set(2.0, 0.12, 0.6);
+      pFin.rotation.x = side * 0.2;
+      whaleGroup.add(pFin);
+    }
+    // Tail stock (narrowing)
+    const tailStock = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.8, 2.5, 6), whaleMat);
+    tailStock.position.set(-3.5, 0.2, 0);
+    tailStock.rotation.z = Math.PI / 2;
+    whaleGroup.add(tailStock);
+    // Tail flukes (horizontal, whale-like)
+    for (const side of [-1, 1]) {
+      const fluke = new THREE.Mesh(new THREE.SphereGeometry(0.8, 6, 5), whaleMat);
+      fluke.position.set(-4.8, 0.3, side * 1.0);
+      fluke.scale.set(1.2, 0.1, 0.7);
       whaleGroup.add(fluke);
     }
-    // Dorsal fin
-    const wDorsal = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 5), whaleMat);
-    wDorsal.position.set(-1, 1.5, 0);
-    wDorsal.rotation.z = 0.3;
-    whaleGroup.add(wDorsal);
-    whaleGroup.position.set(-35, -1.2, 10);
+    // Small dorsal hump (not a fin - humpbacks have a small bump)
+    const wHump = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 4), whaleMat);
+    wHump.position.set(-1, 1.6, 0);
+    wHump.scale.set(1.5, 0.8, 0.8);
+    whaleGroup.add(wHump);
+    whaleGroup.position.set(-35, -1.0, 10);
     whaleGroup.userData = { phase: 0 };
     scene.add(whaleGroup);
 
-    // === DOLPHINS (2, jumping) ===
+    // === DOLPHINS (curved body with tube geometry) ===
     const dolphins: THREE.Group[] = [];
     function makeDolphin(x: number, z: number, phase: number) {
       const g = new THREE.Group();
-      const dMat = new THREE.MeshPhongMaterial({ color: 0x607d9f, shininess: 50 });
-      const dBelly = new THREE.MeshPhongMaterial({ color: 0xc0d0e0, shininess: 40 });
-      // Body
-      const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), dMat);
-      body.scale.set(2.5, 0.8, 0.7);
-      g.add(body);
-      // Belly
-      const belly = new THREE.Mesh(new THREE.SphereGeometry(0.45, 7, 5), dBelly);
-      belly.scale.set(2.2, 0.5, 0.5);
-      belly.position.y = -0.15;
-      g.add(belly);
-      // Snout
-      const snout = new THREE.Mesh(new THREE.SphereGeometry(0.25, 6, 5), dMat);
-      snout.position.set(1.2, 0, 0);
-      snout.scale.set(1.5, 0.5, 0.5);
-      g.add(snout);
-      // Dorsal fin
-      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 4), dMat);
-      fin.position.set(-0.2, 0.35, 0);
-      fin.rotation.z = 0.2;
-      g.add(fin);
-      // Tail
+      const dMat = new THREE.MeshPhongMaterial({ color: 0x5a7a9a, shininess: 60 });
+      const dBellyMat = new THREE.MeshPhongMaterial({ color: 0xd0dde8, shininess: 50 });
+      // Curved body using CatmullRom tube
+      const bodyCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.8, 0, 0),
+        new THREE.Vector3(-0.3, 0.1, 0),
+        new THREE.Vector3(0.2, 0.15, 0),
+        new THREE.Vector3(0.6, 0.05, 0),
+        new THREE.Vector3(0.9, -0.05, 0),
+      ]);
+      const bodyMesh = new THREE.Mesh(new THREE.TubeGeometry(bodyCurve, 12, 0.18, 8, false), dMat);
+      addOutline(bodyMesh, 0.04);
+      g.add(bodyMesh);
+      // Belly stripe
+      const bellyMesh = new THREE.Mesh(new THREE.TubeGeometry(bodyCurve, 12, 0.14, 8, false), dBellyMat);
+      bellyMesh.position.y = -0.05;
+      g.add(bellyMesh);
+      // Head/melon (rounded forehead)
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 7, 6), dMat);
+      head.position.set(0.9, 0, 0);
+      head.scale.set(1.0, 0.85, 0.85);
+      g.add(head);
+      // Beak/rostrum
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.3, 5), dMat);
+      beak.position.set(1.15, -0.03, 0);
+      beak.rotation.z = -Math.PI / 2;
+      g.add(beak);
+      // Dorsal fin (curved, tall)
+      const dorsal = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.25, 4), dMat);
+      dorsal.position.set(0.1, 0.3, 0);
+      dorsal.rotation.z = 0.15;
+      g.add(dorsal);
+      // Tail flukes
       for (const s of [-1, 1]) {
-        const tf = new THREE.Mesh(new THREE.SphereGeometry(0.2, 5, 4), dMat);
-        tf.position.set(-1.3, 0, s * 0.25);
-        tf.scale.set(1.2, 0.15, 0.8);
-        g.add(tf);
+        const fluke = new THREE.Mesh(new THREE.SphereGeometry(0.12, 5, 4), dMat);
+        fluke.position.set(-0.9, 0, s * 0.15);
+        fluke.scale.set(1.0, 0.1, 0.6);
+        g.add(fluke);
+      }
+      // Pectoral fins
+      for (const s of [-1, 1]) {
+        const pec = new THREE.Mesh(new THREE.SphereGeometry(0.08, 5, 4), dMat);
+        pec.position.set(0.5, -0.1, s * 0.18);
+        pec.scale.set(1.5, 0.1, 0.5);
+        g.add(pec);
       }
       // Eye
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.04, 5, 4), new THREE.MeshBasicMaterial({ color: 0x111111 }));
-      eye.position.set(1.0, 0.12, 0.3);
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 5, 4), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      eye.position.set(0.85, 0.06, 0.15);
       g.add(eye);
+      // Smile line
+      const smile = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.01, 0.01), new THREE.MeshBasicMaterial({ color: 0x333333 }));
+      smile.position.set(1.0, -0.04, 0.12);
+      g.add(smile);
       g.position.set(x, -0.8, z);
       g.userData = { phase, baseX: x, baseZ: z };
       return g;
