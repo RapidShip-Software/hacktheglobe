@@ -795,7 +795,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     scene.add(clinicalIslandGroup);
 
     // === SUN ===
-    const sunPos = new THREE.Vector3(25, 8, 18);
+    const sunPos = new THREE.Vector3(20, 25, -15);
     const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
     sunMesh.position.copy(sunPos);
     addOutline(sunMesh, 0.02);
