@@ -329,14 +329,14 @@ function GardenPage() {
       </motion.div>
 
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
-      <div className="hidden md:block absolute left-2 top-16 bottom-2 z-20 w-56 lg:w-60">
+      <div className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 w-56 lg:w-60 max-h-[80vh]">
         <BlurFade delay={0.2} inView>
           {checklistContent}
         </BlurFade>
       </div>
 
       {/* === DESKTOP: Right Butterfly Contacts (hidden on mobile) === */}
-      <div className="hidden md:flex absolute right-2 top-16 z-20 flex-col gap-2 items-center">
+      <div className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-6 items-center">
         {MARGARET_CONTACTS.map((contact, i) => (
           <BlurFade key={contact.name} delay={0.4 + i * 0.1} inView>
             <ButterflyContact contact={contact} position="stacked" />

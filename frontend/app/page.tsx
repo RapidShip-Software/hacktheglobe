@@ -113,7 +113,7 @@ function HomePageInner() {
           >
             <img src="/logo-heart.png" alt="Canopy" className="h-28 sm:h-36 md:h-44 lg:h-52 drop-shadow-xl" />
             <span
-              className="font-semibold tracking-wide ml-4"
+              className="font-semibold tracking-wide -ml-1 sm:ml-1"
               style={{
                 fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
                 color: "#4db8a4",
