@@ -107,7 +107,7 @@ function NestScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
       new THREE.CylinderGeometry(ISLAND_RADIUS, ISLAND_RADIUS - 1, 1.5, 32),
       new THREE.MeshLambertMaterial({ map: grassTex, color: 0x3da55c })
     );
-    island.position.y = -0.3;
+    island.position.y = -0.75;
     island.receiveShadow = true;
     scene.add(island);
 
@@ -117,7 +117,7 @@ function NestScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
       new THREE.MeshLambertMaterial({ color: 0xe8d5a3 })
     );
     beach.rotation.x = -Math.PI / 2;
-    beach.position.y = -0.5;
+    beach.position.y = -0.1;
     scene.add(beach);
 
     // === NEST TREE (large tree with nest on a branch) ===
@@ -349,12 +349,27 @@ function NestScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
       g.rotation.y = facing;
       return g;
     }
-    // Bird on branch near nest
+    // Bird perched on branch near nest
     scene.add(createPerchBird(4.5, 7.2, 1.2, 0xe74c3c, -0.5));
-    // Bird on ground near matcha
-    scene.add(createPerchBird(3.5, 0.15, 5, 0x3498db, 0.3));
-    // Bird on ground near cat
-    scene.add(createPerchBird(6, 0.15, 2.5, 0xf1c40f, -1.2));
+
+    // Flying birds circling the island
+    const flyingBirds: THREE.Group[] = [];
+    const flyBirdData = [
+      { radius: 12, y: 8, speed: 0.4, phase: 0, col: 0x3498db },
+      { radius: 15, y: 10, speed: -0.3, phase: 2, col: 0xf1c40f },
+      { radius: 10, y: 6, speed: 0.5, phase: 4, col: 0xe74c3c },
+      { radius: 18, y: 12, speed: -0.25, phase: 1, col: 0x2ecc71 },
+    ];
+    flyBirdData.forEach((bd) => {
+      const b = createPerchBird(
+        Math.cos(bd.phase) * bd.radius,
+        bd.y,
+        Math.sin(bd.phase) * bd.radius,
+        bd.col, 0
+      );
+      flyingBirds.push(b);
+      scene.add(b);
+    });
 
     // === LIGHTHOUSE ===
     const lhGroup = new THREE.Group();
@@ -569,6 +584,16 @@ function NestScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
           child.position.y = 0.45 + Math.sin(time * 2 + ph) * 0.06;
           (child as THREE.Mesh).material && ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity !== undefined && (((child as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.15 + Math.sin(time * 1.5 + ph) * 0.15);
         }
+      });
+
+      // Flying birds orbit the island
+      flyingBirds.forEach((b, i) => {
+        const bd = flyBirdData[i];
+        const a = bd.phase + time * bd.speed;
+        b.position.x = Math.cos(a) * bd.radius;
+        b.position.z = Math.sin(a) * bd.radius;
+        b.position.y = bd.y + Math.sin(time * 2 + bd.phase) * 0.5;
+        b.rotation.y = a + Math.PI / 2;
       });
 
       // Lighthouse light pulse

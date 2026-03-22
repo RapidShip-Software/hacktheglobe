@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
 import { BlurFade } from "@/components/shared/blur-fade";
+import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 
 const TeamScene3D = dynamic(
   () => import("@/components/team/team-scene-3d").then((m) => m.TeamScene3D),
@@ -46,6 +47,7 @@ const TEAM = [
 function TeamPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
 
   const handleBack = useCallback(() => {
     setIsExiting(true);
@@ -55,7 +57,10 @@ function TeamPage() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Campfire Scene */}
-      <TeamScene3D />
+      <TeamScene3D timeOfDay={timeOfDay} />
+
+      {/* Time toggle */}
+      <TimeToggle timeOfDay={timeOfDay} onChange={setTimeOfDay} />
 
       {/* Back button */}
       <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20">

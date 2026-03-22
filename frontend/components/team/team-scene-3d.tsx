@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function TeamScene3D() {
+type TimeOfDay = "day" | "sunset" | "night";
+
+function TeamScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -11,9 +13,10 @@ function TeamScene3D() {
     const container = containerRef.current;
     if (!container) return;
 
+    const skyCol = timeOfDay === "sunset" ? 0xff8c5a : timeOfDay === "night" ? 0x0d1b2a : 0x87ceeb;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0d1b2a);
-    scene.fog = new THREE.FogExp2(0x0d1b2a, 0.008);
+    scene.background = new THREE.Color(skyCol);
+    scene.fog = new THREE.FogExp2(skyCol, 0.008);
 
     const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 200);
     camera.position.set(6, 4, 8);
@@ -25,14 +28,19 @@ function TeamScene3D() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.8;
+    renderer.toneMappingExposure = timeOfDay === "night" ? 0.8 : timeOfDay === "sunset" ? 1.1 : 1.4;
     container.appendChild(renderer.domElement);
 
-    // Lighting (nighttime campfire scene)
-    scene.add(new THREE.AmbientLight(0x222244, 0.3));
-    const moonLight = new THREE.DirectionalLight(0x8888cc, 0.3);
-    moonLight.position.set(-5, 15, -5);
-    scene.add(moonLight);
+    // Lighting (adapts to time of day)
+    const ambCol = timeOfDay === "night" ? 0x222244 : timeOfDay === "sunset" ? 0xffbe8a : 0xfff8e1;
+    const ambInt = timeOfDay === "night" ? 0.3 : timeOfDay === "sunset" ? 0.5 : 0.7;
+    scene.add(new THREE.AmbientLight(ambCol, ambInt));
+    const skyLight = new THREE.DirectionalLight(
+      timeOfDay === "night" ? 0x8888cc : timeOfDay === "sunset" ? 0xff6030 : 0xfff4e0,
+      timeOfDay === "night" ? 0.3 : timeOfDay === "sunset" ? 1.0 : 1.4
+    );
+    skyLight.position.set(-5, 15, -5);
+    scene.add(skyLight);
 
     const outlineMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide });
     function addOutline(mesh: THREE.Mesh, thickness = 0.03) {
@@ -104,13 +112,13 @@ function TeamScene3D() {
 
     // Fire (multiple layers)
     const fireMeshes: THREE.Mesh[] = [];
-    const fireColors = [0xff4400, 0xff6600, 0xff8800, 0xffaa00, 0xffcc33];
-    for (let i = 0; i < 5; i++) {
+    const fireColors = [0xff4400, 0xff5500, 0xff6600, 0xff8800, 0xffaa00, 0xffcc33, 0xffdd66];
+    for (let i = 0; i < 7; i++) {
       const f = new THREE.Mesh(
-        new THREE.SphereGeometry(0.15 - i * 0.02, 6, 5),
-        new THREE.MeshBasicMaterial({ color: fireColors[i], transparent: true, opacity: 0.8 - i * 0.1 })
+        new THREE.SphereGeometry(0.18 - i * 0.02, 6, 5),
+        new THREE.MeshBasicMaterial({ color: fireColors[i], transparent: true, opacity: 0.85 - i * 0.08 })
       );
-      f.position.y = 0.25 + i * 0.12;
+      f.position.y = 0.25 + i * 0.18;
       fireMeshes.push(f);
       campfireGroup.add(f);
     }
@@ -134,7 +142,7 @@ function TeamScene3D() {
 
     // Fire light (warm, flickering)
     const fireLight = new THREE.PointLight(0xff6600, 5, 25);
-    fireLight.position.y = 0.8;
+    fireLight.position.y = 1.2;
     fireLight.castShadow = true;
     campfireGroup.add(fireLight);
 
@@ -145,6 +153,34 @@ function TeamScene3D() {
 
     campfireGroup.position.set(0, 0, 0);
     scene.add(campfireGroup);
+
+    // === PURPLE FLAG ===
+    const flagGroup = new THREE.Group();
+    // Pole
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.06, 4, 6),
+      new THREE.MeshLambertMaterial({ color: 0x6b3e1e })
+    );
+    pole.position.y = 2;
+    addOutline(pole, 0.04);
+    flagGroup.add(pole);
+    // Flag cloth (purple)
+    const flagCloth = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.8, 1.0),
+      new THREE.MeshLambertMaterial({ color: 0x7c3aed, side: THREE.DoubleSide })
+    );
+    flagCloth.position.set(0.95, 3.5, 0);
+    addOutline(flagCloth, 0.04);
+    flagGroup.add(flagCloth);
+    // Canopy text on flag (small white tree icon)
+    const flagIcon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.15, 6, 5),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    flagIcon.position.set(0.95, 3.5, 0.02);
+    flagGroup.add(flagIcon);
+    flagGroup.position.set(3, 0, -2);
+    scene.add(flagGroup);
 
     // === LOG SEATS (4 around campfire) ===
     const seatData = [
@@ -232,8 +268,12 @@ function TeamScene3D() {
       fireMeshes.forEach((f, i) => {
         f.scale.y = 1 + Math.sin(time * (6 + i * 2)) * 0.3;
         f.scale.x = 1 + Math.sin(time * (5 + i * 1.5) + i) * 0.15;
-        f.position.y = 0.25 + i * 0.12 + Math.sin(time * (7 + i)) * 0.03;
+        f.position.y = 0.25 + i * 0.18 + Math.sin(time * (7 + i)) * 0.04;
       });
+
+      // Flag wave
+      flagCloth.rotation.y = Math.sin(time * 2) * 0.15;
+      flagCloth.position.x = 0.95 + Math.sin(time * 2.5) * 0.05;
 
       // Embers float up
       embers.forEach((e) => {
@@ -275,7 +315,7 @@ function TeamScene3D() {
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [timeOfDay]);
 
   return <div ref={containerRef} className="fixed inset-0 w-full h-full" style={{ zIndex: 0 }} />;
 }
