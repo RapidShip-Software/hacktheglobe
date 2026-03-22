@@ -103,15 +103,21 @@ function HomePageInner() {
 
       {/* Content overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-16">
-        {/* Logo + Title */}
+        {/* Logo */}
         <BlurFade delay={0.1} inView>
           <motion.div
-            className="flex items-center gap-4 mb-6"
+            className="relative flex items-center justify-center mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo.png" alt="Canopy" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" />
+            <img src="/logo.png" alt="" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" />
+            <span
+              className="absolute inset-0 flex items-center justify-center font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-widest uppercase text-white drop-shadow-2xl select-none pointer-events-none"
+              style={{ textShadow: "0 4px 20px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3)" }}
+            >
+              Canopy
+            </span>
           </motion.div>
         </BlurFade>
 
