@@ -1018,8 +1018,6 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     archGroup.position.set(0, 0, -4);
     scene.add(archGroup);
 
-    // Big tall tree behind the arch
-    scene.add(tree(0, -6.5, 1.8, 0x1a6b1a));
 
     // === CENTRAL PLANT (healthy, blooming for landing page) ===
     const plantGroup = new THREE.Group();

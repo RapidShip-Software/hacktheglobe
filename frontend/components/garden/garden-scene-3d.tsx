@@ -18,9 +18,9 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     scene.background = new THREE.Color(skyColor);
     scene.fog = new THREE.Fog(skyColor, 25, 60);
 
-    const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 200);
-    camera.position.set(0, 5, 16);
-    camera.lookAt(0, 1.5, 0);
+    const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.1, 200);
+    camera.position.set(0, 7, 22);
+    camera.lookAt(0, 1, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -173,8 +173,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     scene.add(ground);
 
     // Grass path (dirt texture)
-    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 25), new THREE.MeshLambertMaterial({ map: dirtTex, color: 0xd4b07a }));
-    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.03, 5); path.receiveShadow = true;
+    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 16), new THREE.MeshLambertMaterial({ map: dirtTex, color: 0xd4b07a }));
+    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.03, 2); path.receiveShadow = true;
     scene.add(path);
 
     // === HELPERS ===
@@ -789,26 +789,26 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     lBranch.position.set(-6, 6, 12);
     lBranch.rotation.z = 0.8;
     lBranch.rotation.y = 0.3;
-    scene.add(lBranch);
+    // scene.add(lBranch); // Removed floating log
     for (let i = 0; i < 12; i++) {
       const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.6 + Math.random() * 0.4, 6, 5), canopyLeafMat);
       leaf.position.set(-5 + (Math.random() - 0.5) * 4, 7 + Math.random() * 2, 11 + (Math.random() - 0.5) * 3);
       leaf.scale.set(1.5, 0.4, 1.0);
       canopyLeaves.push(leaf);
-      scene.add(leaf);
+      // scene.add(leaf);
     }
     // Right canopy branch
     const rBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.25, 5, 5), canopyBranchMat);
     rBranch.position.set(7, 6.5, 13);
     rBranch.rotation.z = -0.7;
     rBranch.rotation.y = -0.2;
-    scene.add(rBranch);
+    // scene.add(rBranch);
     for (let i = 0; i < 10; i++) {
       const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.5 + Math.random() * 0.3, 6, 5), canopyLeafMat);
       leaf.position.set(6 + (Math.random() - 0.5) * 3, 7.5 + Math.random() * 1.5, 12 + (Math.random() - 0.5) * 2);
       leaf.scale.set(1.4, 0.35, 0.9);
       canopyLeaves.push(leaf);
-      scene.add(leaf);
+      // scene.add(leaf);
     }
 
     // === FIREFLIES ===
@@ -878,9 +878,9 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
         if (Math.abs(ff.position.x) > 8) ff.userData.driftX *= -1;
         if (Math.abs(ff.position.z) > 10) ff.userData.driftZ *= -1;
       });
-      camera.position.x = Math.sin(time * 0.3) * 0.2;
-      camera.position.y = 5 + Math.sin(time * 0.5) * 0.1;
-      camera.lookAt(0, 1.5, 0);
+      camera.position.x = Math.sin(time * 0.3) * 0.3;
+      camera.position.y = 7 + Math.sin(time * 0.5) * 0.15;
+      camera.lookAt(0, 1, 0);
       plantGroup.rotation.z = Math.sin(time * 0.8) * 0.015;
       plantGroup.rotation.x = Math.sin(time * 0.6) * 0.008;
       flowerParts.forEach((p, i) => { const s = 1 + Math.sin(time * 2 + i * 0.5) * 0.04; p.scale.x = s; p.scale.z = s * 0.7; });
