@@ -53,31 +53,39 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
   const speak = useCallback((text: string, index: number) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
-    // Stop any current speech
-    window.speechSynthesis.cancel();
-
+    // Toggle off if already speaking this message
     if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
       setSpeakingIndex(null);
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.85; // Slower for elderly users
-    utterance.pitch = 1.05;
-    utterance.volume = 1;
+    // Cancel any current speech
+    window.speechSynthesis.cancel();
 
-    // Prefer a warm female voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(
-      (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
-    );
-    if (preferred) utterance.voice = preferred;
+    // Chrome bug: cancel() followed immediately by speak() silently fails.
+    // A short delay + resume fixes this.
+    setTimeout(() => {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.85;
+      utterance.pitch = 1.05;
+      utterance.volume = 1;
 
-    utterance.onstart = () => setSpeakingIndex(index);
-    utterance.onend = () => setSpeakingIndex(null);
-    utterance.onerror = () => setSpeakingIndex(null);
+      const voices = synth.getVoices();
+      const preferred = voices.find(
+        (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
+      );
+      if (preferred) utterance.voice = preferred;
 
-    window.speechSynthesis.speak(utterance);
+      utterance.onstart = () => setSpeakingIndex(index);
+      utterance.onend = () => setSpeakingIndex(null);
+      utterance.onerror = () => setSpeakingIndex(null);
+
+      synth.speak(utterance);
+      // Chrome sometimes pauses synth after cancel, force resume
+      synth.resume();
+    }, 100);
   }, [speakingIndex]);
 
   const toggleListening = useCallback(() => {
@@ -138,20 +146,25 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
       // Small delay so the message renders first
       const timer = setTimeout(() => {
         if (typeof window !== "undefined" && window.speechSynthesis) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(lastMsg.text);
-          utterance.rate = 0.85;
-          utterance.pitch = 1.05;
-          utterance.volume = 1;
-          const voices = window.speechSynthesis.getVoices();
-          const preferred = voices.find(
-            (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
-          );
-          if (preferred) utterance.voice = preferred;
-          utterance.onstart = () => setSpeakingIndex(lastIdx);
-          utterance.onend = () => setSpeakingIndex(null);
-          utterance.onerror = () => setSpeakingIndex(null);
-          window.speechSynthesis.speak(utterance);
+          const synth = window.speechSynthesis;
+          synth.cancel();
+          // Delay after cancel to avoid Chrome silent-fail bug
+          setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(lastMsg.text);
+            utterance.rate = 0.85;
+            utterance.pitch = 1.05;
+            utterance.volume = 1;
+            const voices = synth.getVoices();
+            const preferred = voices.find(
+              (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
+            );
+            if (preferred) utterance.voice = preferred;
+            utterance.onstart = () => setSpeakingIndex(lastIdx);
+            utterance.onend = () => setSpeakingIndex(null);
+            utterance.onerror = () => setSpeakingIndex(null);
+            synth.speak(utterance);
+            synth.resume();
+          }, 100);
         }
       }, 300);
       return () => clearTimeout(timer);
@@ -205,7 +218,7 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
           >
             <div className="w-2 h-2 rounded-full bg-amber-300" />
           </motion.div>
-          <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20">
+          <span className="text-base font-bold text-white bg-slate-900 rounded-full px-5 py-2 shadow-lg border border-slate-700">
             Help
           </span>
         </motion.button>
@@ -221,11 +234,11 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
             exit={{ opacity: 0 }}
           >
             <div
-              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-900/60"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              className="relative w-full max-w-md bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col"
+              className="relative w-full max-w-md bg-white shadow-2xl flex flex-col"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
