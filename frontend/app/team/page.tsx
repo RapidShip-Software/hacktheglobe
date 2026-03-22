@@ -19,28 +19,28 @@ const TEAM = [
     role: "Innovation Engineer",
     emoji: "🛠️",
     gradient: "from-emerald-400 to-teal-500",
-    description: "Backend, AI pipeline, 3D scenes, full-stack architecture.",
+    description: "",
   },
   {
     name: "Aahir C.",
     role: "Innovation Engineer",
     emoji: "⚡",
     gradient: "from-blue-400 to-indigo-500",
-    description: "Frontend polish, TTS/STT accessibility, UI/UX design.",
+    description: "",
   },
   {
     name: "Christie K.",
     role: "Impact Analyst",
     emoji: "📊",
     gradient: "from-amber-400 to-orange-500",
-    description: "Product management, pitch deck, SDG alignment, KPI strategy.",
+    description: "",
   },
   {
     name: "Rojella Santos",
     role: "Business Strategist",
     emoji: "💼",
     gradient: "from-violet-400 to-purple-500",
-    description: "Business model, go-to-market, stakeholder analysis, competitive landscape.",
+    description: "",
   },
 ];
 
