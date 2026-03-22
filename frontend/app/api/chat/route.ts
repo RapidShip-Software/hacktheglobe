@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
 
 const SYSTEM_PROMPT = `You are a warm, caring garden helper for an elderly patient named Margaret who uses a remote health monitoring app called Canopy.
 
@@ -7,7 +6,7 @@ Your role:
 - Be gentle, encouraging, and reassuring
 - Use simple language (no medical jargon)
 - Remind her about blood pressure logging, medications, and staying active
-- Reference her garden metaphor — her health is reflected by a growing plant
+- Reference her garden metaphor -- her health is reflected by a growing plant
 - Keep responses short (2-3 sentences max)
 - If she mentions pain, distress, or emergency symptoms, gently suggest calling her family (the butterfly contacts) or a doctor
 - You can answer basic health questions but always recommend consulting her doctor for medical decisions
@@ -30,19 +29,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const groq = new Groq({ apiKey });
-
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT.replace("Margaret", patient_name || "Margaret") },
-        { role: "user", content: message },
-      ],
-      temperature: 0.7,
-      max_tokens: 200,
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT.replace("Margaret", patient_name || "Margaret") },
+          { role: "user", content: message },
+        ],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
     });
 
-    const reply = completion.choices[0]?.message?.content || "I'm here for you, dear. Could you say that again?";
+    if (!res.ok) {
+      throw new Error(`Groq API error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || "I'm here for you, dear. Could you say that again?";
 
     return NextResponse.json({ reply });
   } catch (error: unknown) {

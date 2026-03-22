@@ -1,7 +1,30 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Web Speech Recognition types (not in default TS lib)
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  maxAlternatives: number;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+}
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
 
 type GardenGateProps = {
   patientName: string;
@@ -14,6 +37,124 @@ function GardenGate({ patientName }: GardenGateProps) {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  const speak = useCallback((text: string, index: number) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    // Stop any current speech
+    window.speechSynthesis.cancel();
+
+    if (speakingIndex === index) {
+      setSpeakingIndex(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.85; // Slower for elderly users
+    utterance.pitch = 1.05;
+    utterance.volume = 1;
+
+    // Prefer a warm female voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(
+      (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
+    );
+    if (preferred) utterance.voice = preferred;
+
+    utterance.onstart = () => setSpeakingIndex(index);
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+
+    window.speechSynthesis.speak(utterance);
+  }, [speakingIndex]);
+
+  const toggleListening = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    // Stop any TTS so the mic doesn't pick it up
+    window.speechSynthesis?.cancel();
+    setSpeakingIndex(null);
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0].transcript)
+        .join("");
+      setInput(transcript);
+
+      // Auto-send when speech ends (final result)
+      if (event.results[event.results.length - 1].isFinal) {
+        setTimeout(() => {
+          setIsListening(false);
+        }, 500);
+      }
+    };
+
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [isListening]);
+
+  // Track which message index we last auto-spoke to prevent repeats
+  const lastSpokenRef = useRef<number>(-1);
+
+  // Auto-speak new AI messages & scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const lastIdx = messages.length - 1;
+    const lastMsg = messages[lastIdx];
+    if (autoSpeak && lastMsg?.role === "ai" && lastIdx > 0 && lastIdx !== lastSpokenRef.current) {
+      lastSpokenRef.current = lastIdx;
+      // Small delay so the message renders first
+      const timer = setTimeout(() => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(lastMsg.text);
+          utterance.rate = 0.85;
+          utterance.pitch = 1.05;
+          utterance.volume = 1;
+          const voices = window.speechSynthesis.getVoices();
+          const preferred = voices.find(
+            (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
+          );
+          if (preferred) utterance.voice = preferred;
+          utterance.onstart = () => setSpeakingIndex(lastIdx);
+          utterance.onend = () => setSpeakingIndex(null);
+          utterance.onerror = () => setSpeakingIndex(null);
+          window.speechSynthesis.speak(utterance);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [messages, autoSpeak]);
+
+  // Load voices (some browsers need this)
+  useEffect(() => {
+    window.speechSynthesis?.getVoices();
+  }, []);
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
@@ -90,9 +231,27 @@ function GardenGate({ patientName }: GardenGateProps) {
                   <h3 className="font-bold text-gray-800">Garden Helper</h3>
                   <p className="text-xs text-gray-400">Always here for you</p>
                 </div>
+                {/* Auto-speak toggle */}
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="ml-auto w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors"
+                  onClick={() => {
+                    if (autoSpeak) window.speechSynthesis?.cancel();
+                    setAutoSpeak(!autoSpeak);
+                    setSpeakingIndex(null);
+                  }}
+                  className={`ml-auto w-9 h-9 rounded-full flex items-center justify-center text-lg transition-colors ${
+                    autoSpeak ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-400"
+                  }`}
+                  title={autoSpeak ? "Auto-read ON" : "Auto-read OFF"}
+                >
+                  {autoSpeak ? "🔊" : "🔇"}
+                </button>
+                <button
+                  onClick={() => {
+                    window.speechSynthesis?.cancel();
+                    setSpeakingIndex(null);
+                    setIsOpen(false);
+                  }}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 transition-colors"
                 >
                   ✕
                 </button>
@@ -108,17 +267,33 @@ function GardenGate({ patientName }: GardenGateProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <div
-                      className={`max-w-[80%] px-4 py-3 rounded-2xl text-base leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-emerald-500 text-white rounded-br-md"
-                          : "bg-gray-100 text-gray-800 rounded-bl-md"
-                      }`}
-                    >
-                      {msg.text}
+                    <div className={`max-w-[80%] ${msg.role === "ai" ? "group/msg" : ""}`}>
+                      <div
+                        className={`px-4 py-3 rounded-2xl text-base leading-relaxed ${
+                          msg.role === "user"
+                            ? "bg-emerald-500 text-white rounded-br-md"
+                            : "bg-gray-100 text-gray-800 rounded-bl-md"
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                      {msg.role === "ai" && (
+                        <button
+                          onClick={() => speak(msg.text, i)}
+                          className={`mt-1 px-2 py-0.5 rounded-full text-xs transition-all ${
+                            speakingIndex === i
+                              ? "bg-emerald-100 text-emerald-600"
+                              : "bg-gray-50 text-gray-400 hover:text-emerald-600"
+                          }`}
+                          title={speakingIndex === i ? "Stop reading" : "Read aloud"}
+                        >
+                          {speakingIndex === i ? "🔊 Speaking..." : "🔈 Read"}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
@@ -130,12 +305,37 @@ function GardenGate({ patientName }: GardenGateProps) {
                   }}
                   className="flex gap-2"
                 >
+                  {/* Mic button */}
+                  <motion.button
+                    type="button"
+                    onClick={toggleListening}
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 transition-colors ${
+                      isListening
+                        ? "bg-red-100 text-red-500 border-2 border-red-300"
+                        : "bg-gray-50 text-gray-400 border border-gray-200 hover:text-emerald-600 hover:border-emerald-300"
+                    }`}
+                    whileTap={{ scale: 0.9 }}
+                    title={isListening ? "Stop listening" : "Speak to type"}
+                  >
+                    {isListening ? (
+                      <motion.span
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        🔴
+                      </motion.span>
+                    ) : (
+                      "🎤"
+                    )}
+                  </motion.button>
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask me anything..."
-                    className="flex-1 px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
+                    placeholder={isListening ? "Listening..." : "Ask me anything..."}
+                    className={`flex-1 px-4 py-3 rounded-xl bg-gray-50 border text-base focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent ${
+                      isListening ? "border-red-300 bg-red-50/30" : "border-gray-200"
+                    }`}
                   />
                   <motion.button
                     type="submit"

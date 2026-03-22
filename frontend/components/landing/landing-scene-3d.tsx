@@ -1480,7 +1480,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     };
   }, []);
 
-  return <div ref={containerRef} className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }} />;
+  return <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />;
 }
 
 export { LandingScene3D };
