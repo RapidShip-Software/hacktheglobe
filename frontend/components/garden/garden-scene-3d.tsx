@@ -215,7 +215,7 @@ function GardenScene3D({ health, skyState, timeOfDay = "day" }: GardenScene3DPro
     }
     islandGeo.computeVertexNormals();
     const ground = new THREE.Mesh(islandGeo, new THREE.MeshLambertMaterial({ map: grassTex, color: 0x3da55c }));
-    ground.position.y = -0.3;
+    ground.position.y = -0.9;
     ground.receiveShadow = true;
     scene.add(ground);
 
@@ -225,7 +225,7 @@ function GardenScene3D({ health, skyState, timeOfDay = "day" }: GardenScene3DPro
       new THREE.MeshLambertMaterial({ color: 0xe8d5a3 })
     );
     beachRing.rotation.x = -Math.PI / 2;
-    beachRing.position.y = -0.6;
+    beachRing.position.y = -0.1;
     scene.add(beachRing);
 
     // === SMALL POND on the island ===
