@@ -113,7 +113,7 @@ function HomePageInner() {
           >
             <img src="/logo-heart.png" alt="Canopy" className="h-28 sm:h-36 md:h-44 lg:h-52 drop-shadow-xl" />
             <span
-              className="font-semibold tracking-wide -ml-1 sm:ml-1"
+              className="font-semibold tracking-wide -ml-6 sm:-ml-4"
               style={{
                 fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
                 color: "#4db8a4",
@@ -148,13 +148,13 @@ function HomePageInner() {
           {INTERFACES.map((item, index) => (
             <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
               <motion.div
-                className={`group relative p-8 md:p-10 bg-white rounded-3xl border border-slate-200 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer h-full overflow-hidden`}
+                className={`group relative p-8 md:p-10 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer h-full overflow-hidden`}
                 whileHover={{ y: -6, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCardClick(item.flyTarget, item.href)}
               >
-                {/* Subtle Gradient background on hover instead of generic block color */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgHover} opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none`} />
+                {/* Gradient background on hover */}
+                <div className={`absolute inset-0 rounded-3xl ${item.bgHover} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
 
                 <div className="relative z-10">
                   {/* Icon */}
@@ -162,18 +162,18 @@ function HomePageInner() {
                     {item.icon}
                   </div>
 
-                  <h2 className="text-2xl font-bold text-slate-900 mb-1">
+                  <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">
                     {item.title}
                   </h2>
-                  <p className="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">
+                  <p className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wider">
                     {item.subtitle}
                   </p>
-                  <p className="text-base font-medium text-slate-700 leading-relaxed">
+                  <p className="text-base font-medium text-white/90 leading-relaxed drop-shadow">
                     {item.description}
                   </p>
 
                   {/* Arrow */}
-                  <div className="mt-8 flex items-center gap-2 text-base font-bold text-emerald-600 group-hover:text-emerald-500 transition-colors">
+                  <div className="mt-8 flex items-center gap-2 text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
                     <span>Open</span>
                     <motion.span
                       className="inline-block text-xl"
