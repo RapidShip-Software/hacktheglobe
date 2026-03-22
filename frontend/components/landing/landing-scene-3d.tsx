@@ -17,8 +17,8 @@ function LandingScene3D() {
 
     // Camera: aerial view, will orbit
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 300);
-    const ORBIT_RADIUS = 30;
-    const ORBIT_HEIGHT = 22;
+    const ORBIT_RADIUS = 35;
+    const ORBIT_HEIGHT = 32;
     const ORBIT_SPEED = 0.15; // radians per second
     camera.position.set(0, ORBIT_HEIGHT, ORBIT_RADIUS);
     camera.lookAt(0, 0, 0);
@@ -191,7 +191,7 @@ function LandingScene3D() {
     scene.add(beach);
 
     // === SUN ===
-    const sunPos = new THREE.Vector3(15, 14, 10);
+    const sunPos = new THREE.Vector3(25, 8, 18);
     const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
     sunMesh.position.copy(sunPos);
     addOutline(sunMesh, 0.02);
