@@ -888,20 +888,21 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
     fire3.position.y = 0.65; campfireGroup.add(fire3);
     const fireLight = new THREE.PointLight(0xff6600, 2, 10);
     fireLight.position.y = 0.5; campfireGroup.add(fireLight);
+    campfireGroup.position.y = 0.8;
     teamIslandGroup.add(campfireGroup);
 
-    // Log seats
+    // Log seats (raised above island surface)
     [{ x: -2, z: 0, ry: 0 }, { x: 2, z: 0, ry: Math.PI }, { x: 0, z: -2, ry: Math.PI / 2 }, { x: 0, z: 2, ry: -Math.PI / 2 }].forEach((sp) => {
-      const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 1.2, 6), logMat2);
-      seat.position.set(sp.x, 0.25, sp.z); seat.rotation.z = Math.PI / 2; seat.rotation.y = sp.ry;
+      const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 1.4, 6), logMat2);
+      seat.position.set(sp.x, 1.1, sp.z); seat.rotation.z = Math.PI / 2; seat.rotation.y = sp.ry;
       addOutline(seat, 0.03); teamIslandGroup.add(seat);
     });
 
-    // Flag
-    const flagPole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 4, 4), new THREE.MeshLambertMaterial({ color: 0x888888 }));
-    flagPole.position.set(0, 2, -3.5); teamIslandGroup.add(flagPole);
-    const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.8), new THREE.MeshLambertMaterial({ color: 0x7c3aed, side: THREE.DoubleSide }));
-    flag.position.set(0.75, 3.6, -3.5); teamIslandGroup.add(flag);
+    // Flag (taller, more visible)
+    const flagPole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 6, 4), new THREE.MeshLambertMaterial({ color: 0x888888 }));
+    flagPole.position.set(3, 3.8, 0); teamIslandGroup.add(flagPole);
+    const teamFlag = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.0), new THREE.MeshLambertMaterial({ color: 0x7c3aed, side: THREE.DoubleSide }));
+    teamFlag.position.set(4, 6.2, 0); teamIslandGroup.add(teamFlag);
 
     // Trees + flowers
     for (let a = 0; a < Math.PI * 2; a += 0.7 + Math.random() * 0.3) {

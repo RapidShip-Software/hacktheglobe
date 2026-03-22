@@ -12,8 +12,8 @@ function TeamScene3D() {
     if (!container) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1040);
-    scene.fog = new THREE.FogExp2(0x1a1040, 0.012);
+    scene.background = new THREE.Color(0x0d1b2a);
+    scene.fog = new THREE.FogExp2(0x0d1b2a, 0.008);
 
     const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 200);
     camera.position.set(6, 4, 8);
@@ -133,7 +133,7 @@ function TeamScene3D() {
     }
 
     // Fire light (warm, flickering)
-    const fireLight = new THREE.PointLight(0xff6600, 3, 15);
+    const fireLight = new THREE.PointLight(0xff6600, 5, 25);
     fireLight.position.y = 0.8;
     fireLight.castShadow = true;
     campfireGroup.add(fireLight);
