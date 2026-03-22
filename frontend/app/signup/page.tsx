@@ -1,24 +1,42 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+
+type FlyToFn = (target: "garden" | "nest" | "clinical" | "team") => Promise<void>;
 
 const LandingScene3D = dynamic(
   () => import("@/components/landing/landing-scene-3d").then((m) => m.LandingScene3D),
   { ssr: false }
 );
 
+function getStoredUsers(): Record<string, { password: string; name: string }> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem("canopy_users") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveUser(email: string, password: string, name: string) {
+  const users = getStoredUsers();
+  users[email] = { password, name };
+  localStorage.setItem("canopy_users", JSON.stringify(users));
+}
+
 function SignupPage() {
   const router = useRouter();
+  const flyToRef = useRef<FlyToFn | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleSignup = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,41 +51,50 @@ function SignupPage() {
       return;
     }
 
+    const trimmedEmail = email.toLowerCase().trim();
+
+    // Check if already exists
+    const existing = getStoredUsers();
+    if (existing[trimmedEmail]) {
+      setError("An account with this email already exists. Please sign in.");
+      return;
+    }
+
     setIsLoading(true);
 
-    try {
-      // Sign up with Supabase Auth
-      const { error: authError } = await supabase.auth.signUp({
-        email: email.toLowerCase().trim(),
-        password,
-        options: {
-          data: { full_name: name.trim() },
-        },
-      });
+    // Save to localStorage
+    saveUser(trimmedEmail, password, name.trim());
 
-      if (authError) {
-        setError(authError.message);
-        setIsLoading(false);
-        return;
-      }
+    // Set session cookie
+    document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({
+      email: trimmedEmail,
+      name: name.trim(),
+      role: "patient",
+    }))};path=/;max-age=86400`;
 
-      // Set session cookie for middleware
-      document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({
-        email: email.toLowerCase().trim(),
-        name: name.trim(),
-        role: "patient",
-      }))};path=/;max-age=86400`;
-
-      router.push("/");
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setIsLoading(false);
+    // Fly-to animation then navigate
+    if (flyToRef.current) {
+      setIsTransitioning(true);
+      await flyToRef.current("garden");
     }
+    router.push("/?from=garden");
   }, [name, email, password, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ backgroundColor: "#87ceeb" }}>
-      <LandingScene3D />
+      <LandingScene3D flyToRef={flyToRef} />
+
+      {/* White fade during fly-to */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            className="fixed inset-0 bg-white z-50 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4, duration: 0.4 }}
+          />
+        )}
+      </AnimatePresence>
 
       <motion.div
         className="relative z-10 w-full max-w-md"

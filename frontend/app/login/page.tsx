@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 
 type FlyToFn = (target: "garden" | "nest" | "clinical" | "team") => Promise<void>;
 
@@ -51,27 +50,22 @@ function LoginPage() {
       return;
     }
 
-    // Try Supabase Auth
+    // Try localStorage accounts (signed-up users)
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password,
-      });
-
-      if (authError || !data.user) {
-        setError("Invalid email or password. Please try again.");
-        setIsLoading(false);
+      const storedUsers: Record<string, { password: string; name: string }> = JSON.parse(localStorage.getItem("canopy_users") || "{}");
+      const storedUser = storedUsers[trimmedEmail];
+      if (storedUser && storedUser.password === password) {
+        document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({ email: trimmedEmail, name: storedUser.name, role: "patient" }))};path=/;max-age=86400`;
+        await flyAndNavigate();
         return;
       }
-
-      const userName = data.user.user_metadata?.full_name || trimmedEmail.split("@")[0];
-      document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({ email: trimmedEmail, name: userName, role: "patient" }))};path=/;max-age=86400`;
-      await flyAndNavigate();
     } catch {
-      setError("Invalid email or password. Please try again.");
-      setIsLoading(false);
+      // localStorage unavailable
     }
-  }, [email, password, router]);
+
+    setError("Invalid email or password. Please try again.");
+    setIsLoading(false);
+  }, [email, password, flyAndNavigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ backgroundColor: "#87ceeb" }}>
