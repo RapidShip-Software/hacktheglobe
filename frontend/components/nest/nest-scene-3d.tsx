@@ -169,8 +169,73 @@ function NestScene3D() {
 
     // Scale up the nest for the 3/4 view
     nestGroup.scale.set(1.8, 1.8, 1.8);
-    nestGroup.position.set(0, 0.8, 2);
+    nestGroup.position.set(0, 1.2, 2);
     scene.add(nestGroup);
+
+    // === LIGHTHOUSE ===
+    const lhGroup = new THREE.Group();
+    const lhHeight = 7;
+    const lhBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.9, lhHeight, 8),
+      new THREE.MeshPhongMaterial({ color: 0xf5f0e0, shininess: 20 })
+    );
+    lhBody.position.y = lhHeight / 2;
+    lhBody.castShadow = true;
+    addOutline(lhBody, 0.02);
+    lhGroup.add(lhBody);
+
+    // Red stripes
+    const lhStripeMat = new THREE.MeshPhongMaterial({ color: 0xcc3333, shininess: 15 });
+    for (let s = 0; s < 3; s++) {
+      const sy = 1.5 + s * 2.0;
+      const sr = 0.9 - (sy / lhHeight) * 0.3;
+      const stripe = new THREE.Mesh(
+        new THREE.CylinderGeometry(sr - 0.01, sr + 0.02, 0.6, 8),
+        lhStripeMat
+      );
+      stripe.position.y = sy;
+      lhGroup.add(stripe);
+    }
+
+    // Deck
+    const lhDeckMat = new THREE.MeshPhongMaterial({ color: 0x333333, shininess: 30 });
+    const lhDeck = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.15, 12), lhDeckMat);
+    lhDeck.position.y = lhHeight + 0.08;
+    lhGroup.add(lhDeck);
+
+    // Railing
+    for (let r = 0; r < 12; r++) {
+      const ra = (r / 12) * Math.PI * 2;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 4), lhDeckMat);
+      post.position.set(Math.cos(ra) * 0.95, lhHeight + 0.35, Math.sin(ra) * 0.95);
+      lhGroup.add(post);
+    }
+    const lhRail = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.03, 4, 12), lhDeckMat);
+    lhRail.rotation.x = -Math.PI / 2;
+    lhRail.position.y = lhHeight + 0.55;
+    lhGroup.add(lhRail);
+
+    // Lamp room
+    const lhLamp = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.55, 0.8, 8),
+      new THREE.MeshPhongMaterial({ color: 0xfff9c4, transparent: true, opacity: 0.7, shininess: 60, emissive: 0xfff176, emissiveIntensity: 0.3 })
+    );
+    lhLamp.position.y = lhHeight + 0.55;
+    lhGroup.add(lhLamp);
+
+    // Roof
+    const lhRoof = new THREE.Mesh(new THREE.ConeGeometry(0.5, 0.5, 8), new THREE.MeshPhongMaterial({ color: 0xcc3333, shininess: 20 }));
+    lhRoof.position.y = lhHeight + 1.2;
+    addOutline(lhRoof, 0.03);
+    lhGroup.add(lhRoof);
+
+    // Light
+    const lhLight = new THREE.PointLight(0xfff9c4, 1.5, 20);
+    lhLight.position.y = lhHeight + 0.55;
+    lhGroup.add(lhLight);
+
+    lhGroup.position.set(-8, 0, -6);
+    scene.add(lhGroup);
 
     // === TREES on the island (3/4 view with trunks) ===
     function nestTree(x: number, z: number, sc: number, col: number) {
@@ -305,6 +370,9 @@ function NestScene3D() {
 
       // Nest gentle rock
       nestGroup.rotation.z = Math.sin(time * 0.5) * 0.02;
+
+      // Lighthouse light pulse
+      lhLight.intensity = 1.0 + Math.sin(time * 2) * 0.5;
 
       // Water animation
       waterTex.offset.x = time * 0.012;

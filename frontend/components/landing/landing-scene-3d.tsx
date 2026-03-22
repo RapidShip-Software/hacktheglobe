@@ -302,7 +302,7 @@ function LandingScene3D() {
       bigNestGroup.add(speck);
     }
 
-    bigNestGroup.position.set(1, 0.5, 0.5);
+    bigNestGroup.position.set(1, 1.5, 0.5);
     nestIslandGroup.add(bigNestGroup);
 
     // === LIGHTHOUSE on the island ===
@@ -921,10 +921,8 @@ function LandingScene3D() {
         });
       });
 
-      // Lighthouse light rotation
-      lighthouseLight.position.x = Math.cos(time * 1.5) * 1.5;
-      lighthouseLight.position.z = Math.sin(time * 1.5) * 1.5;
-      lighthouseLight.intensity = 1.2 + Math.sin(time * 3) * 0.5;
+      // Lighthouse light pulse
+      lighthouseLight.intensity = 1.0 + Math.sin(time * 2) * 0.5;
 
       // Plant sway
       plantGroup.rotation.z = Math.sin(time * 0.8) * 0.015;
