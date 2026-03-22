@@ -174,11 +174,33 @@ All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outli
 
 ## Key Features
 
-- **Voice-First AI Chat** - Tap the flower in the garden to talk. Speech-to-text input, text-to-speech output with warm female voice (Microsoft Jenny/Samantha). 300+ fallback responses covering 80+ intent categories.
-- **Real-Time Monitoring** - Supabase Realtime broadcasts assessment updates. Caregiver and clinical dashboards update live.
-- **Health Simulation** - Interactive slider in the garden page for demo: drag to see the plant wilt/grow/bloom in real time.
-- **Discharge Planning** - AI-generated structured recovery plans with medications, follow-ups, red flags, and community services.
-- **Accessible Design** - Solid high-contrast backgrounds, opaque typography, large touch targets. Designed for elderly users with reduced contrast sensitivity.
+**For the Elder:**
+- Daily checklist (medication, BP, hydration, rest) with time-sensitive reminders
+- Garden visual that blooms when tasks are completed
+- Voice-first AI chat (tap the flower to talk, TTS/STT with warm female voice)
+- One-tap calling to family contacts via butterfly icons
+- Customizable daily routine template
+- AI assistant: answers wellness questions with guidance, always defers to doctor, no diagnostic output
+
+**For the Caregiver:**
+- Real-time green/yellow/red wellness signal at a glance
+- Full checklist visibility (what's done, what's missed)
+- Instant alerts when elder's health pattern is abnormal
+- In-app messaging and note system for the care team
+- Remote calendar and contact management
+
+**For the Clinician:**
+- AI risk stratification with multi-signal pattern detection (risk score 0-100)
+- Patient timelines with risk score trend charts
+- Actionable clinical alerts with take-action workflow
+- AI-generated discharge plans (medications, follow-ups, red flags, community services)
+- Real-time Supabase monitoring (dashboards update live)
+
+**Platform:**
+- Health simulation slider for live demo
+- Day/sunset/night mode toggle on all pages
+- Accessible design (solid high-contrast backgrounds, large touch targets, WCAG-compliant)
+- 300+ chat fallback responses covering 80+ intent categories
 
 ## Multi-Agent AI Pipeline (LangGraph)
 
@@ -189,11 +211,29 @@ Four-node `StateGraph` processing patient health data:
 3. **Communicate** - Single LLM call generates caregiver summary, clinical alert, and garden visual state
 4. **Plan Discharge** - Conditional node, generates structured recovery plan at discharge
 
+## Business Model
+
+Two revenue streams running in parallel:
+
+| Stream | Model | Target |
+|--------|-------|--------|
+| **B2B2C** (Employer Benefits) | Per-employee-per-month pricing, partnering with medium-sized employers (500-5,000 staff) targeting the ~35% who are caregivers | Insurers (GreenShield, Manulife, Sun Life) as distribution partners |
+| **B2C** (Direct Consumer) | Freemium: free core checklist + status signal. Premium ($5/mo) unlocks smart alerts, weekly digests, multi-elder support | App store launch (iOS/Android), caregiver communities, SEO |
+
+## Competitor Landscape
+
+| Competitor | Elder Experience | Caregiver Experience | Gap |
+|-----------|-----------------|---------------------|-----|
+| Apple/Google/Samsung | Generic, not care-focused | Emergency notifications only | No shared dashboard, no medication visibility |
+| GrandPad | Simplified tablet, large buttons | Family messaging, photo sharing | No health visibility, no activity signals |
+| HRS/Health Arc | Post-acute recovery only | Clinical reports for staff, not family | Requires clinician assignment, not self-initiated |
+| **Canopy** | Garden metaphor, zero digital literacy needed | Real-time status + full checklist visibility | **Only platform connecting elder simplicity, family visibility, and health monitoring in one place** |
+
 ## SDG Alignment
 
-- **SDG 3.4**: Reduce premature mortality from NCDs through prevention
-- **SDG 3.8**: Achieve universal health coverage, extending care into homes
-- **SDG 10**: Reduced inequalities, addressing digital literacy barriers for elderly
+- **SDG 3.4**: Reduce premature mortality from NCDs through prevention. Canopy catches deterioration before crisis (12.6% of Ontario elderly are readmitted within 30 days).
+- **SDG 3.8**: Universal health coverage. 40% of seniors lack digital literacy for existing RPM tools. Canopy's garden UI removes that barrier entirely.
+- **SDG 10**: Reduced inequalities. 5.7 billion hours of unpaid care in Canada annually, disproportionately by women, immigrants, and lower-income families. Canopy is funded by employers, not families.
 
 ## Team
 
