@@ -41,8 +41,8 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         whileHover={{ scale: 1.2 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* Butterfly SVG */}
-        <svg width="60" height="50" viewBox="0 0 60 50" className="drop-shadow-lg">
+        {/* Butterfly SVG — larger */}
+        <svg width="80" height="65" viewBox="0 0 60 50" className="drop-shadow-lg">
           {/* Left wing */}
           <motion.ellipse
             cx="20"
@@ -95,7 +95,7 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         </svg>
 
         {/* Name label */}
-        <span className="text-xs font-medium text-white/90 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1 whitespace-nowrap">
+        <span className="text-sm font-semibold text-white bg-black/30 backdrop-blur-sm rounded-full px-4 py-1.5 whitespace-nowrap shadow-md">
           {contact.name}
         </span>
       </motion.button>

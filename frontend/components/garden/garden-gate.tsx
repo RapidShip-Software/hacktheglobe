@@ -42,13 +42,13 @@ function GardenGate({ patientName }: GardenGateProps) {
         whileTap={{ scale: 0.95 }}
       >
         <motion.div
-          className="w-12 h-16 rounded-t-full border-4 border-amber-700 bg-gradient-to-b from-amber-600 to-amber-800 flex items-end justify-center pb-1 shadow-lg"
+          className="w-16 h-20 rounded-t-full border-4 border-amber-700 bg-gradient-to-b from-amber-600 to-amber-800 flex items-end justify-center pb-1.5 shadow-lg"
           animate={{ rotateY: [0, 5, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
           <div className="w-2 h-2 rounded-full bg-amber-300" />
         </motion.div>
-        <span className="text-[10px] font-medium text-amber-800/70 bg-white/40 backdrop-blur-sm rounded-full px-2 py-0.5">
+        <span className="text-sm font-bold text-amber-900 bg-white/50 backdrop-blur-sm rounded-full px-4 py-1 shadow-md">
           Help
         </span>
       </motion.button>
