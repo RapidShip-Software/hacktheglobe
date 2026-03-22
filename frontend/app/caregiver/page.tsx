@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Phone, MessageSquarePlus, History } from "lucide-react";
+import dynamic from "next/dynamic";
 import { DailySignal } from "@/components/caregiver/daily-signal";
 import { HistoryView, type HistoryItem } from "@/components/caregiver/history-view";
 import { CaregiverNotes } from "@/components/caregiver/caregiver-notes";
@@ -10,6 +11,11 @@ import { BlurFade } from "@/components/shared/blur-fade";
 import { api } from "@/lib/api";
 import { subscribeToTable } from "@/lib/supabase";
 import type { Assessment, CaregiverNote } from "@/lib/types";
+
+const NestScene3D = dynamic(
+  () => import("@/components/nest/nest-scene-3d").then((m) => m.NestScene3D),
+  { ssr: false }
+);
 
 const PATIENT_ID = process.env.NEXT_PUBLIC_DEMO_PATIENT_ID || "";
 
@@ -179,33 +185,27 @@ function CaregiverPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-white">
-      {/* Subtle dot pattern background */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #6366f1 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
+    <main className="min-h-screen relative overflow-hidden">
+      {/* 3D Nest Scene Background */}
+      <NestScene3D />
 
-      <div className="relative max-w-2xl mx-auto px-4 py-8 md:py-12">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 md:py-12">
         {/* Header */}
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-8">
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/80 text-blue-600 text-xs font-semibold mb-3"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-900/40 backdrop-blur-sm text-amber-100 text-xs font-semibold mb-3 border border-amber-400/20"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               LIVE MONITORING
             </motion.div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">
-              Caring for Margaret
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-1 drop-shadow-lg">
+              The Nest
             </h1>
-            <p className="text-gray-500">
-              Real-time wellness updates for your peace of mind
+            <p className="text-white/70 drop-shadow">
+              Looking over Margaret. Real-time wellness updates for your peace of mind.
             </p>
           </div>
         </BlurFade>
@@ -214,9 +214,9 @@ function CaregiverPage() {
         <BlurFade delay={0.2} inView>
           <div className="mb-8">
             {loading ? (
-              <div className="p-8 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-100 text-center">
-                <div className="w-8 h-8 rounded-full border-2 border-blue-400 border-t-transparent animate-spin mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Loading latest update...</p>
+              <div className="p-8 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center">
+                <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin mx-auto mb-3" />
+                <p className="text-sm text-white/60">Loading latest update...</p>
               </div>
             ) : (
               <DailySignal
@@ -234,33 +234,33 @@ function CaregiverPage() {
           <div className="grid grid-cols-3 gap-3 mb-8">
             <motion.a
               href="tel:+1-647-555-0123"
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-100 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <Phone className="w-6 h-6 mx-auto mb-1 text-emerald-500" />
-              <span className="text-sm font-medium text-gray-700">Call Mum</span>
+              <span className="text-sm font-medium text-white">Call Mum</span>
             </motion.a>
             <motion.button
               onClick={scrollToNotes}
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-100 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <MessageSquarePlus className="w-6 h-6 mx-auto mb-1 text-blue-500" />
-              <span className="text-sm font-medium text-gray-700">Add Note</span>
+              <span className="text-sm font-medium text-white">Add Note</span>
             </motion.button>
             <motion.button
               onClick={scrollToHistory}
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-100 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-violet-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <History className="w-6 h-6 mx-auto mb-1 text-purple-500" />
-              <span className="text-sm font-medium text-gray-700">View History</span>
+              <span className="text-sm font-medium text-white">View History</span>
             </motion.button>
           </div>
         </BlurFade>
@@ -274,11 +274,11 @@ function CaregiverPage() {
                 {notes.map((n, i) => (
                   <motion.div
                     key={`${n.created_at}-${i}`}
-                    className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-sm text-gray-700"
+                    className="p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 text-sm text-white/80"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <span className="text-xs text-blue-500 font-medium">
+                    <span className="text-xs text-amber-300 font-medium">
                       {n.author}, {formatTimestamp(n.created_at)}
                     </span>
                     <p className="mt-1">{n.content}</p>
@@ -294,14 +294,14 @@ function CaregiverPage() {
           <div ref={historyRef}>
             {loading ? (
               <div className="text-center py-8">
-                <div className="w-6 h-6 rounded-full border-2 border-purple-400 border-t-transparent animate-spin mx-auto mb-2" />
-                <p className="text-sm text-gray-400">Loading history...</p>
+                <div className="w-6 h-6 rounded-full border-2 border-amber-400 border-t-transparent animate-spin mx-auto mb-2" />
+                <p className="text-sm text-white/50">Loading history...</p>
               </div>
             ) : history.length > 0 ? (
               <HistoryView items={history} />
             ) : (
               <div className="text-center py-8">
-                <p className="text-sm text-gray-400">No history yet. Updates will appear here as Margaret logs her vitals.</p>
+                <p className="text-sm text-white/50">No history yet. Updates will appear here as Margaret logs her vitals.</p>
               </div>
             )}
           </div>

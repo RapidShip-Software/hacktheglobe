@@ -6,7 +6,7 @@ import type { Contact } from "@/lib/types";
 
 type ButterflyContactProps = {
   contact: Contact;
-  position: "left" | "center" | "right";
+  position: "left" | "center" | "right" | "stacked";
 };
 
 const butterflyColours: Record<string, { wing: string; body: string; wingDark: string; highlight: string }> = {
@@ -24,26 +24,28 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
     left: "left-8 bottom-36 md:bottom-40",
     center: "left-1/2 -translate-x-1/2 bottom-32 md:bottom-36",
     right: "right-20 bottom-36 md:bottom-40",
+    stacked: "relative",
   };
+
+  const isStacked = position === "stacked";
+  const svgSize = isStacked ? { width: 110, height: 92 } : { width: 90, height: 75 };
 
   return (
     <>
       <motion.button
-        className={`absolute ${positionClasses[position]} z-20 flex flex-col items-center gap-1 cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-3 bg-white/15 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/20 shadow-lg w-56" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => setShowModal(true)}
-        animate={{
-          y: [0, -8, 0, -4, 0],
-        }}
-        transition={{
+        animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
+        transition={isStacked ? {} : {
           duration: 4 + Math.random() * 2,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        whileHover={{ scale: 1.2 }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         {/* 3D Butterfly SVG with gradients, highlights, and depth */}
-        <svg width="90" height="75" viewBox="0 0 60 50" className="drop-shadow-xl" style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))" }}>
+        <svg width={svgSize.width} height={svgSize.height} viewBox="0 0 60 50" className="drop-shadow-xl shrink-0" style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))" }}>
           <defs>
             {/* Wing gradient for 3D depth */}
             <radialGradient id={`${gradId}-lwg`} cx="40%" cy="30%">
@@ -143,9 +145,10 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
           <circle cx="40" cy="2" r="2" fill={colours.wing} stroke={colours.wingDark} strokeWidth="0.5" />
         </svg>
 
-        {/* Name label — larger font */}
-        <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 whitespace-nowrap shadow-lg border border-white/20">
+        {/* Name label */}
+        <span className={`font-bold text-white whitespace-nowrap ${isStacked ? "text-base" : "text-base bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20"}`}>
           {contact.name}
+          {isStacked && <span className="block text-xs font-normal text-white/50">{contact.relation}</span>}
         </span>
       </motion.button>
 
