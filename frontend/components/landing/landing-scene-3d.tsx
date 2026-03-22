@@ -426,15 +426,34 @@ function LandingScene3D() {
       nestIslandGroup.add(rock);
     }
 
-    // A few wildflowers on the nest island
-    for (let i = 0; i < 25; i++) {
+    // Wildflowers on the nest island (simple inline flowers)
+    const nestFlowerColors = [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48, 0x9b59b6, 0xffffff];
+    for (let i = 0; i < 30; i++) {
       const fx = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
       const fz = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
       if (Math.sqrt(fx * fx + fz * fz) > NEST_ISLAND_RADIUS - 2) continue;
       // Skip nest area
       const dxNest = fx - 1, dzNest = fz - 0.5;
       if (Math.sqrt(dxNest * dxNest + dzNest * dzNest) < 4.5) continue;
-      nestIslandGroup.add(flowerCreators[Math.floor(Math.random() * flowerCreators.length)](fx, fz));
+      const fg = new THREE.Group();
+      fg.add(new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015, 0.02, 0.3, 4),
+        new THREE.MeshLambertMaterial({ color: 0x2d7a2d })
+      ));
+      fg.children[0].position.y = 0.15;
+      const col = nestFlowerColors[Math.floor(Math.random() * nestFlowerColors.length)];
+      for (let p = 0; p < 5; p++) {
+        const pa = (p / 5) * Math.PI * 2;
+        const petal = new THREE.Mesh(
+          new THREE.SphereGeometry(0.04, 5, 4),
+          new THREE.MeshPhongMaterial({ color: col, shininess: 20 })
+        );
+        petal.position.set(Math.cos(pa) * 0.04, 0.32, Math.sin(pa) * 0.04);
+        petal.scale.set(1.3, 0.3, 0.6);
+        fg.add(petal);
+      }
+      fg.position.set(fx, 0, fz);
+      nestIslandGroup.add(fg);
     }
 
     scene.add(nestIslandGroup);
