@@ -21,9 +21,11 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.FogExp2(0x87ceeb, 0.008);
 
-    // Camera: aerial view, will orbit
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 300);
-    const ORBIT_RADIUS = 35;
+    // Camera: aerial view, will orbit. Wider FOV on portrait/mobile to show all islands
+    const isPortrait = container.clientHeight > container.clientWidth;
+    const baseFov = isPortrait ? 72 : 45;
+    const camera = new THREE.PerspectiveCamera(baseFov, container.clientWidth / container.clientHeight, 0.1, 300);
+    const ORBIT_RADIUS = isPortrait ? 45 : 35;
     const ORBIT_HEIGHT = 32;
     const ORBIT_SPEED = 0.15; // radians per second
     camera.position.set(0, ORBIT_HEIGHT, ORBIT_RADIUS);
@@ -944,8 +946,8 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
     ];
 
     // === DIRT PATH (through center of island) ===
-    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 20), new THREE.MeshLambertMaterial({ map: dirtTex, color: 0xd4b07a }));
-    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.05, 2); path.receiveShadow = true;
+    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 14), new THREE.MeshLambertMaterial({ map: dirtTex, color: 0xd4b07a }));
+    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.05, 1); path.receiveShadow = true;
     scene.add(path);
 
     // === FLOWER BORDERS along path ===
@@ -993,7 +995,7 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
     // Interior trees (sparse)
     const interiorTrees = [
       [-5, -4, 1.0], [6, -3, 0.9], [-7, 5, 0.8], [8, 6, 0.85],
-      [-3, -7, 0.75], [4, -6, 0.9], [-9, 0, 1.1], [9, 1, 0.95],
+      [-3, -7, 0.75], [4, -6, 0.9], [9, 1, 0.95],
     ];
     interiorTrees.forEach(([tx, tz, ts]) => {
       if (isOnIsland(tx, tz)) scene.add(tree(tx, tz, ts, treeColors[Math.floor(Math.random() * 3)]));
@@ -1430,6 +1432,8 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
 
     function handleResize() {
       if (!container) return;
+      const portrait = container.clientHeight > container.clientWidth;
+      camera.fov = portrait ? 72 : 45;
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
