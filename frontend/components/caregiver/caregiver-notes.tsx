@@ -20,7 +20,7 @@ function CaregiverNotes({ onSubmit }: CaregiverNotesProps) {
   };
 
   return (
-    <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-150 rounded-[2rem] p-6 shadow-2xl border border-white/40">
+    <div className="bg-white/45 backdrop-blur-3xl backdrop-saturate-150 rounded-[2rem] p-6 shadow-2xl border border-white/40">
       <h3 className="text-2xl font-extrabold text-white drop-shadow-lg mb-2">Add a Note</h3>
       <p className="text-sm font-bold text-white/80 drop-shadow-md mb-4">Visible to the care team</p>
       <textarea

@@ -14,7 +14,7 @@ function TimeToggle({ timeOfDay, onChange }: TimeToggleProps) {
   return (
     <button
       onClick={() => onChange(TIME_CYCLE[(TIME_CYCLE.indexOf(timeOfDay) + 1) % 3])}
-      className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/30 active:scale-90 transition-all"
+      className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/45 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/55 active:scale-90 transition-all"
       title={`Switch to ${TIME_CYCLE[(TIME_CYCLE.indexOf(timeOfDay) + 1) % 3]}`}
     >
       {TIME_ICONS[timeOfDay]}

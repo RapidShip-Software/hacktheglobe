@@ -169,7 +169,7 @@ function GardenPage() {
   };
 
   const checklistContent = (
-    <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-2xl p-4 md:p-5 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
+    <div className="bg-white/45 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-2xl p-4 md:p-5 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base md:text-lg font-extrabold text-slate-900 drop-shadow-md">Today&apos;s Tasks</h2>
         <span className="text-xs font-extrabold text-slate-700 bg-white/40 border border-white/50 px-3 py-1 rounded-full shadow-sm drop-shadow-sm">
@@ -456,7 +456,7 @@ function GardenPage() {
             exit={{ opacity: 0, y: 40 }}
             transition={{ type: "spring", damping: 25 }}
           >
-            <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-xl p-4 space-y-3">
+            <div className="bg-white/45 backdrop-blur-3xl backdrop-saturate-200 rounded-[2rem] border border-white/40 shadow-xl p-4 space-y-3">
               <h2 className="text-base font-extrabold text-slate-900 drop-shadow-md mb-2">Family Contacts</h2>
               {MARGARET_CONTACTS.map((contact) => (
                 <ButterflyContact key={contact.name} contact={contact} position="stacked" onClick={setActiveContact} />
@@ -480,7 +480,7 @@ function GardenPage() {
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="bg-white/25 backdrop-blur-2xl rounded-2xl px-5 py-3 border border-white/40 shadow-xl max-w-xs">
+            <div className="bg-white/50 backdrop-blur-2xl rounded-2xl px-5 py-3 border border-white/40 shadow-xl max-w-xs">
               <p className="text-sm font-bold text-white drop-shadow-md text-center">{animalMsg}</p>
             </div>
           </motion.div>

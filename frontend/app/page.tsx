@@ -99,7 +99,7 @@ function HomePageInner() {
       {/* Time of day toggle */}
       <button
         onClick={() => setTimeOfDay((prev) => TIME_CYCLE[(TIME_CYCLE.indexOf(prev) + 1) % 3])}
-        className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/30 active:scale-90 transition-all"
+        className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/45 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/55 active:scale-90 transition-all"
         title={`Switch to ${TIME_CYCLE[(TIME_CYCLE.indexOf(timeOfDay) + 1) % 3]}`}
       >
         {TIME_ICONS[timeOfDay]}
@@ -167,7 +167,7 @@ function HomePageInner() {
           {INTERFACES.map((item, index) => (
             <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
               <motion.div
-                className={`group relative p-8 md:p-10 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer h-full overflow-hidden`}
+                className={`group relative p-8 md:p-10 bg-white/45 backdrop-blur-xl rounded-3xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer h-full overflow-hidden`}
                 whileHover={{ y: -6, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCardClick(item.flyTarget, item.href)}

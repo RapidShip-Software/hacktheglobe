@@ -36,11 +36,11 @@ function HistoryView({ items }: HistoryViewProps) {
             <div className="absolute left-[11px] top-8 w-0.5 h-full bg-white/30 shadow-sm" />
           )}
           {/* Timeline dot */}
-          <div className="absolute left-0 top-2 w-6 h-6 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/50 shadow-md flex items-center justify-center text-xs">
+          <div className="absolute left-0 top-2 w-6 h-6 rounded-full bg-white/45 backdrop-blur-md border-2 border-white/50 shadow-md flex items-center justify-center text-xs">
             {statusEmoji[item.status]}
           </div>
 
-          <div className="bg-white/20 backdrop-blur-3xl backdrop-saturate-150 rounded-2xl p-4 border border-white/30 hover:border-white/50 hover:shadow-xl transition-all">
+          <div className="bg-white/45 backdrop-blur-3xl backdrop-saturate-150 rounded-2xl p-4 border border-white/30 hover:border-white/50 hover:shadow-xl transition-all">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-extrabold text-white/80 drop-shadow-sm uppercase tracking-wider">{item.date}</span>
             </div>
