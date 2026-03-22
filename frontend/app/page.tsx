@@ -111,10 +111,19 @@ function HomePageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo.png" alt="" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" />
+            {/* Image as base for the heart icon */}
+            <img src="/logo.png" alt="" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" aria-hidden="true" />
+            {/* Crisp text overlay, positioned over the "Canopy" text in the image */}
             <span
-              className="absolute inset-0 flex items-center justify-center font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-widest uppercase text-white drop-shadow-2xl select-none pointer-events-none"
-              style={{ textShadow: "0 4px 20px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3)" }}
+              className="absolute select-none pointer-events-none font-display font-semibold tracking-wide"
+              style={{
+                right: "2%",
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
+                color: "#4db8a4",
+                textShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              }}
             >
               Canopy
             </span>
@@ -122,19 +131,19 @@ function HomePageInner() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-3 leading-tight drop-shadow-lg">
-            <span className="text-white">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-3 leading-tight">
+            <span className="text-slate-900">
               Continuous Care,
             </span>
             <br />
-            <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
               Naturally
             </span>
           </h1>
         </BlurFade>
 
         <BlurFade delay={0.3} inView>
-          <p className="text-sm md:text-base text-white/70 text-center max-w-md mb-14 leading-relaxed drop-shadow">
+          <p className="text-base md:text-lg font-medium text-slate-700 text-center max-w-md mb-14 leading-relaxed">
             Remote care powered by AI, keeping elderly patients healthy at home.
           </p>
         </BlurFade>
@@ -144,13 +153,13 @@ function HomePageInner() {
           {INTERFACES.map((item, index) => (
             <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
               <motion.div
-                className={`group relative p-8 md:p-10 bg-white/15 backdrop-blur-xl rounded-3xl border border-white/25 ${item.border} ${item.shadow} shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer h-full`}
+                className={`group relative p-8 md:p-10 bg-white rounded-3xl border border-slate-200 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer h-full overflow-hidden`}
                 whileHover={{ y: -6, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleCardClick(item.flyTarget, item.href)}
               >
-                {/* Gradient background on hover */}
-                <div className={`absolute inset-0 rounded-3xl ${item.bgHover} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
+                {/* Subtle Gradient background on hover instead of generic block color */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.bgHover} opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none`} />
 
                 <div className="relative z-10">
                   {/* Icon */}
@@ -158,21 +167,21 @@ function HomePageInner() {
                     {item.icon}
                   </div>
 
-                  <h2 className="text-2xl font-bold text-white mb-1 drop-shadow">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-1">
                     {item.title}
                   </h2>
-                  <p className="text-xs font-medium text-white/50 mb-3 uppercase tracking-wider">
+                  <p className="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">
                     {item.subtitle}
                   </p>
-                  <p className="text-sm text-white/70 leading-relaxed">
+                  <p className="text-base font-medium text-slate-700 leading-relaxed">
                     {item.description}
                   </p>
 
                   {/* Arrow */}
-                  <div className="mt-6 flex items-center gap-2 text-base font-semibold text-white/50 group-hover:text-white transition-colors">
+                  <div className="mt-8 flex items-center gap-2 text-base font-bold text-emerald-600 group-hover:text-emerald-500 transition-colors">
                     <span>Open</span>
                     <motion.span
-                      className="inline-block text-lg"
+                      className="inline-block text-xl"
                       animate={{ x: [0, 5, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
@@ -188,12 +197,12 @@ function HomePageInner() {
         {/* Footer badge */}
         <BlurFade delay={0.8} inView>
           <motion.div
-            className="mt-12 flex items-center gap-2 px-4 py-2 rounded-full bg-black/30 backdrop-blur-sm border border-white/15 text-xs text-white/60"
+            className="mt-12 flex items-center gap-2 px-5 py-2.5 rounded-full bg-white shadow-md border border-slate-200 text-sm font-semibold text-slate-700"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             Hack the Globe 2026 &middot; Health &amp; Humanity &middot; BCG Toronto
           </motion.div>
         </BlurFade>
