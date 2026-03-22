@@ -168,7 +168,7 @@ function ClinicalPage() {
 
       <div className="relative z-10 flex flex-col md:flex-row h-screen">
         {/* Patient list - full width on mobile (only when no patient selected), sidebar on desktop */}
-        <div className={`bg-white/95 backdrop-blur-md ${patient ? "hidden md:block" : "block"}`}>
+        <div className={`bg-white/60 backdrop-blur-xl ${patient ? "hidden md:block" : "block"}`}>
           <PatientList
             patients={patients}
             selectedId={selectedId}
@@ -177,7 +177,7 @@ function ClinicalPage() {
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white/95 backdrop-blur-sm">
+        <div className="flex-1 overflow-y-auto bg-white/50 backdrop-blur-xl">
           {/* Mobile back to list button */}
           {patient && (
             <div className="md:hidden p-3 border-b border-gray-100">
