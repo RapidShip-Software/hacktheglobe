@@ -15,21 +15,21 @@ const TeamScene3D = dynamic(
 
 const TEAM = [
   {
-    name: "Marco A.",
+    name: "Marco Anthony Ayuste",
     role: "Innovation Engineer",
     emoji: "🛠️",
     gradient: "from-emerald-400 to-teal-500",
     description: "",
   },
   {
-    name: "Aahir C.",
+    name: "Aahir Charkra",
     role: "Innovation Engineer",
     emoji: "⚡",
     gradient: "from-blue-400 to-indigo-500",
     description: "",
   },
   {
-    name: "Christie K.",
+    name: "Christie Ko",
     role: "Impact Analyst",
     emoji: "📊",
     gradient: "from-amber-400 to-orange-500",
