@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { api } from "@/lib/api";
 
 type GardenGateProps = {
   patientName: string;
@@ -24,8 +23,13 @@ function GardenGate({ patientName }: GardenGateProps) {
     setIsLoading(true);
 
     try {
-      const response = await api.chat(userMsg, patientName);
-      setMessages((prev) => [...prev, { role: "ai", text: response.reply }]);
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMsg, patient_name: patientName }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [...prev, { role: "ai", text: data.reply }]);
     } catch {
       setMessages((prev) => [
         ...prev,
