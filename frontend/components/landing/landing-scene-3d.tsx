@@ -795,7 +795,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     scene.add(clinicalIslandGroup);
 
     // === SUN ===
-    const sunPos = new THREE.Vector3(20, 25, -15);
+    const sunPos = new THREE.Vector3(20, 45, -15);
     const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
     sunMesh.position.copy(sunPos);
     addOutline(sunMesh, 0.02);
@@ -1392,8 +1392,8 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
 
       // Sun orbits opposite to camera
       const sunAngle = time * ORBIT_SPEED + Math.PI;
-      const sunOrbitR = 40;
-      const sunY = 25;
+      const sunOrbitR = 35;
+      const sunY = 45;
       sunMesh.position.set(Math.cos(sunAngle) * sunOrbitR, sunY, Math.sin(sunAngle) * sunOrbitR);
       glow1.position.copy(sunMesh.position);
       glow2.position.copy(sunMesh.position);
