@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Heart, SmilePlus } from "lucide-react";
+import { Heart, SmilePlus, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { AuroraBackground } from "@/components/garden/aurora-background";
 import { HealthPlant } from "@/components/garden/health-plant";
 import { ButterflyContact } from "@/components/garden/butterfly-contact";
@@ -149,7 +150,7 @@ function GardenPage() {
   }, []);
 
   return (
-    <AuroraBackground skyState={gardenState.sky}>
+    <AuroraBackground skyState={gardenState.sky} health={gardenState.plant_health}>
       {/* Nudge text */}
       <div className="pt-8 px-6 text-center">
         <BlurFade delay={0.3} inView>
@@ -165,43 +166,69 @@ function GardenPage() {
         </BlurFade>
       </div>
 
-      {/* Health Plant (centre) */}
-      <div className="flex-1 flex items-center justify-center">
-        <BlurFade delay={0.5} inView>
-          <HealthPlant health={gardenState.plant_health} />
-          {/* Health indicator */}
-          <motion.div
-            className="text-center mt-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/40 backdrop-blur-sm">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{
-                  backgroundColor:
-                    gardenState.plant_health > 0.7
-                      ? "#22c55e"
-                      : gardenState.plant_health > 0.4
-                      ? "#eab308"
-                      : "#ef4444",
-                }}
-              />
-              <span className="text-xs font-medium text-gray-600">
-                {gardenState.plant_health > 0.7
-                  ? "Blooming"
+      {/* Health tag — floating above the plant (center of scene) */}
+      <motion.div
+        className="absolute left-1/2 -translate-x-1/2 z-20"
+        style={{ bottom: "38%" }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5 }}
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-sm shadow-lg border border-white/20">
+          <div
+            className="w-3 h-3 rounded-full animate-pulse"
+            style={{
+              backgroundColor:
+                gardenState.plant_health > 0.7
+                  ? "#22c55e"
                   : gardenState.plant_health > 0.4
-                  ? "Needs care"
-                  : "Wilting"}
-              </span>
-            </div>
-          </motion.div>
-        </BlurFade>
+                  ? "#eab308"
+                  : "#ef4444",
+            }}
+          />
+          <span className="text-sm font-bold text-white tracking-wide">
+            {gardenState.plant_health > 0.7
+              ? "Blooming"
+              : gardenState.plant_health > 0.4
+              ? "Growing"
+              : "Wilting"}
+          </span>
+        </div>
+      </motion.div>
+
+      {/* DEBUG: Health slider */}
+      <div className="absolute top-20 left-6 z-30 bg-black/50 backdrop-blur-sm rounded-xl p-3 flex flex-col gap-1">
+        <label className="text-white text-xs font-bold">Health: {gardenState.plant_health.toFixed(2)}</label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={gardenState.plant_health}
+          onChange={(e) => setGardenState((prev) => ({ ...prev, plant_health: parseFloat(e.target.value) }))}
+          className="w-40 accent-green-500"
+        />
+        <div className="flex gap-1 mt-1">
+          {[0, 0.15, 0.3, 0.5, 0.7, 0.9, 1].map((v) => (
+            <button
+              key={v}
+              onClick={() => setGardenState((prev) => ({ ...prev, plant_health: v }))}
+              className="text-[10px] px-1.5 py-0.5 bg-white/20 text-white rounded hover:bg-white/40"
+            >
+              {v}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Action buttons (floating, top-left) */}
       <div className="absolute top-6 left-6 z-20 flex gap-2">
+        <Link
+          href="/"
+          className="flex items-center justify-center w-12 h-12 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg cursor-pointer hover:bg-white/80 active:scale-95 transition-all"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </Link>
         <motion.button
           className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg"
           onClick={() => setShowBpEntry(true)}
