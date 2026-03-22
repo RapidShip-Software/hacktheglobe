@@ -13,6 +13,11 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     const container = containerRef.current;
     if (!container) return;
 
+    // Seeded PRNG so trees/bushes/flowers stay consistent across re-renders
+    let _seed = 42;
+    const seededRandom = () => { _seed = (_seed * 16807 + 0) % 2147483647; return (_seed - 1) / 2147483646; };
+    const rand = seededRandom;
+
     const scene = new THREE.Scene();
     const skyColor = skyState === "clear" ? 0x87ceeb : skyState === "cloudy" ? 0xb0c4de : 0x708090;
     scene.background = new THREE.Color(skyColor);
@@ -87,15 +92,15 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       ctx.fillStyle = "#3da55c"; ctx.fillRect(0, 0, 256, 256);
       const greens = ["#35974f", "#42b066", "#2e8a45", "#4aba6e", "#339950", "#3da55c"];
       for (let i = 0; i < 3000; i++) {
-        ctx.strokeStyle = greens[Math.floor(Math.random() * greens.length)];
-        ctx.lineWidth = 0.5 + Math.random();
-        const x = Math.random() * 256, y = Math.random() * 256;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random() - 0.5) * 3, y - 2 - Math.random() * 5); ctx.stroke();
+        ctx.strokeStyle = greens[Math.floor(rand() * greens.length)];
+        ctx.lineWidth = 0.5 + rand();
+        const x = rand() * 256, y = rand() * 256;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (rand() - 0.5) * 3, y - 2 - rand() * 5); ctx.stroke();
       }
       // Add subtle noise
       for (let i = 0; i < 500; i++) {
-        ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 0 : 80}, ${40 + Math.random() * 60}, ${Math.random() > 0.5 ? 0 : 30}, 0.08)`;
-        ctx.fillRect(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 3, 2 + Math.random() * 3);
+        ctx.fillStyle = `rgba(${rand() > 0.5 ? 0 : 80}, ${40 + rand() * 60}, ${rand() > 0.5 ? 0 : 30}, 0.08)`;
+        ctx.fillRect(rand() * 256, rand() * 256, 2 + rand() * 3, 2 + rand() * 3);
       }
       const tex = new THREE.CanvasTexture(c);
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -109,14 +114,14 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       ctx.fillStyle = "#c4a56a"; ctx.fillRect(0, 0, 128, 128);
       const dirts = ["#b8965a", "#d4b67a", "#a8884e", "#c9a862", "#bfa068"];
       for (let i = 0; i < 800; i++) {
-        ctx.fillStyle = dirts[Math.floor(Math.random() * dirts.length)];
-        const s = 1 + Math.random() * 4;
-        ctx.fillRect(Math.random() * 128, Math.random() * 128, s, s);
+        ctx.fillStyle = dirts[Math.floor(rand() * dirts.length)];
+        const s = 1 + rand() * 4;
+        ctx.fillRect(rand() * 128, rand() * 128, s, s);
       }
       // Small pebbles
       for (let i = 0; i < 30; i++) {
-        ctx.fillStyle = `rgba(${120 + Math.random() * 60}, ${100 + Math.random() * 50}, ${70 + Math.random() * 40}, 0.5)`;
-        ctx.beginPath(); ctx.arc(Math.random() * 128, Math.random() * 128, 1 + Math.random() * 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(${120 + rand() * 60}, ${100 + rand() * 50}, ${70 + rand() * 40}, 0.5)`;
+        ctx.beginPath(); ctx.arc(rand() * 128, rand() * 128, 1 + rand() * 2, 0, Math.PI * 2); ctx.fill();
       }
       const tex = new THREE.CanvasTexture(c);
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -129,12 +134,12 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       const ctx = c.getContext("2d")!;
       ctx.fillStyle = "#6b3e1e"; ctx.fillRect(0, 0, 64, 128);
       for (let y = 0; y < 128; y += 2) {
-        ctx.strokeStyle = `rgba(${50 + Math.random() * 30}, ${25 + Math.random() * 20}, ${10 + Math.random() * 15}, ${0.3 + Math.random() * 0.3})`;
-        ctx.lineWidth = 1 + Math.random();
+        ctx.strokeStyle = `rgba(${50 + rand() * 30}, ${25 + rand() * 20}, ${10 + rand() * 15}, ${0.3 + rand() * 0.3})`;
+        ctx.lineWidth = 1 + rand();
         ctx.beginPath();
-        ctx.moveTo(0, y + Math.random() * 2);
+        ctx.moveTo(0, y + rand() * 2);
         let x = 0;
-        while (x < 64) { x += 3 + Math.random() * 5; ctx.lineTo(x, y + (Math.random() - 0.5) * 3); }
+        while (x < 64) { x += 3 + rand() * 5; ctx.lineTo(x, y + (rand() - 0.5) * 3); }
         ctx.stroke();
       }
       const tex = new THREE.CanvasTexture(c);
@@ -147,14 +152,14 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       const ctx = c.getContext("2d")!;
       ctx.fillStyle = "#c0652a"; ctx.fillRect(0, 0, 128, 128);
       for (let i = 0; i < 500; i++) {
-        ctx.fillStyle = `rgba(${160 + Math.random() * 40}, ${80 + Math.random() * 30}, ${30 + Math.random() * 20}, 0.15)`;
-        ctx.fillRect(Math.random() * 128, Math.random() * 128, 1 + Math.random() * 3, 1 + Math.random() * 3);
+        ctx.fillStyle = `rgba(${160 + rand() * 40}, ${80 + rand() * 30}, ${30 + rand() * 20}, 0.15)`;
+        ctx.fillRect(rand() * 128, rand() * 128, 1 + rand() * 3, 1 + rand() * 3);
       }
       // Horizontal rings (wheel marks)
-      for (let y = 10; y < 128; y += 8 + Math.random() * 6) {
-        ctx.strokeStyle = `rgba(${140 + Math.random() * 30}, ${60 + Math.random() * 20}, ${20 + Math.random() * 15}, 0.2)`;
-        ctx.lineWidth = 0.5 + Math.random();
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(128, y + (Math.random() - 0.5) * 2); ctx.stroke();
+      for (let y = 10; y < 128; y += 8 + rand() * 6) {
+        ctx.strokeStyle = `rgba(${140 + rand() * 30}, ${60 + rand() * 20}, ${20 + rand() * 15}, 0.2)`;
+        ctx.lineWidth = 0.5 + rand();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(128, y + (rand() - 0.5) * 2); ctx.stroke();
       }
       return new THREE.CanvasTexture(c);
     }
@@ -192,9 +197,9 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       const g = new THREE.Group();
       const mat = new THREE.MeshLambertMaterial({ color: col });
       for (let i = 0; i < 5; i++) {
-        const r = (0.25 + Math.random() * 0.35) * sc;
+        const r = (0.25 + rand() * 0.35) * sc;
         const m = new THREE.Mesh(new THREE.SphereGeometry(r, 7, 5), mat);
-        m.position.set((Math.random() - 0.5) * sc * 0.7, r * 0.7, (Math.random() - 0.5) * sc * 0.5);
+        m.position.set((rand() - 0.5) * sc * 0.7, r * 0.7, (rand() - 0.5) * sc * 0.5);
         m.castShadow = true;
         addOutline(m, 0.04);
                g.add(m);
@@ -210,7 +215,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       const fMat = new THREE.MeshLambertMaterial({ color: col });
       [{ r: 1.4, y: 3.0 }, { r: 1.6, y: 3.8 }, { r: 1.2, y: 4.5 }, { r: 0.9, y: 5.0 }, { r: 1.3, y: 3.4 }].forEach((l) => {
         const f = new THREE.Mesh(new THREE.SphereGeometry(l.r * sc, 7, 6), fMat);
-        f.position.set((Math.random() - 0.5) * 0.5 * sc, l.y * sc, (Math.random() - 0.5) * 0.4 * sc);
+        f.position.set((rand() - 0.5) * 0.5 * sc, l.y * sc, (rand() - 0.5) * 0.4 * sc);
         f.castShadow = true; addOutline(f, 0.03); g.add(f);
       });
       g.position.set(x, 0, z); return g;
@@ -315,44 +320,44 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     }
 
     const flowerCreators = [
-      (x: number, z: number) => createRose(x, z, [0xf472b6, 0xe11d48, 0xf43f5e, 0xec4899][Math.floor(Math.random() * 4)], 1 + Math.random() * 0.5),
-      (x: number, z: number) => createTulip(x, z, [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48][Math.floor(Math.random() * 5)], 1 + Math.random() * 0.5),
-      (x: number, z: number) => createDaisy(x, z, 1 + Math.random() * 0.4),
-      (x: number, z: number) => createLavender(x, z, 1 + Math.random() * 0.5),
-      (x: number, z: number) => createSunflower(x, z, 0.8 + Math.random() * 0.4),
+      (x: number, z: number) => createRose(x, z, [0xf472b6, 0xe11d48, 0xf43f5e, 0xec4899][Math.floor(rand() * 4)], 1 + rand() * 0.5),
+      (x: number, z: number) => createTulip(x, z, [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48][Math.floor(rand() * 5)], 1 + rand() * 0.5),
+      (x: number, z: number) => createDaisy(x, z, 1 + rand() * 0.4),
+      (x: number, z: number) => createLavender(x, z, 1 + rand() * 0.5),
+      (x: number, z: number) => createSunflower(x, z, 0.8 + rand() * 0.4),
     ];
 
     // === PLANT FLOWER BORDERS (varied types) ===
-    for (let z = -4; z < 12; z += 0.8 + Math.random() * 0.4) {
+    for (let z = -4; z < 12; z += 0.8 + rand() * 0.4) {
       for (let row = 0; row < 3; row++) {
-        const lx = -2.0 - row * 0.9 + (Math.random() - 0.5) * 0.5;
-        scene.add(flowerCreators[Math.floor(Math.random() * flowerCreators.length)](lx, z + (Math.random() - 0.5) * 0.4));
-        const rx = 2.0 + row * 0.9 + (Math.random() - 0.5) * 0.5;
-        scene.add(flowerCreators[Math.floor(Math.random() * flowerCreators.length)](rx, z + (Math.random() - 0.5) * 0.4));
+        const lx = -2.0 - row * 0.9 + (rand() - 0.5) * 0.5;
+        scene.add(flowerCreators[Math.floor(rand() * flowerCreators.length)](lx, z + (rand() - 0.5) * 0.4));
+        const rx = 2.0 + row * 0.9 + (rand() - 0.5) * 0.5;
+        scene.add(flowerCreators[Math.floor(rand() * flowerCreators.length)](rx, z + (rand() - 0.5) * 0.4));
       }
     }
 
     // === FILL BACKGROUND with more flowers, shrubs, trees ===
     // Scatter flowers everywhere beyond borders
     for (let i = 0; i < 80; i++) {
-      const fx = (Math.random() - 0.5) * 40;
-      const fz = (Math.random() - 0.5) * 30 - 2;
+      const fx = (rand() - 0.5) * 40;
+      const fz = (rand() - 0.5) * 30 - 2;
       if (Math.abs(fx) < 5 && fz > -3 && fz < 12) continue; // skip path area
-      scene.add(flowerCreators[Math.floor(Math.random() * flowerCreators.length)](fx, fz));
+      scene.add(flowerCreators[Math.floor(rand() * flowerCreators.length)](fx, fz));
     }
 
     // Side hedges
     const sc = [0x2d7a2d, 0x357a35, 0x268026, 0x3a8a3a];
     for (let z = -6; z < 10; z += 2.2) {
-      scene.add(shrub(-5.5 + (Math.random() - 0.5) * 0.3, z, 0.9 + Math.random() * 0.3, sc[Math.floor(Math.random() * 4)]));
-      scene.add(shrub(5.5 + (Math.random() - 0.5) * 0.3, z, 0.9 + Math.random() * 0.3, sc[Math.floor(Math.random() * 4)]));
+      scene.add(shrub(-5.5 + (rand() - 0.5) * 0.3, z, 0.9 + rand() * 0.3, sc[Math.floor(rand() * 4)]));
+      scene.add(shrub(5.5 + (rand() - 0.5) * 0.3, z, 0.9 + rand() * 0.3, sc[Math.floor(rand() * 4)]));
     }
     // Back hedge wall (dense)
-    for (let x = -20; x <= 20; x += 2) scene.add(shrub(x, -10 + (Math.random() - 0.5), 1.2 + Math.random() * 0.6, 0x1e6b1e));
+    for (let x = -20; x <= 20; x += 2) scene.add(shrub(x, -10 + (rand() - 0.5), 1.2 + rand() * 0.6, 0x1e6b1e));
     // Side hedge walls (far)
     for (let z = -12; z < 12; z += 2.5) {
-      scene.add(shrub(-10 + (Math.random() - 0.5), z, 1.0 + Math.random() * 0.4, 0x1e6b1e));
-      scene.add(shrub(10 + (Math.random() - 0.5), z, 1.0 + Math.random() * 0.4, 0x1e6b1e));
+      scene.add(shrub(-10 + (rand() - 0.5), z, 1.0 + rand() * 0.4, 0x1e6b1e));
+      scene.add(shrub(10 + (rand() - 0.5), z, 1.0 + rand() * 0.4, 0x1e6b1e));
     }
 
     // Trees — more, filling edges
@@ -361,7 +366,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       [-12, -8, 1.0], [12, -9, 0.9], [-14, -5, 0.8], [14, -6, 0.85], [-9, -12, 1.1], [9, -11, 0.95],
       [-15, -2, 0.7], [15, -3, 0.75], [-7, -14, 0.9], [7, -13, 0.8],
     ];
-    treePositions.forEach(([tx, tz, ts]) => scene.add(tree(tx, tz, ts, [0x1a6b1a, 0x228b22, 0x2e8b57][Math.floor(Math.random() * 3)])));
+    treePositions.forEach(([tx, tz, ts]) => scene.add(tree(tx, tz, ts, [0x1a6b1a, 0x228b22, 0x2e8b57][Math.floor(rand() * 3)])));
 
     // === GARDEN ARCH ===
     const archGroup = new THREE.Group();
@@ -372,8 +377,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     const archTop = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.07, 6, 16, Math.PI), archMat);
     archTop.position.set(0, 3.5, 0); archTop.rotation.z = Math.PI; archGroup.add(archTop);
     const vineMat = new THREE.MeshLambertMaterial({ color: 0x2d8a2d });
-    for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI; const v = new THREE.Mesh(new THREE.SphereGeometry(0.12 + Math.random() * 0.1, 5, 4), vineMat); v.position.set(Math.cos(a) * 1.25, 3.5 + Math.sin(a) * 1.25, (Math.random() - 0.5) * 0.2); archGroup.add(v); }
-    for (let y = 0.3; y < 3.2; y += 0.35) { const v = new THREE.Mesh(new THREE.SphereGeometry(0.1, 5, 4), vineMat); v.position.set(-1.2 + (Math.random() - 0.5) * 0.2, y, 0); archGroup.add(v); const v2 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 5, 4), vineMat); v2.position.set(1.2 + (Math.random() - 0.5) * 0.2, y, 0); archGroup.add(v2); }
+    for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI; const v = new THREE.Mesh(new THREE.SphereGeometry(0.12 + rand() * 0.1, 5, 4), vineMat); v.position.set(Math.cos(a) * 1.25, 3.5 + Math.sin(a) * 1.25, (rand() - 0.5) * 0.2); archGroup.add(v); }
+    for (let y = 0.3; y < 3.2; y += 0.35) { const v = new THREE.Mesh(new THREE.SphereGeometry(0.1, 5, 4), vineMat); v.position.set(-1.2 + (rand() - 0.5) * 0.2, y, 0); archGroup.add(v); const v2 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 5, 4), vineMat); v2.position.set(1.2 + (rand() - 0.5) * 0.2, y, 0); archGroup.add(v2); }
     // Arch flowers
     const archCols = [0xf472b6, 0xe11d48, 0xc084fc, 0xfbbf24, 0xfb923c];
     for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI; const f = new THREE.Mesh(new THREE.SphereGeometry(0.07, 5, 4), new THREE.MeshPhongMaterial({ color: archCols[i % 5], shininess: 20 })); f.position.set(Math.cos(a) * 1.38, 3.5 + Math.sin(a) * 1.38, 0.15); archGroup.add(f); }
@@ -466,7 +471,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     if (h_val > 0.8) {
       for (let i = 0; i < 8; i++) {
         const s = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 4), new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0 }));
-        s.position.set((Math.random() - 0.5) * 1.2, 0.6 + Math.random() * plantHeight, (Math.random() - 0.5) * 0.8);
+        s.position.set((rand() - 0.5) * 1.2, 0.6 + rand() * plantHeight, (rand() - 0.5) * 0.8);
         sparkles.push(s); plantGroup.add(s);
       }
     }
@@ -585,7 +590,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
       // White spots on back
       for (let i = 0; i < 6; i++) {
         const spot = new THREE.Mesh(new THREE.SphereGeometry(0.025, 5, 4), lightFurMat);
-        spot.position.set((Math.random() - 0.5) * 0.2, 0.6 + Math.random() * 0.1, (Math.random() - 0.5) * 0.25);
+        spot.position.set((rand() - 0.5) * 0.2, 0.6 + rand() * 0.1, (rand() - 0.5) * 0.25);
         g.add(spot);
       }
 
@@ -777,7 +782,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
         g.add(tip);
       }
       g.position.set(bd.x, bd.y, bd.z);
-      g.userData = { speed: bd.sp, radius: bd.r, startX: bd.x, startZ: bd.z, phase: Math.random() * Math.PI * 2 };
+      g.userData = { speed: bd.sp, radius: bd.r, startX: bd.x, startZ: bd.z, phase: rand() * Math.PI * 2 };
       butterflies.push(g);
       scene.add(g);
     });
@@ -793,8 +798,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     lBranch.rotation.y = 0.3;
     // scene.add(lBranch); // Removed floating log
     for (let i = 0; i < 12; i++) {
-      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.6 + Math.random() * 0.4, 6, 5), canopyLeafMat);
-      leaf.position.set(-5 + (Math.random() - 0.5) * 4, 7 + Math.random() * 2, 11 + (Math.random() - 0.5) * 3);
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.6 + rand() * 0.4, 6, 5), canopyLeafMat);
+      leaf.position.set(-5 + (rand() - 0.5) * 4, 7 + rand() * 2, 11 + (rand() - 0.5) * 3);
       leaf.scale.set(1.5, 0.4, 1.0);
       canopyLeaves.push(leaf);
       // scene.add(leaf);
@@ -806,8 +811,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     rBranch.rotation.y = -0.2;
     // scene.add(rBranch);
     for (let i = 0; i < 10; i++) {
-      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.5 + Math.random() * 0.3, 6, 5), canopyLeafMat);
-      leaf.position.set(6 + (Math.random() - 0.5) * 3, 7.5 + Math.random() * 1.5, 12 + (Math.random() - 0.5) * 2);
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.5 + rand() * 0.3, 6, 5), canopyLeafMat);
+      leaf.position.set(6 + (rand() - 0.5) * 3, 7.5 + rand() * 1.5, 12 + (rand() - 0.5) * 2);
       leaf.scale.set(1.4, 0.35, 0.9);
       canopyLeaves.push(leaf);
       // scene.add(leaf);
@@ -821,11 +826,11 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
         new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0 })
       );
       ff.position.set(
-        (Math.random() - 0.5) * 14,
-        0.5 + Math.random() * 4,
-        (Math.random() - 0.5) * 14 + 2
+        (rand() - 0.5) * 14,
+        0.5 + rand() * 4,
+        (rand() - 0.5) * 14 + 2
       );
-      ff.userData = { phase: Math.random() * Math.PI * 2, driftX: (Math.random() - 0.5) * 0.003, driftZ: (Math.random() - 0.5) * 0.003 };
+      ff.userData = { phase: rand() * Math.PI * 2, driftX: (rand() - 0.5) * 0.003, driftZ: (rand() - 0.5) * 0.003 };
       fireflies.push(ff);
       scene.add(ff);
     }
