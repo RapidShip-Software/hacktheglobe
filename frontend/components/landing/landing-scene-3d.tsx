@@ -806,18 +806,19 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     const glow2 = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfffde7, transparent: true, opacity: 0.1 }));
     glow2.position.copy(sunPos);
     scene.add(glow2);
-    // Sun rays
+    // Sun rays (grouped with sun so they orbit together)
+    const sunRaysGroup = new THREE.Group();
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
       const rayGeo = new THREE.CylinderGeometry(0.1, 0.03, 5, 4);
       const rayMat = new THREE.MeshBasicMaterial({ color: 0xfff9c4, transparent: true, opacity: 0.12 });
       const ray = new THREE.Mesh(rayGeo, rayMat);
-      ray.position.copy(sunPos);
-      ray.position.x += Math.cos(angle) * 4.5;
-      ray.position.y += Math.sin(angle) * 4.5;
+      ray.position.set(Math.cos(angle) * 4.5, Math.sin(angle) * 4.5, 0);
       ray.rotation.z = angle + Math.PI / 2;
-      scene.add(ray);
+      sunRaysGroup.add(ray);
     }
+    sunRaysGroup.position.copy(sunPos);
+    scene.add(sunRaysGroup);
 
     // === HELPERS ===
     function makeMesh(geo: THREE.BufferGeometry, mat: THREE.Material, px: number, py: number, pz: number, shadow = false, outline = false) {
@@ -1396,6 +1397,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
       sunMesh.position.set(Math.cos(sunAngle) * sunOrbitR, sunY, Math.sin(sunAngle) * sunOrbitR);
       glow1.position.copy(sunMesh.position);
       glow2.position.copy(sunMesh.position);
+      sunRaysGroup.position.copy(sunMesh.position);
 
       // Animate water
       waterTex.offset.x = time * 0.015;
