@@ -33,7 +33,7 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
   return (
     <>
       <motion.button
-        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/15 backdrop-blur-xl rounded-xl px-3 py-2 border border-white/20 shadow-lg w-44" : "flex-col items-center gap-1"} cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2.5 border border-slate-200 shadow-lg w-48" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => setShowModal(true)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
@@ -146,9 +146,9 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         </svg>
 
         {/* Name label */}
-        <span className={`font-bold text-white whitespace-nowrap ${isStacked ? "text-sm" : "text-base bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20"}`}>
+        <span className={`font-bold whitespace-nowrap ${isStacked ? "text-sm text-slate-800" : "text-base text-white bg-slate-900 rounded-full px-5 py-2 shadow-lg border border-slate-700"}`}>
           {contact.name}
-          {isStacked && <span className="block text-[10px] font-normal text-white/50">{contact.relation}</span>}
+          {isStacked && <span className="block text-[10px] font-semibold text-slate-500">{contact.relation}</span>}
         </span>
       </motion.button>
 
@@ -162,11 +162,11 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
             exit={{ opacity: 0 }}
           >
             <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-900/60"
               onClick={() => setShowModal(false)}
             />
             <motion.div
-              className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl max-w-sm mx-4 text-center"
+              className="relative bg-white rounded-3xl p-8 shadow-2xl max-w-sm mx-4 text-center"
               initial={{ scale: 0.8, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 20 }}

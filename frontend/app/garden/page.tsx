@@ -242,12 +242,12 @@ function GardenPage() {
         <BlurFade delay={0.3} inView>
           <motion.p
             key={nudgeText}
-            className="text-sm md:text-lg font-medium text-white max-w-md mx-auto bg-slate-900/80 backdrop-blur-sm rounded-2xl px-3 md:px-5 py-2 md:py-3 shadow-lg border border-slate-700/50"
+            className="text-xs md:text-sm font-medium text-white max-w-sm mx-auto bg-slate-900/80 backdrop-blur-sm rounded-2xl px-3 md:px-4 py-2 shadow-lg border border-slate-700/50 line-clamp-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {nudgeText}
+            {nudgeText.length > 120 ? nudgeText.slice(0, 120) + "..." : nudgeText}
           </motion.p>
         </BlurFade>
       </div>
@@ -329,7 +329,7 @@ function GardenPage() {
       </motion.div>
 
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
-      <div className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 w-56 lg:w-60 max-h-[80vh]">
+      <div className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 w-64 lg:w-72 max-h-[80vh]">
         <BlurFade delay={0.2} inView>
           {checklistContent}
         </BlurFade>
