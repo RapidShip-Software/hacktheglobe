@@ -1469,7 +1469,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       { x: 25, z: 10, angle: 0.8, speed: 0.12, color: 0x8B4513, size: 1.0 },
       { x: -30, z: 5, angle: 4.5, speed: 0.06, color: 0x1a5276, size: 1.1 },
       { x: -20, z: -18, angle: 2.2, speed: 0.08, color: 0x2c3e50, size: 0.8 },
-      { x: -28, z: 22, angle: 1.5, speed: 0.1, color: 0x7f1d1d, size: 0.9 },
+      { x: 20, z: -18, angle: 1.5, speed: 0.1, color: 0x7f1d1d, size: 0.9 },
     ];
     shipConfigs.forEach((cfg) => {
       const ship = makeShip(cfg.color, cfg.size);
@@ -1560,6 +1560,122 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       fishGroup.push(fish);
       scene.add(fish);
     });
+
+    // === WHALE ===
+    const whaleGroup = new THREE.Group();
+    const whaleMat = new THREE.MeshPhongMaterial({ color: 0x2c3e6b, shininess: 40 });
+    const whaleBelly = new THREE.MeshPhongMaterial({ color: 0x8faabe, shininess: 30 });
+    // Body
+    const whaleBody = new THREE.Mesh(new THREE.SphereGeometry(2.5, 10, 8), whaleMat);
+    whaleBody.scale.set(2.2, 0.8, 0.9);
+    whaleGroup.add(whaleBody);
+    // Belly
+    const wBelly = new THREE.Mesh(new THREE.SphereGeometry(2.3, 8, 6), whaleBelly);
+    wBelly.scale.set(2.0, 0.5, 0.7);
+    wBelly.position.y = -0.5;
+    whaleGroup.add(wBelly);
+    // Head
+    const whaleHead = new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 7), whaleMat);
+    whaleHead.position.set(4, 0.2, 0);
+    whaleHead.scale.set(1.2, 0.7, 0.8);
+    whaleGroup.add(whaleHead);
+    // Eye
+    const whaleEye = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 5), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+    whaleEye.position.set(5, 0.5, 1.2);
+    whaleGroup.add(whaleEye);
+    // Tail fluke
+    for (const side of [-1, 1]) {
+      const fluke = new THREE.Mesh(new THREE.SphereGeometry(1.0, 6, 5), whaleMat);
+      fluke.position.set(-5, 0.3, side * 1.2);
+      fluke.scale.set(1.5, 0.15, 0.8);
+      whaleGroup.add(fluke);
+    }
+    // Dorsal fin
+    const wDorsal = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 5), whaleMat);
+    wDorsal.position.set(-1, 1.5, 0);
+    wDorsal.rotation.z = 0.3;
+    whaleGroup.add(wDorsal);
+    whaleGroup.position.set(-35, -1.2, 10);
+    whaleGroup.userData = { phase: 0 };
+    scene.add(whaleGroup);
+
+    // === DOLPHINS (2, jumping) ===
+    const dolphins: THREE.Group[] = [];
+    function makeDolphin(x: number, z: number, phase: number) {
+      const g = new THREE.Group();
+      const dMat = new THREE.MeshPhongMaterial({ color: 0x607d9f, shininess: 50 });
+      const dBelly = new THREE.MeshPhongMaterial({ color: 0xc0d0e0, shininess: 40 });
+      // Body
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), dMat);
+      body.scale.set(2.5, 0.8, 0.7);
+      g.add(body);
+      // Belly
+      const belly = new THREE.Mesh(new THREE.SphereGeometry(0.45, 7, 5), dBelly);
+      belly.scale.set(2.2, 0.5, 0.5);
+      belly.position.y = -0.15;
+      g.add(belly);
+      // Snout
+      const snout = new THREE.Mesh(new THREE.SphereGeometry(0.25, 6, 5), dMat);
+      snout.position.set(1.2, 0, 0);
+      snout.scale.set(1.5, 0.5, 0.5);
+      g.add(snout);
+      // Dorsal fin
+      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 4), dMat);
+      fin.position.set(-0.2, 0.35, 0);
+      fin.rotation.z = 0.2;
+      g.add(fin);
+      // Tail
+      for (const s of [-1, 1]) {
+        const tf = new THREE.Mesh(new THREE.SphereGeometry(0.2, 5, 4), dMat);
+        tf.position.set(-1.3, 0, s * 0.25);
+        tf.scale.set(1.2, 0.15, 0.8);
+        g.add(tf);
+      }
+      // Eye
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.04, 5, 4), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+      eye.position.set(1.0, 0.12, 0.3);
+      g.add(eye);
+      g.position.set(x, -0.8, z);
+      g.userData = { phase, baseX: x, baseZ: z };
+      return g;
+    }
+    const d1 = makeDolphin(25, -30, 0);
+    const d2 = makeDolphin(28, -28, 1.5);
+    dolphins.push(d1, d2);
+    scene.add(d1);
+    scene.add(d2);
+
+    // === SUNFISH (Mola mola - big round flat fish) ===
+    const sunfishGroup = new THREE.Group();
+    const sfMat = new THREE.MeshPhongMaterial({ color: 0x8a9a6a, shininess: 30 });
+    // Body (very round, flat)
+    const sfBody = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), sfMat);
+    sfBody.scale.set(1.0, 1.2, 0.4);
+    sunfishGroup.add(sfBody);
+    // Top fin
+    const sfTopFin = new THREE.Mesh(new THREE.SphereGeometry(0.4, 5, 4), sfMat);
+    sfTopFin.position.set(0, 1.2, 0);
+    sfTopFin.scale.set(0.3, 1.0, 0.15);
+    sunfishGroup.add(sfTopFin);
+    // Bottom fin
+    const sfBotFin = new THREE.Mesh(new THREE.SphereGeometry(0.4, 5, 4), sfMat);
+    sfBotFin.position.set(0, -1.2, 0);
+    sfBotFin.scale.set(0.3, 1.0, 0.15);
+    sunfishGroup.add(sfBotFin);
+    // Eye
+    const sfEye = new THREE.Mesh(new THREE.SphereGeometry(0.08, 5, 4), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+    sfEye.position.set(0.8, 0.3, 0.35);
+    sunfishGroup.add(sfEye);
+    // Spots
+    const sfSpotMat = new THREE.MeshLambertMaterial({ color: 0x6a7a5a });
+    for (let i = 0; i < 5; i++) {
+      const spot = new THREE.Mesh(new THREE.SphereGeometry(0.1 + Math.random() * 0.1, 5, 4), sfSpotMat);
+      spot.position.set((Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, 0.35);
+      sunfishGroup.add(spot);
+    }
+    sunfishGroup.position.set(-20, -1.5, -25);
+    sunfishGroup.userData = { phase: 2.0 };
+    scene.add(sunfishGroup);
 
     // === CENTRAL CANOPY TREE (the "Canopy" tree - tallest, center of island) ===
     const canopyTreeGroup = new THREE.Group();
@@ -1899,6 +2015,29 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       fire1.scale.y = 1 + Math.sin(time * 6) * 0.2;
       fire2.position.y = 0.5 + Math.sin(time * 7) * 0.05;
       fire3.position.y = 0.65 + Math.sin(time * 9) * 0.04;
+
+      // Whale swim
+      whaleGroup.position.x = -35 + Math.sin(time * 0.05) * 15;
+      whaleGroup.position.z = 10 + Math.cos(time * 0.05) * 10;
+      whaleGroup.position.y = -1.2 + Math.sin(time * 0.3) * 0.3;
+      whaleGroup.rotation.y = Math.atan2(Math.cos(time * 0.05) * 15 * 0.05, -Math.sin(time * 0.05) * 10 * 0.05);
+
+      // Dolphins jump
+      dolphins.forEach((d) => {
+        const ph = d.userData.phase;
+        const jumpCycle = (time * 0.8 + ph) % (Math.PI * 2);
+        d.position.x = d.userData.baseX + Math.sin(time * 0.15 + ph) * 5;
+        d.position.z = d.userData.baseZ + Math.cos(time * 0.15 + ph) * 5;
+        d.position.y = -0.8 + Math.max(0, Math.sin(jumpCycle)) * 2.5;
+        d.rotation.x = Math.sin(jumpCycle) > 0 ? -Math.sin(jumpCycle) * 0.8 : 0;
+        d.rotation.y = time * 0.15 + ph + Math.PI / 2;
+      });
+
+      // Sunfish lazy drift
+      sunfishGroup.position.x = -20 + Math.sin(time * 0.03 + 2) * 8;
+      sunfishGroup.position.z = -25 + Math.cos(time * 0.04 + 2) * 6;
+      sunfishGroup.position.y = -1.5 + Math.sin(time * 0.2) * 0.2;
+      sunfishGroup.rotation.y = time * 0.03 + 2;
 
       // Clinical island: smoke puffs
       smokePuffs.forEach((puff, i) => {
