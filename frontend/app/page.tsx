@@ -111,12 +111,7 @@ function HomePageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-3xl shadow-xl shadow-emerald-500/25">
-              {"\u{1F333}"}
-            </div>
-            <span className="text-2xl font-bold text-white tracking-wider uppercase drop-shadow-lg">
-              Canopy
-            </span>
+            <img src="/logo.png" alt="Canopy" className="h-14 md:h-16 drop-shadow-xl" />
           </motion.div>
         </BlurFade>
 
