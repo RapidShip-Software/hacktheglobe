@@ -3,6 +3,12 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const LandingScene3D = dynamic(
+  () => import("@/components/landing/landing-scene-3d").then((m) => m.LandingScene3D),
+  { ssr: false }
+);
 
 const USERS: Record<string, { password: string; name: string; role: string }> = {
   "margaret@canopy.care": { password: "garden123", name: "Margaret Santos", role: "patient" },
@@ -37,16 +43,12 @@ function LoginPage() {
   }, [email, password, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-4">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-emerald-200/30 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-teal-200/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cyan-100/20 blur-3xl" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* 3D Scene Background */}
+      <LandingScene3D />
 
       <motion.div
-        className="relative w-full max-w-md"
+        className="relative z-10 w-full max-w-md"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -62,19 +64,19 @@ function LoginPage() {
               Canopy
             </span>
           </div>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-white/70 font-medium">
             Shelter for the people you love.
           </p>
         </div>
 
         {/* Login card */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-8">
-          <h2 className="text-xl font-bold text-slate-800 mb-1">Welcome back</h2>
+        <div className="bg-white/20 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8">
+          <h2 className="text-xl font-bold text-white drop-shadow mb-1">Welcome back</h2>
           <p className="text-sm text-slate-500 mb-6">Sign in to continue to your dashboard</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-semibold text-white/90 mb-1.5">
                 Email
               </label>
               <input
@@ -89,7 +91,7 @@ function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-semibold text-white/90 mb-1.5">
                 Password
               </label>
               <input
@@ -132,8 +134,8 @@ function LoginPage() {
           </form>
 
           {/* Demo credentials */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Demo Accounts</p>
+          <div className="mt-6 pt-5 border-t border-white/20">
+            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3">Demo Accounts</p>
             <div className="space-y-2">
               <button
                 onClick={() => { setEmail("margaret@canopy.care"); setPassword("garden123"); setError(""); }}
@@ -160,7 +162,7 @@ function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-white/50 mt-6">
           Hack the Globe 2026 &middot; Health &amp; Humanity &middot; BCG Toronto
         </p>
       </motion.div>
