@@ -43,7 +43,7 @@ function LoginPage() {
   }, [email, password, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden" style={{ backgroundColor: "#87ceeb" }}>
       {/* 3D Scene Background */}
       <LandingScene3D />
 
