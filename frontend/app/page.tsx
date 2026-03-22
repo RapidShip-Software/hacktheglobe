@@ -126,6 +126,9 @@ function HomePageInner() {
               Canopy
             </span>
           </motion.div>
+          <p className="text-sm md:text-base font-medium text-white/60 italic tracking-wide -mt-4 drop-shadow">
+            shelter for the people you love.
+          </p>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
