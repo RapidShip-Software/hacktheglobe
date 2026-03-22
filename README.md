@@ -15,24 +15,31 @@ Between a 75-year-old living at home and the hospital that treats them, there is
 
 ## The Solution
 
-Three interconnected layers, one platform:
+Three interconnected layers, one platform, each with its own immersive 3D island experience:
 
 | Layer | For | What It Does |
 |-------|-----|-------------|
-| **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Zero digital literacy required. |
-| **Peace of Mind Dashboard** | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. |
-| **Clinical Intelligence** | GP / care coordinator | AI risk stratification with multi-signal pattern detection and actionable alerts. |
+| **The Garden** (Patient App) | Elderly patient (iPad) | Daily check-ins via a living garden metaphor. Health-reactive 3D scene with flowers, animals, and weather. Zero digital literacy required. |
+| **The Nest** (Family Dashboard) | Family caregiver (web/mobile) | Single daily green/yellow/red signal with natural language summary. 3D island with a cozy nest, lighthouse, and nature. |
+| **Clinical** (Healthcare Intelligence) | GP / care coordinator | AI risk stratification, patient timelines, and real-time monitoring. Fly-to camera transition from landing page into a cozy 3D clinic interior. |
+
+### Live Demo
+
+**[hacktheglobe.vercel.app](https://hacktheglobe.vercel.app)**
+
+The landing page features three animated 3D islands (garden, nest, clinic) orbiting on a cel-shaded ocean. Clicking Clinical triggers a cinematic camera fly-to transition into the hospital.
 
 ## Tech Stack
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| Frontend | Next.js 14 (App Router), Tailwind CSS, Framer Motion | React-based, fast prototyping, SSR |
+| Frontend | Next.js 15 (App Router), Tailwind CSS, Framer Motion, Three.js | React-based, fast prototyping, SSR, immersive 3D |
 | Backend API | FastAPI (Python) | Async, lightweight, native Python for LangGraph |
+| AI Chat | Groq (Llama 3.3 70B) | Fast, free-tier chatbot for patient conversations |
 | Multi-Agent AI | LangGraph + Gemini 2.0 Flash | Stateful agent orchestration with fast inference |
 | Database | Supabase (PostgreSQL + Auth + Realtime) | Real-time subscriptions, RLS, free tier |
 | Deploy (FE) | Vercel | Zero-config Next.js deployment |
-| Deploy (BE) | Railway or Render | One-click Python deploy |
+| Deploy (BE) | Railway | One-click Python deploy |
 
 ## Architecture
 
@@ -59,16 +66,18 @@ Three interconnected layers, one platform:
 hacktheglobe/
 ├── frontend/                   # Next.js (all 3 interfaces)
 │   ├── app/
-│   │   ├── garden/             # Patient garden app routes
-│   │   ├── caregiver/          # Caregiver dashboard routes
-│   │   ├── clinical/           # Clinical dashboard routes
-│   │   ├── api/                # Next.js API routes (proxy to FastAPI)
+│   │   ├── garden/             # Patient garden app
+│   │   ├── caregiver/          # Family dashboard (The Nest)
+│   │   ├── clinical/           # Clinical dashboard
+│   │   ├── api/chat/           # Groq chatbot API route
 │   │   └── layout.tsx
 │   ├── components/
-│   │   ├── garden/             # HealthPlant, Sky, Butterfly, Gate
-│   │   ├── caregiver/          # DailySignal, WeeklyDigest, Notes
-│   │   ├── clinical/           # PatientList, AlertCard, RiskChart
-│   │   └── shared/             # Button, Card, StatusBadge
+│   │   ├── garden/             # GardenScene3D, HealthPlant, Butterfly, Gate
+│   │   ├── nest/               # NestScene3D (3D island with nest + lighthouse)
+│   │   ├── landing/            # LandingScene3D (3-island orbiting scene)
+│   │   ├── caregiver/          # DailySignal, HistoryView, Notes
+│   │   ├── clinical/           # ClinicalScene3D, PatientList, AlertCard, RiskTimeline
+│   │   └── shared/             # BlurFade, ErrorBoundary
 │   ├── lib/
 │   │   ├── supabase.ts         # Supabase client + Realtime helpers
 │   │   └── api.ts              # FastAPI client wrapper
@@ -76,7 +85,7 @@ hacktheglobe/
 ├── backend/                    # FastAPI + LangGraph
 │   ├── app/
 │   │   ├── main.py             # FastAPI app + CORS + routes
-│   │   ├── routers/            # readings, patients, alerts
+│   │   ├── routers/            # readings, patients, alerts, chat
 │   │   ├── agents/             # LangGraph graph, nodes, prompts, state
 │   │   ├── services/           # supabase, gemini clients
 │   │   └── models/             # Pydantic schemas
@@ -147,6 +156,16 @@ cd seed
 python margaret.py
 python readings_7day.py
 ```
+
+## 3D Visual Experience
+
+All three interfaces feature immersive Three.js 3D scenes with cel-shaded (black outline) art style:
+
+- **Landing Page** - Three islands orbiting on an ocean: a garden island with flowers/animals, a nest island with lighthouse, and a hospital island with a cozy clinic building. Camera orbits continuously.
+- **The Garden** - Health-reactive 3D garden scene. Sky changes with health status (clear/cloudy/stormy). Plants, flowers, and animals respond to patient wellness.
+- **The Nest** - 3D island with a large nest, lighthouse, trees, and birds. Camera slowly orbits at a comfortable 3/4 angle.
+- **Clinical** - Cozy clinic interior (warm wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Camera gently pans in on page load.
+- **Fly-To Transition** - Clicking the Clinical card on the landing page triggers a 1.8s cinematic camera fly toward the hospital island with cubic ease-in-out, fading to white before entering the clinic interior.
 
 ## Multi-Agent AI Pipeline (LangGraph)
 
