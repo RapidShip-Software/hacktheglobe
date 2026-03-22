@@ -18,6 +18,7 @@ const INTERFACES: Array<{
   href: string;
   flyTarget: FlyTarget;
   icon: string;
+  iconImage?: string;
   title: string;
   subtitle: string;
   description: string;
@@ -30,6 +31,7 @@ const INTERFACES: Array<{
     href: "/garden",
     flyTarget: "garden",
     icon: "\u{1F33F}",
+    iconImage: "/garden-logo.png",
     title: "The Garden",
     subtitle: "Patient wellness companion",
     description: "A living garden that reflects Margaret's health. Tap butterflies to call family.",
@@ -159,8 +161,12 @@ function HomePageInner() {
 
                 <div className="relative z-10">
                   {/* Icon */}
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center text-3xl mb-5 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300`}>
-                    {item.icon}
+                  <div className={`w-16 h-16 rounded-2xl ${item.iconImage ? "bg-white/80" : `bg-gradient-to-br ${item.gradient}`} flex items-center justify-center text-3xl mb-5 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 overflow-hidden`}>
+                    {item.iconImage ? (
+                      <img src={item.iconImage} alt={item.title} className="w-14 h-14 object-contain" />
+                    ) : (
+                      item.icon
+                    )}
                   </div>
 
                   <h2 className="text-2xl font-bold text-white mb-1 drop-shadow-lg">

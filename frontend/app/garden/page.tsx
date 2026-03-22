@@ -216,14 +216,18 @@ function GardenPage() {
 
   return (
     <AuroraBackground skyState={gardenState.sky} health={gardenState.plant_health}>
-      {/* Back button */}
-      <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20">
+      {/* Back button + Garden logo */}
+      <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20 flex items-center gap-3">
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg cursor-pointer hover:bg-white/80 active:scale-95 transition-all"
         >
           <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
         </button>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg">
+          <img src="/garden-logo.png" alt="The Garden" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
+          <span className="text-sm md:text-base font-bold text-slate-800 hidden sm:inline">The Garden</span>
+        </div>
       </div>
 
       {/* Exit fade overlay */}
