@@ -440,7 +440,7 @@ function ClinicalScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [timeOfDay]);
 
   return <div ref={containerRef} className="fixed inset-0 w-full h-full" style={{ zIndex: 0 }} />;
 }

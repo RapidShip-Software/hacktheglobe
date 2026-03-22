@@ -256,9 +256,6 @@ function GardenPage() {
         </div>
       </div>
 
-      {/* Time of day toggle */}
-      <TimeToggle timeOfDay={timeOfDay} onChange={setTimeOfDay} />
-
       {/* Exit fade overlay */}
       <AnimatePresence>
         {isExiting && (
