@@ -106,18 +106,19 @@ function HomePageInner() {
         {/* Logo */}
         <BlurFade delay={0.1} inView>
           <motion.div
-            className="relative flex items-center justify-start mb-6 w-full max-w-5xl"
+            className="flex items-center justify-center gap-3 md:gap-5 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo-heart.png" alt="Canopy" className="h-40 drop-shadow-xl" />
+            <img src="/logo-heart.png" alt="Canopy Heart" className="h-20 sm:h-24 md:h-28 object-contain drop-shadow-2xl" />
             <span
-              className="font-bold tracking-wide -ml-2"
+              className="font-extrabold tracking-tight"
               style={{
-                fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+                fontSize: "clamp(3rem, 7vw, 5.5rem)",
                 color: "#4db8a4",
-                textShadow: "0 2px 12px rgba(0,0,0,0.2)",
+                textShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                lineHeight: 1,
               }}
             >
               Canopy
@@ -126,19 +127,19 @@ function HomePageInner() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-3 leading-tight">
-            <span className="text-slate-900">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight">
+            <span className="text-white drop-shadow-xl">
               Continuous Care,
             </span>
             <br />
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-lg">
               Naturally
             </span>
           </h1>
         </BlurFade>
 
         <BlurFade delay={0.3} inView>
-          <p className="text-base md:text-lg font-medium text-slate-700 text-center max-w-md mb-14 leading-relaxed">
+          <p className="text-base md:text-lg font-bold text-white drop-shadow-md text-center max-w-md mb-16 leading-relaxed">
             Remote care powered by AI, keeping elderly patients healthy at home.
           </p>
         </BlurFade>
