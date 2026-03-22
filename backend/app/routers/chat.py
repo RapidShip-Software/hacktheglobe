@@ -36,13 +36,19 @@ class ChatResponse(BaseModel):
     reply: str
 
 
-FALLBACK_RESPONSES = [
-    "Your garden is looking wonderful today, {name}! Remember to log your blood pressure when you get a chance.",
-    "Hello {name}! I hope you're having a lovely day. Don't forget your medications, they help your garden grow!",
-    "Good to see you, {name}! Your plant is growing beautifully. A little walk today would do wonders.",
-    "Hi {name}! Everything is blooming nicely. Make sure to take your Lisinopril and Metformin on schedule.",
-    "Welcome back, {name}! Your garden reflects how well you're taking care of yourself. Keep it up!",
-]
+FALLBACK_RESPONSES = {
+    "sad": "I'm so sorry you're feeling that way, {name}. You're not alone, and it's okay to have tough days. Would you like to tap a butterfly to call Sarah or James? Sometimes hearing a familiar voice helps.",
+    "depressed": "I hear you, {name}, and I'm glad you told me. Please know your family cares about you deeply. Tap the butterfly to reach Sarah, she would love to hear from you. You matter so much.",
+    "pain": "I'm sorry you're in pain, {name}. Please let your family or Dr. Patel know. You can tap the robin to call the doctor, or the butterfly to reach Sarah.",
+    "help": "Of course, {name}! I'm here for you. You can log your blood pressure with the heart button, take your medications, or tap a butterfly to call your family anytime.",
+    "dizzy": "Dizziness can be worrying, {name}. Please sit down somewhere safe and have some water. If it doesn't pass, tap the robin to call Dr. Patel.",
+    "default": [
+        "Hello {name}! Your garden is doing beautifully today. Remember, every time you log your blood pressure or take your medication, your plant grows a little more!",
+        "Hi {name}! I hope you're having a good day. Don't forget your Lisinopril this morning, it helps keep your garden blooming!",
+        "Welcome back, {name}! Your family is always just a butterfly tap away if you need them. Is there anything I can help with?",
+        "Good to see you, {name}! A little walk today would do wonders for both you and your garden. How are you feeling?",
+    ],
+}
 
 _fallback_index = 0
 
@@ -60,6 +66,22 @@ async def chat(req: ChatRequest) -> ChatResponse:
         return ChatResponse(reply=response.content)
     except Exception:
         global _fallback_index
-        reply = FALLBACK_RESPONSES[_fallback_index % len(FALLBACK_RESPONSES)].format(name=req.patient_name)
+        msg_lower = req.message.lower()
+        # Check for emotional/health keywords
+        for keyword in ("depress", "sad", "lonely", "crying", "upset", "anxious", "scared"):
+            if keyword in msg_lower:
+                return ChatResponse(reply=FALLBACK_RESPONSES["sad"].format(name=req.patient_name))
+        for keyword in ("pain", "hurt", "ache"):
+            if keyword in msg_lower:
+                return ChatResponse(reply=FALLBACK_RESPONSES["pain"].format(name=req.patient_name))
+        for keyword in ("dizzy", "faint", "lightheaded"):
+            if keyword in msg_lower:
+                return ChatResponse(reply=FALLBACK_RESPONSES["dizzy"].format(name=req.patient_name))
+        for keyword in ("help",):
+            if keyword in msg_lower:
+                return ChatResponse(reply=FALLBACK_RESPONSES["help"].format(name=req.patient_name))
+        # Default rotating responses
+        defaults = FALLBACK_RESPONSES["default"]
+        reply = defaults[_fallback_index % len(defaults)].format(name=req.patient_name)
         _fallback_index += 1
         return ChatResponse(reply=reply)

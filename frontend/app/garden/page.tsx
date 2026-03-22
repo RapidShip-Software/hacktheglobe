@@ -50,7 +50,7 @@ function GardenPage() {
         setGardenState(summary.garden_state);
       }
       if (summary.caregiver_summary) {
-        const short = summary.caregiver_summary.slice(0, 120);
+        const short = summary.caregiver_summary;
         setNudgeText(short);
       }
     }).catch(() => {
