@@ -9,15 +9,16 @@ type ButterflyContactProps = {
   position: "left" | "center" | "right";
 };
 
-const butterflyColours: Record<string, { wing: string; body: string }> = {
-  butterfly_blue: { wing: "#60a5fa", body: "#2563eb" },
-  butterfly_green: { wing: "#4ade80", body: "#16a34a" },
-  robin_red: { wing: "#fb923c", body: "#ea580c" },
+const butterflyColours: Record<string, { wing: string; body: string; wingDark: string; highlight: string }> = {
+  butterfly_blue: { wing: "#60a5fa", body: "#2563eb", wingDark: "#3b82f6", highlight: "#93c5fd" },
+  butterfly_green: { wing: "#4ade80", body: "#16a34a", wingDark: "#22c55e", highlight: "#86efac" },
+  robin_red: { wing: "#fb923c", body: "#ea580c", wingDark: "#f97316", highlight: "#fdba74" },
 };
 
 function ButterflyContact({ contact, position }: ButterflyContactProps) {
   const [showModal, setShowModal] = useState(false);
-  const colours = butterflyColours[contact.avatar] || { wing: "#a78bfa", body: "#7c3aed" };
+  const colours = butterflyColours[contact.avatar] || { wing: "#a78bfa", body: "#7c3aed", wingDark: "#8b5cf6", highlight: "#c4b5fd" };
+  const gradId = `bf-grad-${contact.name.replace(/\s/g, "")}`;
 
   const positionClasses = {
     left: "left-8 bottom-36 md:bottom-40",
@@ -41,61 +42,109 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         whileHover={{ scale: 1.2 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* Butterfly SVG — larger */}
-        <svg width="80" height="65" viewBox="0 0 60 50" className="drop-shadow-lg">
-          {/* Left wing */}
+        {/* 3D Butterfly SVG with gradients, highlights, and depth */}
+        <svg width="90" height="75" viewBox="0 0 60 50" className="drop-shadow-xl" style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))" }}>
+          <defs>
+            {/* Wing gradient for 3D depth */}
+            <radialGradient id={`${gradId}-lwg`} cx="40%" cy="30%">
+              <stop offset="0%" stopColor={colours.highlight} />
+              <stop offset="60%" stopColor={colours.wing} />
+              <stop offset="100%" stopColor={colours.wingDark} />
+            </radialGradient>
+            <radialGradient id={`${gradId}-rwg`} cx="60%" cy="30%">
+              <stop offset="0%" stopColor={colours.highlight} />
+              <stop offset="60%" stopColor={colours.wing} />
+              <stop offset="100%" stopColor={colours.wingDark} />
+            </radialGradient>
+            {/* Body gradient */}
+            <linearGradient id={`${gradId}-bg`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={colours.body} />
+              <stop offset="100%" stopColor={colours.wingDark} />
+            </linearGradient>
+          </defs>
+
+          {/* Shadow underneath */}
+          <ellipse cx="30" cy="46" rx="18" ry="3" fill="rgba(0,0,0,0.15)" />
+
+          {/* Left upper wing — 3D with gradient + inner pattern */}
           <motion.ellipse
-            cx="20"
-            cy="22"
-            rx="16"
-            ry="18"
-            fill={colours.wing}
-            opacity={0.85}
+            cx="19" cy="20" rx="16" ry="18"
+            fill={`url(#${gradId}-lwg)`}
+            stroke={colours.wingDark}
+            strokeWidth="0.8"
             animate={{ rx: [16, 12, 16] }}
             transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
           />
+          {/* Wing pattern spots */}
+          <circle cx="14" cy="18" r="4" fill={colours.highlight} opacity={0.4} />
+          <circle cx="20" cy="14" r="2.5" fill="white" opacity={0.25} />
+
+          {/* Left lower wing */}
           <motion.ellipse
-            cx="20"
-            cy="32"
-            rx="12"
-            ry="12"
-            fill={colours.wing}
-            opacity={0.7}
+            cx="19" cy="33" rx="12" ry="12"
+            fill={`url(#${gradId}-lwg)`}
+            stroke={colours.wingDark}
+            strokeWidth="0.6"
+            opacity={0.8}
             animate={{ rx: [12, 8, 12] }}
             transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.05 }}
           />
-          {/* Right wing */}
+          <circle cx="16" cy="32" r="3" fill={colours.highlight} opacity={0.3} />
+
+          {/* Right upper wing */}
           <motion.ellipse
-            cx="40"
-            cy="22"
-            rx="16"
-            ry="18"
-            fill={colours.wing}
-            opacity={0.85}
+            cx="41" cy="20" rx="16" ry="18"
+            fill={`url(#${gradId}-rwg)`}
+            stroke={colours.wingDark}
+            strokeWidth="0.8"
             animate={{ rx: [16, 12, 16] }}
             transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
           />
+          <circle cx="46" cy="18" r="4" fill={colours.highlight} opacity={0.4} />
+          <circle cx="40" cy="14" r="2.5" fill="white" opacity={0.25} />
+
+          {/* Right lower wing */}
           <motion.ellipse
-            cx="40"
-            cy="32"
-            rx="12"
-            ry="12"
-            fill={colours.wing}
-            opacity={0.7}
+            cx="41" cy="33" rx="12" ry="12"
+            fill={`url(#${gradId}-rwg)`}
+            stroke={colours.wingDark}
+            strokeWidth="0.6"
+            opacity={0.8}
             animate={{ rx: [12, 8, 12] }}
             transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut", delay: 0.05 }}
           />
-          {/* Body */}
-          <ellipse cx="30" cy="26" rx="3" ry="16" fill={colours.body} />
-          {/* Antennae */}
-          <line x1="28" y1="12" x2="22" y2="4" stroke={colours.body} strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="32" y1="12" x2="38" y2="4" stroke={colours.body} strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="22" cy="3" r="2" fill={colours.body} />
-          <circle cx="38" cy="3" r="2" fill={colours.body} />
+          <circle cx="44" cy="32" r="3" fill={colours.highlight} opacity={0.3} />
+
+          {/* Body — 3D with gradient and segments */}
+          <ellipse cx="30" cy="26" rx="3.5" ry="17" fill={`url(#${gradId}-bg)`} stroke={colours.body} strokeWidth="0.5" />
+          {/* Body segments */}
+          <line x1="27" y1="20" x2="33" y2="20" stroke={colours.wingDark} strokeWidth="0.4" opacity={0.5} />
+          <line x1="27" y1="24" x2="33" y2="24" stroke={colours.wingDark} strokeWidth="0.4" opacity={0.5} />
+          <line x1="27" y1="28" x2="33" y2="28" stroke={colours.wingDark} strokeWidth="0.4" opacity={0.5} />
+          <line x1="27" y1="32" x2="33" y2="32" stroke={colours.wingDark} strokeWidth="0.4" opacity={0.5} />
+          {/* Body highlight (3D sheen) */}
+          <ellipse cx="29" cy="22" rx="1.2" ry="8" fill="white" opacity={0.2} />
+
+          {/* Head */}
+          <circle cx="30" cy="10" r="3.5" fill={colours.body} stroke={colours.wingDark} strokeWidth="0.5" />
+          {/* Eyes */}
+          <circle cx="28.5" cy="9" r="1.2" fill="white" />
+          <circle cx="31.5" cy="9" r="1.2" fill="white" />
+          <circle cx="28.8" cy="9.2" r="0.6" fill="#111" />
+          <circle cx="31.8" cy="9.2" r="0.6" fill="#111" />
+          {/* Eye highlights */}
+          <circle cx="28.3" cy="8.7" r="0.3" fill="white" />
+          <circle cx="31.3" cy="8.7" r="0.3" fill="white" />
+
+          {/* Antennae — curved */}
+          <path d="M28 7 Q24 1 20 2" stroke={colours.body} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          <path d="M32 7 Q36 1 40 2" stroke={colours.body} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          <circle cx="20" cy="2" r="2" fill={colours.wing} stroke={colours.wingDark} strokeWidth="0.5" />
+          <circle cx="40" cy="2" r="2" fill={colours.wing} stroke={colours.wingDark} strokeWidth="0.5" />
         </svg>
 
-        {/* Name label */}
-        <span className="text-sm font-semibold text-white bg-black/30 backdrop-blur-sm rounded-full px-4 py-1.5 whitespace-nowrap shadow-md">
+        {/* Name label — larger font */}
+        <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 whitespace-nowrap shadow-lg border border-white/20">
           {contact.name}
         </span>
       </motion.button>
@@ -143,7 +192,7 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
-                  📞 Call
+                  Call
                 </motion.a>
                 <motion.button
                   onClick={() => setShowModal(false)}
