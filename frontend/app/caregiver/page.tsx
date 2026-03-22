@@ -78,37 +78,48 @@ function CaregiverPage() {
 
     const fetchData = async () => {
       try {
-        const [summaryRaw, historyRaw, profileRaw] = await Promise.all([
+        // Fetch independently so one failure doesn't block the others
+        const [summaryResult, historyResult, profileResult] = await Promise.allSettled([
           api.getPatientSummary(PATIENT_ID),
           api.getPatientHistory(PATIENT_ID),
           api.getPatientProfile(PATIENT_ID),
         ]);
 
-        const summaryData = summaryRaw as {
-          caregiver_summary?: string;
-          risk_score?: number;
-          created_at?: string;
-        };
+        if (summaryResult.status === "fulfilled") {
+          const summaryData = summaryResult.value as {
+            caregiver_summary?: string;
+            risk_score?: number;
+            created_at?: string;
+          };
+          setSignal({
+            status: riskToStatus(summaryData.risk_score ?? 0),
+            summary: summaryData.caregiver_summary || "No assessment data available yet. Readings will appear here once Margaret logs her vitals.",
+            timestamp: formatTimestamp(summaryData.created_at ?? null),
+          });
+        } else {
+          setSignal((prev) => ({
+            ...prev,
+            summary: "No assessment data available yet. Readings will appear here once Margaret logs her vitals.",
+          }));
+        }
 
-        setSignal({
-          status: riskToStatus(summaryData.risk_score ?? 0),
-          summary: summaryData.caregiver_summary || "No assessment data available yet. Readings will appear here once Margaret logs her vitals.",
-          timestamp: formatTimestamp(summaryData.created_at ?? null),
-        });
+        if (historyResult.status === "fulfilled") {
+          const assessments = historyResult.value as Assessment[];
+          setHistory(assessments.map(assessmentToHistoryItem));
+        }
 
-        const assessments = historyRaw as Assessment[];
-        setHistory(assessments.map(assessmentToHistoryItem));
-
-        const profile = profileRaw as { caregiver_notes?: CaregiverNote[] };
-        if (profile.caregiver_notes) {
-          setNotes(profile.caregiver_notes.map((n) => ({
-            author: n.author,
-            content: n.content,
-            created_at: n.created_at || new Date().toISOString(),
-          })));
+        if (profileResult.status === "fulfilled") {
+          const profile = profileResult.value as { caregiver_notes?: CaregiverNote[] };
+          if (profile.caregiver_notes) {
+            setNotes(profile.caregiver_notes.map((n) => ({
+              author: n.author,
+              content: n.content,
+              created_at: n.created_at || new Date().toISOString(),
+            })));
+          }
         }
       } catch {
-        // API unavailable, keep defaults
+        // All failed
       } finally {
         setLoading(false);
       }

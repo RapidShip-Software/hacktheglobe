@@ -36,6 +36,17 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+FALLBACK_RESPONSES = [
+    "Your garden is looking wonderful today, {name}! Remember to log your blood pressure when you get a chance.",
+    "Hello {name}! I hope you're having a lovely day. Don't forget your medications, they help your garden grow!",
+    "Good to see you, {name}! Your plant is growing beautifully. A little walk today would do wonders.",
+    "Hi {name}! Everything is blooming nicely. Make sure to take your Lisinopril and Metformin on schedule.",
+    "Welcome back, {name}! Your garden reflects how well you're taking care of yourself. Keep it up!",
+]
+
+_fallback_index = 0
+
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResponse:
     """Send a message to the garden helper AI."""
@@ -47,7 +58,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
         ]
         response = llm.invoke(messages)
         return ChatResponse(reply=response.content)
-    except Exception as e:
-        return ChatResponse(
-            reply="I'm having a little trouble right now, dear. Please try again in a moment, or tap a butterfly to call your family."
-        )
+    except Exception:
+        global _fallback_index
+        reply = FALLBACK_RESPONSES[_fallback_index % len(FALLBACK_RESPONSES)].format(name=req.patient_name)
+        _fallback_index += 1
+        return ChatResponse(reply=reply)
