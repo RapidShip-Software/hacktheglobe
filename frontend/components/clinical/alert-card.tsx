@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 import type { ClinicalAlert } from "@/lib/types";
 
 type AlertCardProps = {
   alert: ClinicalAlert;
   onDismiss: () => void;
+  onAction?: () => void;
 };
 
 const levelConfig = {
@@ -36,7 +38,8 @@ const levelConfig = {
   },
 };
 
-function AlertCard({ alert, onDismiss }: AlertCardProps) {
+function AlertCard({ alert, onDismiss, onAction }: AlertCardProps) {
+  const [acted, setActed] = useState(false);
   const config = levelConfig[alert.level];
 
   return (
@@ -69,11 +72,24 @@ function AlertCard({ alert, onDismiss }: AlertCardProps) {
           )}
           <div className="flex gap-2">
             <motion.button
-              className={`px-4 py-1.5 rounded-lg ${config.button} text-white text-xs font-semibold`}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              className={`px-4 py-1.5 rounded-lg ${acted ? "bg-emerald-500" : config.button} text-white text-xs font-semibold flex items-center gap-1.5`}
+              whileHover={{ scale: acted ? 1 : 1.03 }}
+              whileTap={{ scale: acted ? 1 : 0.97 }}
+              onClick={() => {
+                if (acted) return;
+                setActed(true);
+                onAction?.();
+                setTimeout(onDismiss, 2000);
+              }}
             >
-              Take Action
+              {acted ? (
+                <>
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  Action Logged
+                </>
+              ) : (
+                "Take Action"
+              )}
             </motion.button>
             <button
               onClick={onDismiss}
