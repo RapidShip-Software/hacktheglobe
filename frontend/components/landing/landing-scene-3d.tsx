@@ -1389,6 +1389,14 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
         camera.lookAt(0, 1, 0);
       }
 
+      // Sun orbits opposite to camera
+      const sunAngle = time * ORBIT_SPEED + Math.PI;
+      const sunOrbitR = 40;
+      const sunY = 25;
+      sunMesh.position.set(Math.cos(sunAngle) * sunOrbitR, sunY, Math.sin(sunAngle) * sunOrbitR);
+      glow1.position.copy(sunMesh.position);
+      glow2.position.copy(sunMesh.position);
+
       // Animate water
       waterTex.offset.x = time * 0.015;
       waterTex.offset.y = time * 0.01;
