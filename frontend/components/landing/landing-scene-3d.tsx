@@ -190,6 +190,255 @@ function LandingScene3D() {
     beach.position.y = -0.5;
     scene.add(beach);
 
+    // === NEST ISLAND (second island, offset from main) ===
+    const NEST_ISLAND_X = -28;
+    const NEST_ISLAND_Z = -18;
+    const NEST_ISLAND_RADIUS = 9;
+    const nestIslandGroup = new THREE.Group();
+    nestIslandGroup.position.set(NEST_ISLAND_X, 0, NEST_ISLAND_Z);
+
+    // Island base
+    const nestIslandGeo = new THREE.CylinderGeometry(NEST_ISLAND_RADIUS, NEST_ISLAND_RADIUS - 0.8, 1.8, 24, 4);
+    const niPos = nestIslandGeo.attributes.position;
+    for (let i = 0; i < niPos.count; i++) {
+      const y = niPos.getY(i);
+      if (y < -0.3) {
+        const x = niPos.getX(i);
+        const z = niPos.getZ(i);
+        const dist = Math.sqrt(x * x + z * z);
+        if (dist > NEST_ISLAND_RADIUS * 0.5) {
+          niPos.setY(i, y - (dist / NEST_ISLAND_RADIUS) * 0.6);
+        }
+      }
+    }
+    nestIslandGeo.computeVertexNormals();
+    const nestIsland = new THREE.Mesh(nestIslandGeo, new THREE.MeshLambertMaterial({ map: grassTex, color: 0x3da55c }));
+    nestIsland.position.y = -0.2;
+    nestIsland.receiveShadow = true;
+    nestIslandGroup.add(nestIsland);
+
+    // Beach ring
+    const nestBeach = new THREE.Mesh(
+      new THREE.TorusGeometry(NEST_ISLAND_RADIUS - 0.2, 0.7, 8, 24),
+      new THREE.MeshLambertMaterial({ color: 0xe8d5a3 })
+    );
+    nestBeach.rotation.x = -Math.PI / 2;
+    nestBeach.position.y = -0.5;
+    nestIslandGroup.add(nestBeach);
+
+    // === BIG NEST on the island ===
+    const bigNestGroup = new THREE.Group();
+    const nestRadius = 3.5;
+
+    // Nest bowl (woven twigs ring)
+    const bigNestBowl = new THREE.Mesh(
+      new THREE.TorusGeometry(nestRadius, 0.9, 10, 20),
+      new THREE.MeshLambertMaterial({ color: 0x8B6914 })
+    );
+    bigNestBowl.rotation.x = -Math.PI / 2;
+    addOutline(bigNestBowl, 0.03);
+    bigNestGroup.add(bigNestBowl);
+
+    // Nest inner (soft bedding)
+    const nestInner = new THREE.Mesh(
+      new THREE.CircleGeometry(nestRadius - 0.5, 20),
+      new THREE.MeshLambertMaterial({ color: 0x6B4E2A })
+    );
+    nestInner.rotation.x = -Math.PI / 2;
+    nestInner.position.y = -0.15;
+    bigNestGroup.add(nestInner);
+
+    // Second layer of straw inside
+    const strawMat = new THREE.MeshLambertMaterial({ color: 0xC4A050 });
+    const nestInner2 = new THREE.Mesh(
+      new THREE.CircleGeometry(nestRadius - 1.0, 16),
+      strawMat
+    );
+    nestInner2.rotation.x = -Math.PI / 2;
+    nestInner2.position.y = -0.08;
+    bigNestGroup.add(nestInner2);
+
+    // Twigs layered around the nest for texture
+    for (let i = 0; i < 35; i++) {
+      const angle = (i / 35) * Math.PI * 2;
+      const twigLen = 1.8 + Math.random() * 1.2;
+      const twig = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.08, twigLen, 4),
+        new THREE.MeshLambertMaterial({ color: 0x7A5C2E + Math.floor(Math.random() * 0x202020) })
+      );
+      twig.position.set(
+        Math.cos(angle) * (nestRadius - 0.3),
+        0.3 + Math.random() * 0.3,
+        Math.sin(angle) * (nestRadius - 0.3)
+      );
+      twig.rotation.z = (Math.random() - 0.5) * 0.6;
+      twig.rotation.y = angle + Math.random();
+      bigNestGroup.add(twig);
+    }
+
+    // Eggs in nest
+    const nestEggMat = new THREE.MeshPhongMaterial({ color: 0xF5F0E8, shininess: 30 });
+    for (let i = 0; i < 4; i++) {
+      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), nestEggMat);
+      egg.scale.set(0.8, 1.0, 0.8);
+      egg.position.set(
+        Math.cos(i * 1.6 + 0.3) * 1.0,
+        0.2,
+        Math.sin(i * 1.6 + 0.3) * 1.0
+      );
+      addOutline(egg, 0.04);
+      bigNestGroup.add(egg);
+    }
+
+    // Speckles on eggs
+    const speckleMat = new THREE.MeshLambertMaterial({ color: 0xC4A882 });
+    for (let i = 0; i < 15; i++) {
+      const speck = new THREE.Mesh(new THREE.SphereGeometry(0.08, 4, 3), speckleMat);
+      speck.position.set(
+        Math.cos(i * 0.42) * 1.1 + (Math.random() - 0.5) * 0.5,
+        0.45,
+        Math.sin(i * 0.42) * 1.1 + (Math.random() - 0.5) * 0.5
+      );
+      bigNestGroup.add(speck);
+    }
+
+    bigNestGroup.position.set(1, 0.5, 0.5);
+    nestIslandGroup.add(bigNestGroup);
+
+    // === LIGHTHOUSE on the island ===
+    const lighthouseGroup = new THREE.Group();
+
+    // Tower body (white with red stripes)
+    const towerHeight = 7;
+    const towerBase = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.9, towerHeight, 8),
+      new THREE.MeshPhongMaterial({ color: 0xf5f0e0, shininess: 20 })
+    );
+    towerBase.position.y = towerHeight / 2;
+    towerBase.castShadow = true;
+    addOutline(towerBase, 0.02);
+    lighthouseGroup.add(towerBase);
+
+    // Red stripes
+    const stripeMat = new THREE.MeshPhongMaterial({ color: 0xcc3333, shininess: 15 });
+    for (let s = 0; s < 3; s++) {
+      const stripeY = 1.5 + s * 2.0;
+      const stripeR = 0.9 - (stripeY / towerHeight) * 0.3;
+      const stripe = new THREE.Mesh(
+        new THREE.CylinderGeometry(stripeR - 0.01, stripeR + 0.02, 0.6, 8),
+        stripeMat
+      );
+      stripe.position.y = stripeY;
+      lighthouseGroup.add(stripe);
+    }
+
+    // Observation deck (railing platform)
+    const deckMat = new THREE.MeshPhongMaterial({ color: 0x333333, shininess: 30 });
+    const deck = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.0, 1.0, 0.15, 12),
+      deckMat
+    );
+    deck.position.y = towerHeight + 0.08;
+    lighthouseGroup.add(deck);
+
+    // Railing posts
+    for (let r = 0; r < 12; r++) {
+      const ra = (r / 12) * Math.PI * 2;
+      const post = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.03, 0.5, 4),
+        deckMat
+      );
+      post.position.set(Math.cos(ra) * 0.95, towerHeight + 0.35, Math.sin(ra) * 0.95);
+      lighthouseGroup.add(post);
+    }
+
+    // Railing ring
+    const railRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.95, 0.03, 4, 12),
+      deckMat
+    );
+    railRing.rotation.x = -Math.PI / 2;
+    railRing.position.y = towerHeight + 0.55;
+    lighthouseGroup.add(railRing);
+
+    // Lamp room (glass dome)
+    const lampRoom = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.55, 0.8, 8),
+      new THREE.MeshPhongMaterial({ color: 0xfff9c4, transparent: true, opacity: 0.7, shininess: 60, emissive: 0xfff176, emissiveIntensity: 0.3 })
+    );
+    lampRoom.position.y = towerHeight + 0.55;
+    lighthouseGroup.add(lampRoom);
+
+    // Roof cap
+    const roofCap = new THREE.Mesh(
+      new THREE.ConeGeometry(0.5, 0.5, 8),
+      new THREE.MeshPhongMaterial({ color: 0xcc3333, shininess: 20 })
+    );
+    roofCap.position.y = towerHeight + 1.2;
+    addOutline(roofCap, 0.03);
+    lighthouseGroup.add(roofCap);
+
+    // Light point
+    const lighthouseLight = new THREE.PointLight(0xfff9c4, 1.5, 20);
+    lighthouseLight.position.y = towerHeight + 0.55;
+    lighthouseGroup.add(lighthouseLight);
+
+    lighthouseGroup.position.set(-4.5, 0, -3);
+    nestIslandGroup.add(lighthouseGroup);
+
+    // === NATURE on nest island ===
+    // Trees around the edges
+    const nestTreePositions = [
+      { x: 5, z: -2, s: 0.8 }, { x: -6, z: 2, s: 0.7 }, { x: 3, z: 5, s: 0.65 },
+      { x: -3, z: 5, s: 0.75 }, { x: 6, z: 3, s: 0.6 }, { x: -5, z: -4, s: 0.7 },
+      { x: 0, z: -6, s: 0.8 }, { x: 4, z: -5, s: 0.65 },
+    ];
+    nestTreePositions.forEach((tp) => {
+      if (Math.sqrt(tp.x * tp.x + tp.z * tp.z) < NEST_ISLAND_RADIUS - 1.5) {
+        nestIslandGroup.add(tree(tp.x, tp.z, tp.s, treeColors[Math.floor(Math.random() * 3)]));
+      }
+    });
+
+    // Shrubs near the nest
+    const nestShrubPositions = [
+      { x: 4, z: 1 }, { x: -1, z: 4 }, { x: 3, z: -3 },
+      { x: -2, z: -4 }, { x: 5, z: -1 }, { x: -4, z: 3 },
+    ];
+    nestShrubPositions.forEach((sp) => {
+      if (Math.sqrt(sp.x * sp.x + sp.z * sp.z) < NEST_ISLAND_RADIUS - 2) {
+        nestIslandGroup.add(shrub(sp.x, sp.z, 0.6 + Math.random() * 0.4, shrubColors[Math.floor(Math.random() * 4)]));
+      }
+    });
+
+    // Rocks scattered
+    const rockMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+    for (let i = 0; i < 8; i++) {
+      const rx = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
+      const rz = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
+      if (Math.sqrt(rx * rx + rz * rz) > NEST_ISLAND_RADIUS - 2) continue;
+      const rock = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(0.2 + Math.random() * 0.3, 0),
+        rockMat
+      );
+      rock.position.set(rx, 0.1, rz);
+      rock.rotation.set(Math.random(), Math.random(), Math.random());
+      addOutline(rock, 0.04);
+      nestIslandGroup.add(rock);
+    }
+
+    // A few wildflowers on the nest island
+    for (let i = 0; i < 25; i++) {
+      const fx = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
+      const fz = (Math.random() - 0.5) * NEST_ISLAND_RADIUS * 1.4;
+      if (Math.sqrt(fx * fx + fz * fz) > NEST_ISLAND_RADIUS - 2) continue;
+      // Skip nest area
+      const dxNest = fx - 1, dzNest = fz - 0.5;
+      if (Math.sqrt(dxNest * dxNest + dzNest * dzNest) < 4.5) continue;
+      nestIslandGroup.add(flowerCreators[Math.floor(Math.random() * flowerCreators.length)](fx, fz));
+    }
+
+    scene.add(nestIslandGroup);
+
     // === SUN ===
     const sunPos = new THREE.Vector3(25, 8, 18);
     const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
@@ -650,6 +899,11 @@ function LandingScene3D() {
           }
         });
       });
+
+      // Lighthouse light rotation
+      lighthouseLight.position.x = Math.cos(time * 1.5) * 1.5;
+      lighthouseLight.position.z = Math.sin(time * 1.5) * 1.5;
+      lighthouseLight.intensity = 1.2 + Math.sin(time * 3) * 0.5;
 
       // Plant sway
       plantGroup.rotation.z = Math.sin(time * 0.8) * 0.015;

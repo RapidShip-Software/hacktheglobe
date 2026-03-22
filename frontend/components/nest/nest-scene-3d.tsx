@@ -15,10 +15,10 @@ function NestScene3D() {
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.FogExp2(0x87ceeb, 0.006);
 
-    // Camera: high up in a tree, looking down at the garden
-    const camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.1, 300);
-    camera.position.set(0, 35, 8);
-    camera.lookAt(0, 0, 0);
+    // Camera: elevated 3/4 view looking at the island and nest
+    const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 300);
+    camera.position.set(18, 16, 22);
+    camera.lookAt(0, 3, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -167,49 +167,32 @@ function NestScene3D() {
       nestGroup.add(spot);
     }
 
-    nestGroup.position.set(0, 30, 5);
+    // Scale up the nest for the 3/4 view
+    nestGroup.scale.set(1.8, 1.8, 1.8);
+    nestGroup.position.set(0, 0.8, 2);
     scene.add(nestGroup);
 
-    // === BRANCH holding the nest ===
-    const branchMat = new THREE.MeshLambertMaterial({ color: 0x5C3A1E });
-    const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 20, 6), branchMat);
-    branch.position.set(-3, 22, 6);
-    branch.rotation.z = 0.15;
-    addOutline(branch, 0.03);
-    scene.add(branch);
-
-    // Horizontal branch under the nest
-    const hBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 8, 6), branchMat);
-    hBranch.position.set(0, 29.5, 5);
-    hBranch.rotation.z = Math.PI / 2;
-    addOutline(hBranch, 0.03);
-    scene.add(hBranch);
-
-    // Leaves around the branch/nest
-    const leafMat = new THREE.MeshLambertMaterial({ color: 0x228B22 });
-    for (let i = 0; i < 30; i++) {
-      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.4 + Math.random() * 0.3, 5, 4), leafMat);
-      leaf.position.set(
-        (Math.random() - 0.5) * 8,
-        28 + Math.random() * 5,
-        4 + (Math.random() - 0.5) * 4
-      );
-      leaf.scale.set(1.5, 0.4, 1.0);
-      scene.add(leaf);
-    }
-
-    // === TREES on the island (viewed from above) ===
-    function treeTopDown(x: number, z: number, sc: number, col: number) {
+    // === TREES on the island (3/4 view with trunks) ===
+    function nestTree(x: number, z: number, sc: number, col: number) {
       const g = new THREE.Group();
+      // Trunk
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15 * sc, 0.25 * sc, 2.5 * sc, 6),
+        new THREE.MeshLambertMaterial({ color: 0x6b3e1e })
+      );
+      trunk.position.y = 1.25 * sc;
+      trunk.castShadow = true;
+      addOutline(trunk, 0.04);
+      g.add(trunk);
+      // Foliage
       const fMat = new THREE.MeshLambertMaterial({ color: col });
-      // Just the canopy (seen from above)
-      for (let i = 0; i < 4; i++) {
-        const f = new THREE.Mesh(new THREE.SphereGeometry((1.2 + Math.random() * 0.5) * sc, 7, 6), fMat);
-        f.position.set((Math.random() - 0.5) * sc, (3 + Math.random() * 2) * sc, (Math.random() - 0.5) * sc);
+      [{ r: 1.4, y: 3.0 }, { r: 1.6, y: 3.8 }, { r: 1.2, y: 4.5 }, { r: 0.9, y: 5.0 }].forEach((l) => {
+        const f = new THREE.Mesh(new THREE.SphereGeometry(l.r * sc, 7, 6), fMat);
+        f.position.set((Math.random() - 0.5) * 0.5 * sc, l.y * sc, (Math.random() - 0.5) * 0.4 * sc);
         f.castShadow = true;
         addOutline(f, 0.03);
         g.add(f);
-      }
+      });
       g.position.set(x, 0, z);
       return g;
     }
@@ -219,7 +202,7 @@ function NestScene3D() {
       const r = ISLAND_RADIUS - 3 + (Math.random() - 0.5) * 2;
       const tx = Math.cos(angle) * r;
       const tz = Math.sin(angle) * r;
-      scene.add(treeTopDown(tx, tz, 0.7 + Math.random() * 0.4, treeColors[Math.floor(Math.random() * 3)]));
+      scene.add(nestTree(tx, tz, 0.7 + Math.random() * 0.4, treeColors[Math.floor(Math.random() * 3)]));
     }
 
     // Some interior trees
@@ -227,31 +210,47 @@ function NestScene3D() {
       const tx = (Math.random() - 0.5) * ISLAND_RADIUS;
       const tz = (Math.random() - 0.5) * ISLAND_RADIUS;
       if (Math.sqrt(tx * tx + tz * tz) < ISLAND_RADIUS - 2) {
-        scene.add(treeTopDown(tx, tz, 0.6 + Math.random() * 0.3, treeColors[Math.floor(Math.random() * 3)]));
+        scene.add(nestTree(tx, tz, 0.6 + Math.random() * 0.3, treeColors[Math.floor(Math.random() * 3)]));
       }
     }
 
-    // Flower dots (seen from above as colored dots)
+    // Flowers on the island
+    const flowerColors = [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48, 0x9b59b6, 0xffffff];
     for (let i = 0; i < 60; i++) {
       const fx = (Math.random() - 0.5) * ISLAND_RADIUS * 1.6;
       const fz = (Math.random() - 0.5) * ISLAND_RADIUS * 1.6;
       if (Math.sqrt(fx * fx + fz * fz) > ISLAND_RADIUS - 1.5) continue;
-      const colors = [0xf472b6, 0xfbbf24, 0xc084fc, 0xfb923c, 0xe11d48, 0x9b59b6, 0xffffff];
-      const flower = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12 + Math.random() * 0.1, 5, 4),
-        new THREE.MeshPhongMaterial({ color: colors[Math.floor(Math.random() * colors.length)], shininess: 20 })
+      const flowerG = new THREE.Group();
+      // Stem
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015, 0.02, 0.3, 4),
+        new THREE.MeshLambertMaterial({ color: 0x2d7a2d })
       );
-      flower.position.set(fx, 0.3, fz);
-      scene.add(flower);
+      stem.position.y = 0.15;
+      flowerG.add(stem);
+      // Petals
+      const col = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+      for (let p = 0; p < 5; p++) {
+        const pa = (p / 5) * Math.PI * 2;
+        const petal = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 5, 4),
+          new THREE.MeshPhongMaterial({ color: col, shininess: 20 })
+        );
+        petal.position.set(Math.cos(pa) * 0.04, 0.32, Math.sin(pa) * 0.04);
+        petal.scale.set(1.3, 0.3, 0.6);
+        flowerG.add(petal);
+      }
+      flowerG.position.set(fx, 0, fz);
+      scene.add(flowerG);
     }
 
     // === CLOUDS ===
     const clouds: THREE.Group[] = [];
     const cloudData = [
-      { x: -15, y: 18, z: -10, s: 2.0, sp: 0.006 },
-      { x: 10, y: 20, z: -12, s: 2.5, sp: 0.004 },
-      { x: -8, y: 16, z: -8, s: 1.5, sp: 0.007 },
-      { x: 20, y: 17, z: -9, s: 2.2, sp: 0.005 },
+      { x: -18, y: 13, z: -12, s: 2.0, sp: 0.006 },
+      { x: 12, y: 15, z: -15, s: 2.5, sp: 0.004 },
+      { x: -8, y: 14, z: -10, s: 1.5, sp: 0.007 },
+      { x: 22, y: 12, z: -9, s: 2.2, sp: 0.005 },
     ];
     cloudData.forEach((cd) => {
       const g = new THREE.Group();
@@ -297,10 +296,12 @@ function NestScene3D() {
       const delta = clock.getDelta();
       time += delta;
 
-      // Gentle camera sway (looking down from nest)
-      camera.position.x = Math.sin(time * 0.2) * 1.5;
-      camera.position.y = 35 + Math.sin(time * 0.15) * 0.8;
-      camera.lookAt(Math.sin(time * 0.1) * 0.5, 0, Math.cos(time * 0.1) * 0.5);
+      // Gentle camera sway (3/4 view orbiting slowly)
+      const camAngle = time * 0.12;
+      camera.position.x = 18 * Math.cos(camAngle) + Math.sin(time * 0.2) * 1.0;
+      camera.position.z = 22 * Math.sin(camAngle) + Math.cos(time * 0.15) * 0.8;
+      camera.position.y = 16 + Math.sin(time * 0.15) * 0.8;
+      camera.lookAt(0, 3, 0);
 
       // Nest gentle rock
       nestGroup.rotation.z = Math.sin(time * 0.5) * 0.02;
