@@ -378,6 +378,9 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     archGroup.position.set(0, 0, -5);
     scene.add(archGroup);
 
+    // Big tall tree behind the arch
+    scene.add(tree(0, -7, 1.8, 0x1a6b1a));
+
     // === CENTRAL PLANT ===
     const plantGroup = new THREE.Group();
     const h_val = Math.max(0, Math.min(1, health));
