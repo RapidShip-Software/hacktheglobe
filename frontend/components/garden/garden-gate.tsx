@@ -50,6 +50,27 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
+  // Find the best warm female voice available
+  const pickVoice = useCallback((voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined => {
+    // Priority list: natural-sounding female voices (most human first)
+    const preferred = [
+      "Microsoft Jenny", "Microsoft Aria", "Google UK English Female",
+      "Samantha", "Karen", "Moira", "Tessa", "Fiona",
+      "Microsoft Zira", "Google US English",
+    ];
+    for (const name of preferred) {
+      const match = voices.find((v) => v.name.includes(name));
+      if (match) return match;
+    }
+    // Fallback: any English female voice
+    const englishFemale = voices.find((v) =>
+      v.lang.startsWith("en") && (v.name.toLowerCase().includes("female") || v.name.includes("Jenny") || v.name.includes("Samantha"))
+    );
+    if (englishFemale) return englishFemale;
+    // Last resort: any English voice
+    return voices.find((v) => v.lang.startsWith("en"));
+  }, []);
+
   const speak = useCallback((text: string, index: number) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
@@ -64,29 +85,24 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
     window.speechSynthesis.cancel();
 
     // Chrome bug: cancel() followed immediately by speak() silently fails.
-    // A short delay + resume fixes this.
     setTimeout(() => {
       const synth = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.85;
-      utterance.pitch = 1.05;
+      utterance.rate = 0.82;
+      utterance.pitch = 1.1;
       utterance.volume = 1;
 
-      const voices = synth.getVoices();
-      const preferred = voices.find(
-        (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
-      );
-      if (preferred) utterance.voice = preferred;
+      const voice = pickVoice(synth.getVoices());
+      if (voice) utterance.voice = voice;
 
       utterance.onstart = () => setSpeakingIndex(index);
       utterance.onend = () => setSpeakingIndex(null);
       utterance.onerror = () => setSpeakingIndex(null);
 
       synth.speak(utterance);
-      // Chrome sometimes pauses synth after cancel, force resume
       synth.resume();
     }, 100);
-  }, [speakingIndex]);
+  }, [speakingIndex, pickVoice]);
 
   const toggleListening = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -151,14 +167,11 @@ function GardenGate({ patientName, externalOpen, onClose }: GardenGateProps) {
           // Delay after cancel to avoid Chrome silent-fail bug
           setTimeout(() => {
             const utterance = new SpeechSynthesisUtterance(lastMsg.text);
-            utterance.rate = 0.85;
-            utterance.pitch = 1.05;
+            utterance.rate = 0.82;
+            utterance.pitch = 1.1;
             utterance.volume = 1;
-            const voices = synth.getVoices();
-            const preferred = voices.find(
-              (v) => v.name.includes("Samantha") || v.name.includes("Google UK English Female") || v.name.includes("Microsoft Zira")
-            );
-            if (preferred) utterance.voice = preferred;
+            const voice = pickVoice(synth.getVoices());
+            if (voice) utterance.voice = voice;
             utterance.onstart = () => setSpeakingIndex(lastIdx);
             utterance.onend = () => setSpeakingIndex(null);
             utterance.onerror = () => setSpeakingIndex(null);
