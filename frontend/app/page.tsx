@@ -1,22 +1,34 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRef, useState, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { BlurFade } from "@/components/shared/blur-fade";
 
-type FlyToFn = (target: "clinical") => Promise<void>;
+type FlyTarget = "garden" | "nest" | "clinical";
+type FlyToFn = (target: FlyTarget) => Promise<void>;
 
 const LandingScene3D = dynamic(
   () => import("@/components/landing/landing-scene-3d").then((m) => m.LandingScene3D),
   { ssr: false }
 );
 
-const INTERFACES = [
+const INTERFACES: Array<{
+  href: string;
+  flyTarget: FlyTarget;
+  icon: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  gradient: string;
+  bgHover: string;
+  border: string;
+  shadow: string;
+}> = [
   {
     href: "/garden",
+    flyTarget: "garden",
     icon: "\u{1F33F}",
     title: "The Garden",
     subtitle: "Patient wellness companion",
@@ -28,6 +40,7 @@ const INTERFACES = [
   },
   {
     href: "/caregiver",
+    flyTarget: "nest",
     icon: "\u{1FABA}",
     title: "The Nest",
     subtitle: "Family peace of mind",
@@ -39,6 +52,7 @@ const INTERFACES = [
   },
   {
     href: "/clinical",
+    flyTarget: "clinical",
     icon: "\u{1F3E5}",
     title: "Clinical",
     subtitle: "Healthcare intelligence",
@@ -50,27 +64,30 @@ const INTERFACES = [
   },
 ];
 
-function HomePage() {
+function HomePageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const flyToRef = useRef<FlyToFn | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const handleClinicalClick = useCallback(async (e: React.MouseEvent) => {
-    e.preventDefault();
+  const fromParam = searchParams.get("from") as FlyTarget | null;
+  const initialFlyFrom = fromParam && ["garden", "nest", "clinical"].includes(fromParam) ? fromParam : undefined;
+
+  const handleCardClick = useCallback(async (flyTarget: FlyTarget, href: string) => {
     if (isTransitioning) return;
     if (!flyToRef.current) {
-      router.push("/clinical");
+      router.push(href);
       return;
     }
     setIsTransitioning(true);
-    await flyToRef.current("clinical");
-    router.push("/clinical");
+    await flyToRef.current(flyTarget);
+    router.push(href);
   }, [isTransitioning, router]);
 
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Garden Scene Background */}
-      <LandingScene3D flyToRef={flyToRef} />
+      <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} />
 
       {/* White fade overlay during transition */}
       <AnimatePresence>
@@ -104,7 +121,7 @@ function HomePage() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-center mb-3 leading-tight drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-center mb-3 leading-tight drop-shadow-lg">
             <span className="text-white">
               Continuous Care,
             </span>
@@ -123,14 +140,13 @@ function HomePage() {
 
         {/* Interface Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
-          {INTERFACES.map((item, index) => {
-            const isClinical = item.href === "/clinical";
-            const cardContent = (
+          {INTERFACES.map((item, index) => (
+            <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
               <motion.div
                 className={`group relative p-8 md:p-10 bg-white/15 backdrop-blur-xl rounded-3xl border border-white/25 ${item.border} ${item.shadow} shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer h-full`}
                 whileHover={{ y: -6, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={isClinical ? handleClinicalClick : undefined}
+                onClick={() => handleCardClick(item.flyTarget, item.href)}
               >
                 {/* Gradient background on hover */}
                 <div className={`absolute inset-0 rounded-3xl ${item.bgHover} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
@@ -164,14 +180,8 @@ function HomePage() {
                   </div>
                 </div>
               </motion.div>
-            );
-
-            return (
-              <BlurFade key={item.href} delay={0.4 + index * 0.1} inView>
-                {isClinical ? cardContent : <Link href={item.href}>{cardContent}</Link>}
-              </BlurFade>
-            );
-          })}
+            </BlurFade>
+          ))}
         </div>
 
         {/* Footer badge */}
@@ -188,6 +198,14 @@ function HomePage() {
         </BlurFade>
       </div>
     </main>
+  );
+}
+
+function HomePage() {
+  return (
+    <Suspense>
+      <HomePageInner />
+    </Suspense>
   );
 }
 

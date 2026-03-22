@@ -3,13 +3,15 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-type FlyToFn = (target: "clinical") => Promise<void>;
+type FlyTarget = "garden" | "nest" | "clinical";
+type FlyToFn = (target: FlyTarget) => Promise<void>;
 
 type LandingScene3DProps = {
   flyToRef?: React.MutableRefObject<FlyToFn | null>;
+  initialFlyFrom?: FlyTarget;
 };
 
-function LandingScene3D({ flyToRef }: LandingScene3DProps) {
+function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -1295,6 +1297,13 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
       scene.add(g);
     });
 
+    // === FLY-TO TARGETS ===
+    const flyTargets: Record<FlyTarget, { pos: THREE.Vector3; lookAt: THREE.Vector3 }> = {
+      garden: { pos: new THREE.Vector3(0, 6, 8), lookAt: new THREE.Vector3(0, 1.5, 0) },
+      nest: { pos: new THREE.Vector3(NEST_ISLAND_X + 2, 8, NEST_ISLAND_Z - 8), lookAt: new THREE.Vector3(NEST_ISLAND_X, 2, NEST_ISLAND_Z) },
+      clinical: { pos: new THREE.Vector3(CLINICAL_ISLAND_X + 2, 8, CLINICAL_ISLAND_Z - 10), lookAt: new THREE.Vector3(CLINICAL_ISLAND_X, 2, CLINICAL_ISLAND_Z) },
+    };
+
     // === FLY-TO STATE ===
     const flyState = {
       active: false,
@@ -1307,12 +1316,11 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
       onComplete: null as (() => void) | null,
     };
 
-    function flyTo(target: "clinical"): Promise<void> {
+    function flyTo(target: FlyTarget): Promise<void> {
       return new Promise((resolve) => {
-        if (target === "clinical") {
-          flyState.targetPos.set(CLINICAL_ISLAND_X + 2, 8, CLINICAL_ISLAND_Z - 10);
-          flyState.targetLookAt.set(CLINICAL_ISLAND_X, 2, CLINICAL_ISLAND_Z);
-        }
+        const t = flyTargets[target];
+        flyState.targetPos.copy(t.pos);
+        flyState.targetLookAt.copy(t.lookAt);
         flyState.active = true;
         flyState.elapsed = 0;
         flyState.startPos.copy(camera.position);
@@ -1323,6 +1331,24 @@ function LandingScene3D({ flyToRef }: LandingScene3DProps) {
 
     if (flyToRef) {
       flyToRef.current = flyTo;
+    }
+
+    // === REVERSE FLY (coming back from a page) ===
+    if (initialFlyFrom) {
+      const from = flyTargets[initialFlyFrom];
+      camera.position.copy(from.pos);
+      camera.lookAt(from.lookAt);
+      // Animate back to orbit
+      flyState.active = true;
+      flyState.elapsed = 0;
+      flyState.duration = 1.5;
+      flyState.startPos.copy(from.pos);
+      flyState.startLookAt.copy(from.lookAt);
+      // Target: a point on the orbit
+      const orbitAngle = Math.atan2(from.pos.z, from.pos.x);
+      flyState.targetPos.set(Math.cos(orbitAngle) * ORBIT_RADIUS, ORBIT_HEIGHT, Math.sin(orbitAngle) * ORBIT_RADIUS);
+      flyState.targetLookAt.set(0, 1, 0);
+      flyState.onComplete = () => { flyState.duration = 1.8; };
     }
 
     // === ANIMATION (orbiting camera) ===

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Phone, MessageSquarePlus, History } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Phone, MessageSquarePlus, History, ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import { DailySignal } from "@/components/caregiver/daily-signal";
 import { HistoryView, type HistoryItem } from "@/components/caregiver/history-view";
@@ -62,6 +63,14 @@ function assessmentToHistoryItem(a: Assessment): HistoryItem {
 }
 
 function CaregiverPage() {
+  const router = useRouter();
+  const [isExiting, setIsExiting] = useState(false);
+
+  const handleBack = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => router.push("/?from=nest"), 500);
+  }, [router]);
+
   const [signal, setSignal] = useState<{
     status: "green" | "yellow" | "red";
     summary: string;
@@ -188,6 +197,28 @@ function CaregiverPage() {
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Nest Scene Background */}
       <NestScene3D />
+
+      {/* Back button */}
+      <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20">
+        <button
+          onClick={handleBack}
+          className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg cursor-pointer hover:bg-white/80 active:scale-95 transition-all"
+        >
+          <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+        </button>
+      </div>
+
+      {/* Exit fade overlay */}
+      <AnimatePresence>
+        {isExiting && (
+          <motion.div
+            className="fixed inset-0 bg-white z-50 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        )}
+      </AnimatePresence>
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 md:py-12">
         {/* Header */}

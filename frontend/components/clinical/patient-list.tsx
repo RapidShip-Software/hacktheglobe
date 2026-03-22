@@ -27,7 +27,7 @@ function PatientList({ patients, selectedId, onSelect, loading }: PatientListPro
   );
 
   return (
-    <aside className="w-80 bg-white border-r border-gray-200 flex flex-col relative">
+    <aside className="w-full md:w-80 bg-white border-r border-gray-200 flex flex-col relative">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.02]"
         style={{
