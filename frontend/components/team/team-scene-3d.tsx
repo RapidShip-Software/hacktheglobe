@@ -271,9 +271,6 @@ function TeamScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
         f.position.y = 0.25 + i * 0.18 + Math.sin(time * (7 + i)) * 0.04;
       });
 
-      // Flag wave
-      flagCloth.rotation.y = Math.sin(time * 2) * 0.15;
-      flagCloth.position.x = 0.95 + Math.sin(time * 2.5) * 0.05;
 
       // Embers float up
       embers.forEach((e) => {
