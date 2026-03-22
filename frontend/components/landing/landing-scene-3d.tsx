@@ -388,6 +388,7 @@ function LandingScene3D() {
 
     // === NATURE on nest island ===
     // Trees around the edges
+    const nestTreeColors = [0x1a6b1a, 0x228b22, 0x2e8b57];
     const nestTreePositions = [
       { x: 5, z: -2, s: 0.8 }, { x: -6, z: 2, s: 0.7 }, { x: 3, z: 5, s: 0.65 },
       { x: -3, z: 5, s: 0.75 }, { x: 6, z: 3, s: 0.6 }, { x: -5, z: -4, s: 0.7 },
@@ -395,18 +396,19 @@ function LandingScene3D() {
     ];
     nestTreePositions.forEach((tp) => {
       if (Math.sqrt(tp.x * tp.x + tp.z * tp.z) < NEST_ISLAND_RADIUS - 1.5) {
-        nestIslandGroup.add(tree(tp.x, tp.z, tp.s, treeColors[Math.floor(Math.random() * 3)]));
+        nestIslandGroup.add(tree(tp.x, tp.z, tp.s, nestTreeColors[Math.floor(Math.random() * 3)]));
       }
     });
 
     // Shrubs near the nest
+    const nestShrubColors = [0x2d7a2d, 0x357a35, 0x268026, 0x3a8a3a];
     const nestShrubPositions = [
       { x: 4, z: 1 }, { x: -1, z: 4 }, { x: 3, z: -3 },
       { x: -2, z: -4 }, { x: 5, z: -1 }, { x: -4, z: 3 },
     ];
     nestShrubPositions.forEach((sp) => {
       if (Math.sqrt(sp.x * sp.x + sp.z * sp.z) < NEST_ISLAND_RADIUS - 2) {
-        nestIslandGroup.add(shrub(sp.x, sp.z, 0.6 + Math.random() * 0.4, shrubColors[Math.floor(Math.random() * 4)]));
+        nestIslandGroup.add(shrub(sp.x, sp.z, 0.6 + Math.random() * 0.4, nestShrubColors[Math.floor(Math.random() * 4)]));
       }
     });
 
