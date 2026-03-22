@@ -111,7 +111,19 @@ function HomePageInner() {
         <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} timeOfDay={timeOfDay} />
       </ErrorBoundary>
 
-      {/* Time of day toggle */}
+      {/* Top bar: logout + time toggle */}
+      <div className="absolute top-4 left-4 z-20">
+        <button
+          onClick={() => {
+            document.cookie = "canopy_user=;path=/;max-age=0";
+            router.push("/login");
+          }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg text-sm font-semibold text-white hover:bg-white/30 active:scale-95 transition-all"
+          title="Switch account"
+        >
+          {"\u{1F511}"} Switch Account
+        </button>
+      </div>
       <button
         onClick={() => setTimeOfDay((prev) => TIME_CYCLE[(TIME_CYCLE.indexOf(prev) + 1) % 3])}
         className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white/45 backdrop-blur-xl border border-white/30 shadow-lg flex items-center justify-center text-xl hover:bg-white/55 active:scale-90 transition-all"
