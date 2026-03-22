@@ -5,26 +5,52 @@ import { Component, type ReactNode } from "react";
 type Props = {
   children: ReactNode;
   fallback?: ReactNode;
+  autoRetry?: boolean;
+  maxRetries?: number;
 };
 
 type State = {
   hasError: boolean;
   error: Error | null;
+  retryCount: number;
 };
 
 class ErrorBoundary extends Component<Props, State> {
+  private retryTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, retryCount: 0 };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
   }
 
+  componentDidCatch() {
+    const maxRetries = this.props.maxRetries ?? 3;
+    if (this.props.autoRetry !== false && this.state.retryCount < maxRetries) {
+      this.retryTimer = setTimeout(() => {
+        this.setState((prev) => ({
+          hasError: false,
+          error: null,
+          retryCount: prev.retryCount + 1,
+        }));
+      }, 500);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.retryTimer) clearTimeout(this.retryTimer);
+  }
+
   render() {
+    const maxRetries = this.props.maxRetries ?? 3;
     if (this.state.hasError) {
-      if (this.props.fallback) return this.props.fallback;
+      // If auto-retrying, render nothing (silent retry)
+      if (this.props.autoRetry !== false && this.state.retryCount < maxRetries) {
+        return this.props.fallback ?? null;
+      }
 
       return (
         <div className="flex items-center justify-center min-h-[200px] p-8">
@@ -37,7 +63,7 @@ class ErrorBoundary extends Component<Props, State> {
               {this.state.error?.message || "An unexpected error occurred."}
             </p>
             <button
-              onClick={() => this.setState({ hasError: false, error: null })}
+              onClick={() => this.setState({ hasError: false, error: null, retryCount: 0 })}
               className="px-4 py-2 rounded-xl bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
             >
               Try again
