@@ -34,7 +34,7 @@ Demo accounts (login page):
 - **Margaret Santos** (Patient): `margaret@canopy.care` / `garden123`
 - **Sarah Santos** (Family): `sarah@canopy.care` / `nest123`
 
-Or sign up with your own email at `/signup`. Accounts persist in browser localStorage.
+Or sign up with your own email at `/signup`. Accounts are stored securely in Supabase.
 
 ## Tech Stack
 
@@ -74,7 +74,7 @@ hacktheglobe/
 ├── frontend/                   # Next.js (all 3 interfaces)
 │   ├── app/
 │   │   ├── login/              # Login page with demo accounts
-│   │   ├── signup/             # Sign up page (localStorage auth)
+│   │   ├── signup/             # Sign up page (Supabase Auth)
 │   │   ├── garden/             # Patient garden app
 │   │   ├── caregiver/          # Family dashboard (The Nest)
 │   │   ├── clinical/           # Clinic dashboard
@@ -173,7 +173,7 @@ python readings_7day.py
 
 All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outline) art style:
 
-- **Login / Sign Up** - Full 3D scene with orbiting islands behind glassmorphism cards. Sign in with demo accounts or create your own. Fly-to animation zooms into the garden flower on login, then the landing page zooms out from it.
+- **Login / Sign Up** - Full 3D scene with orbiting islands behind glassmorphism cards. Sign in with demo accounts or create your own (Supabase Auth). Fly-to animation zooms into the garden flower on login, then the landing page zooms out from it.
 - **Landing Page** - Four islands on a cel-shaded ocean: garden (flowers, animals, deer, rabbits, butterflies), nest (tree with nest on branch, cat, matcha cup, birdies, lighthouse), clinic (hospital with chimney smoke, fountain, people), and team (campfire with flickering flames, log seats, purple flag). Ocean life: humpback whale, jumping dolphins, sunfish (mola mola), swimming fish. Sailing ships, airplanes. Sun orbits opposite the camera. Day/sunset/night mode toggle.
 - **The Garden** - Health-reactive island scene with surrounding ocean. Sky changes with health (clear/cloudy/stormy). Central flower opens AI chat with voice (TTS/STT). Flying 3D butterflies, canopy tree branches framing the view, fireflies, pond with lily pads, wooden bench, lantern, stepping stones. Random animal speech bubbles ("The rabbits think you're doing great!"). Day/sunset/night mode.
 - **The Nest** - Island with a large tree, small nest with eggs on a branch, grey cat with swaying tail and green eyes, matcha cup with animated steam, 4 flying birds orbiting the island, 1 perched bird on tree branch, scattered twigs, lighthouse. Camera slowly orbits. Day/sunset/night mode.
@@ -209,7 +209,7 @@ All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outli
 - Health simulation slider for live demo
 - Day/sunset/night mode toggle on all pages
 - Accessible design (solid high-contrast backgrounds, large touch targets, WCAG-compliant)
-- Sign up / login with localStorage persistence, dynamic user names across all pages
+- Sign up / login with Supabase Auth, dynamic user names across all pages
 - Cinematic fly-to transitions: login zooms into flower, landing zooms out, all cards fly to their island
 - 300+ chat fallback responses covering 80+ intent categories
 
