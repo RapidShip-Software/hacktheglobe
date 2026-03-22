@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { api } from "@/lib/api";
 
 type GardenGateProps = {
   patientName: string;
@@ -13,24 +14,27 @@ function GardenGate({ patientName }: GardenGateProps) {
     { role: "ai", text: `Hello ${patientName}! I'm here to help you with anything you need. How are you feeling today?` },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = useCallback(async () => {
+    if (!input.trim() || isLoading) return;
     const userMsg = input.trim();
     setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
     setInput("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await api.chat(userMsg, patientName);
+      setMessages((prev) => [...prev, { role: "ai", text: response.reply }]);
+    } catch {
       setMessages((prev) => [
         ...prev,
-        {
-          role: "ai",
-          text: "That's good to hear! Remember to log your blood pressure reading today, and don't forget your morning medication. Your garden is looking lovely! 🌿",
-        },
+        { role: "ai", text: "I'm having a little trouble right now, dear. Please try again in a moment, or tap a butterfly to call your family." },
       ]);
-    }, 1200);
-  };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [input, isLoading, patientName]);
 
   return (
     <>
@@ -131,11 +135,12 @@ function GardenGate({ patientName }: GardenGateProps) {
                   />
                   <motion.button
                     type="submit"
-                    className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold shadow-md"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    disabled={isLoading}
+                    className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold shadow-md disabled:opacity-50"
+                    whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                    whileTap={{ scale: isLoading ? 1 : 0.95 }}
                   >
-                    Send
+                    {isLoading ? "..." : "Send"}
                   </motion.button>
                 </form>
               </div>

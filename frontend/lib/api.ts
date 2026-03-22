@@ -63,4 +63,8 @@ export const api = {
   // Discharge
   postDischarge: (patientId: string) =>
     request<Record<string, unknown>>(`/api/patients/${patientId}/discharge`, { method: "POST", timeout: 30000 }),
+
+  // Chat (Garden Helper)
+  chat: (message: string, patientName = "Margaret") =>
+    request<{ reply: string }>("/api/chat", { method: "POST", body: { message, patient_name: patientName }, timeout: 20000 }),
 };

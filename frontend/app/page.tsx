@@ -123,7 +123,7 @@ function HomePage() {
                   whileTap={{ scale: 0.97 }}
                 >
                   {/* Gradient background on hover */}
-                  <div className={`absolute inset-0 rounded-3xl ${item.bgHover} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  <div className={`absolute inset-0 rounded-3xl ${item.bgHover} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
 
                   <div className="relative z-10">
                     {/* Icon */}
