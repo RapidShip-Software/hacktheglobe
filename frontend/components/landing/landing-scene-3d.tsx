@@ -28,7 +28,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     const baseFov = isPortrait ? 72 : 45;
     const camera = new THREE.PerspectiveCamera(baseFov, container.clientWidth / container.clientHeight, 0.1, 300);
     const ORBIT_RADIUS = isPortrait ? 45 : 35;
-    const ORBIT_HEIGHT = 32;
+    const ORBIT_HEIGHT = 40;
     const ORBIT_SPEED = 0.15; // radians per second
     camera.position.set(0, ORBIT_HEIGHT, ORBIT_RADIUS);
     camera.lookAt(0, 0, 0);
@@ -1200,23 +1200,27 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
       birds.push(b); scene.add(b);
     });
 
-    // === CLOUDS ===
+    // === CLOUDS (orbiting around the islands) ===
     const clouds: THREE.Group[] = [];
-    const cloudData = [
-      { x: -18, y: 13, z: -12, s: 2.0, sp: 0.008 },
-      { x: 8, y: 15, z: -15, s: 2.5, sp: 0.005 },
-      { x: -8, y: 14, z: -14, s: 1.5, sp: 0.007 },
-      { x: 20, y: 12, z: -10, s: 2.2, sp: 0.006 },
-      { x: -25, y: 13.5, z: -13, s: 1.8, sp: 0.009 },
-      { x: 15, y: 16, z: -18, s: 2.8, sp: 0.004 },
+    const cloudOrbitData = [
+      { radius: 22, y: 14, speed: 0.08, phase: 0, s: 2.0 },
+      { radius: 28, y: 15, speed: -0.06, phase: 1.2, s: 2.5 },
+      { radius: 18, y: 13, speed: 0.1, phase: 2.5, s: 1.5 },
+      { radius: 32, y: 12, speed: 0.05, phase: 3.8, s: 2.2 },
+      { radius: 25, y: 13.5, speed: -0.07, phase: 5.0, s: 1.8 },
+      { radius: 35, y: 16, speed: 0.04, phase: 0.8, s: 2.8 },
+      { radius: 20, y: 14.5, speed: -0.09, phase: 4.2, s: 1.6 },
+      { radius: 30, y: 15.5, speed: 0.055, phase: 2.0, s: 2.0 },
     ];
-    cloudData.forEach((cd) => {
+    cloudOrbitData.forEach((cd) => {
       const g = new THREE.Group();
       const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 });
       [[0, 0, 0, 1], [1, 0.2, 0.2, 0.8], [-0.9, 0.1, -0.1, 0.75], [0.4, 0.4, 0, 0.6], [-0.4, 0.3, 0.2, 0.65]].forEach(([px, py, pz, s]) => {
         g.add(makeMesh(new THREE.SphereGeometry((s as number) * cd.s, 7, 6), mat, (px as number) * cd.s, (py as number) * cd.s, (pz as number) * cd.s));
       });
-      g.position.set(cd.x, cd.y, cd.z); clouds.push(g); scene.add(g);
+      const angle = cd.phase;
+      g.position.set(Math.cos(angle) * cd.radius, cd.y, Math.sin(angle) * cd.radius);
+      clouds.push(g); scene.add(g);
     });
 
     // === CENTRAL CANOPY TREE (the "Canopy" tree - tallest, center of island) ===
@@ -1240,7 +1244,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
       canopyTreeGroup.add(f);
     });
     canopyTreeGroup.position.set(0, 0, -2);
-    scene.add(canopyTreeGroup);
+    // scene.add(canopyTreeGroup); // Removed tallest tree
 
     // === POND (off-center on the island) ===
     const pondGeo = new THREE.CircleGeometry(2.5, 16);
@@ -1389,10 +1393,12 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
       waterTex.offset.x = time * 0.015;
       waterTex.offset.y = time * 0.01;
 
-      // Clouds drift
+      // Clouds orbit around islands
       clouds.forEach((c, i) => {
-        c.position.x += cloudData[i].sp;
-        if (c.position.x > 30) c.position.x = -30;
+        const cd = cloudOrbitData[i];
+        const a = cd.phase + time * cd.speed;
+        c.position.x = Math.cos(a) * cd.radius;
+        c.position.z = Math.sin(a) * cd.radius;
       });
 
       // Birds fly + wing flap
