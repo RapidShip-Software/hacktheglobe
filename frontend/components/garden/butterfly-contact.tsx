@@ -28,12 +28,12 @@ function ButterflyContact({ contact, position, onClick }: ButterflyContactProps)
   };
 
   const isStacked = position === "stacked";
-  const svgSize = isStacked ? { width: 50, height: 42 } : { width: 90, height: 75 };
+  const svgSize = isStacked ? { width: 60, height: 50 } : { width: 90, height: 75 };
 
   return (
     <>
       <motion.button
-        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/20 backdrop-blur-2xl backdrop-saturate-150 rounded-xl px-3 py-2 border border-white/40 shadow-xl w-40" : "flex-col items-center gap-1"} cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-3 bg-white/45 backdrop-blur-2xl backdrop-saturate-150 rounded-2xl px-4 py-3 border border-white/40 shadow-xl w-48" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => onClick?.(contact)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
@@ -146,9 +146,9 @@ function ButterflyContact({ contact, position, onClick }: ButterflyContactProps)
         </svg>
 
         {/* Name label */}
-        <span className={`font-extrabold whitespace-nowrap ${isStacked ? "text-sm text-slate-900 drop-shadow-md" : "text-base text-slate-900 drop-shadow-md bg-white/30 backdrop-blur-2xl backdrop-saturate-150 rounded-full px-5 py-2 shadow-xl border border-white/40"}`}>
+        <span className={`font-extrabold whitespace-nowrap ${isStacked ? "text-base text-slate-900 drop-shadow-md" : "text-base text-slate-900 drop-shadow-md bg-white/30 backdrop-blur-2xl backdrop-saturate-150 rounded-full px-5 py-2 shadow-xl border border-white/40"}`}>
           {contact.name}
-          {isStacked && <span className="block text-[10px] font-bold text-slate-700 drop-shadow-sm">{contact.relation}</span>}
+          {isStacked && <span className="block text-xs font-bold text-slate-600 drop-shadow-sm">{contact.relation}</span>}
         </span>
       </motion.button>
     </>
