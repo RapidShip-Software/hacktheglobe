@@ -842,8 +842,8 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
     scene.add(clinicalIslandGroup);
 
     // === TEAM ISLAND ===
-    const TEAM_ISLAND_X = 0;
-    const TEAM_ISLAND_Z = 35;
+    const TEAM_ISLAND_X = -28;
+    const TEAM_ISLAND_Z = 22;
     const TEAM_ISLAND_RADIUS = 7;
     const teamIslandGroup = new THREE.Group();
     teamIslandGroup.position.set(TEAM_ISLAND_X, 0, TEAM_ISLAND_Z);

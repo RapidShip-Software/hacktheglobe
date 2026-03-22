@@ -236,7 +236,7 @@ function HomePageInner() {
             transition={{ delay: 1.2 }}
           >
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            Hack the Globe 2026 &middot; Health &amp; Humanity &middot; BCG Toronto
+            Hack the Globe 2026 &middot; Health &amp; Humanity &middot; BCG Toronto &middot; <span className="underline cursor-pointer hover:text-white transition-colors" onClick={() => handleCardClick("team", "/team")}>The Team</span>
           </motion.div>
         </BlurFade>
       </div>
