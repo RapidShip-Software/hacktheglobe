@@ -1,9 +1,29 @@
+import json
 import os
 from functools import lru_cache
 from datetime import datetime
 from typing import Optional
 
 from supabase import create_client, Client
+
+# JSONB columns that may be stored as double-encoded strings
+_JSONB_FIELDS = {"value", "medications", "contacts", "clinical_alert", "garden_state", "follow_ups"}
+
+
+def _fix_row(row: dict) -> dict:
+    """Parse any JSONB fields that were stored as double-encoded strings."""
+    for key in _JSONB_FIELDS:
+        val = row.get(key)
+        if isinstance(val, str):
+            try:
+                row[key] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
+    return row
+
+
+def _fix_rows(rows: list[dict]) -> list[dict]:
+    return [_fix_row(r) for r in rows]
 
 
 @lru_cache(maxsize=1)
@@ -23,13 +43,13 @@ def get_supabase_client() -> Client:
 def get_all_patients() -> list[dict]:
     sb = get_supabase_client()
     resp = sb.table("patients").select("*").execute()
-    return resp.data
+    return _fix_rows(resp.data)
 
 
 def get_patient_by_id(patient_id: str) -> Optional[dict]:
     sb = get_supabase_client()
     resp = sb.table("patients").select("*").eq("id", patient_id).single().execute()
-    return resp.data
+    return _fix_row(resp.data) if resp.data else None
 
 
 # ---------------------------------------------------------------------------
@@ -59,7 +79,7 @@ def get_readings_for_patient(patient_id: str, limit: int = 50) -> list[dict]:
         .limit(limit)
         .execute()
     )
-    return resp.data
+    return _fix_rows(resp.data)
 
 
 # ---------------------------------------------------------------------------
@@ -82,7 +102,7 @@ def get_latest_assessment(patient_id: str) -> Optional[dict]:
         .limit(1)
         .execute()
     )
-    return resp.data[0] if resp.data else None
+    return _fix_row(resp.data[0]) if resp.data else None
 
 
 def get_assessments_for_patient(patient_id: str, limit: int = 30) -> list[dict]:
@@ -95,7 +115,7 @@ def get_assessments_for_patient(patient_id: str, limit: int = 30) -> list[dict]:
         .limit(limit)
         .execute()
     )
-    return resp.data
+    return _fix_rows(resp.data)
 
 
 def get_high_risk_assessments(threshold: float = 40.0) -> list[dict]:
@@ -108,7 +128,7 @@ def get_high_risk_assessments(threshold: float = 40.0) -> list[dict]:
         .limit(50)
         .execute()
     )
-    return resp.data
+    return _fix_rows(resp.data)
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +151,7 @@ def get_latest_discharge_plan(patient_id: str) -> Optional[dict]:
         .limit(1)
         .execute()
     )
-    return resp.data[0] if resp.data else None
+    return _fix_row(resp.data[0]) if resp.data else None
 
 
 # ---------------------------------------------------------------------------

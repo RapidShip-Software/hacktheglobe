@@ -1,5 +1,3 @@
-import json
-
 from fastapi import APIRouter, HTTPException
 
 from ..models.schemas import (
@@ -17,18 +15,6 @@ from ..services.supabase_client import (
     get_caregiver_notes,
     create_caregiver_note,
 )
-
-
-def _fix_json_strings(row: dict) -> dict:
-    """Parse JSONB fields that were stored as double-encoded strings."""
-    for key in ("medications", "contacts"):
-        val = row.get(key)
-        if isinstance(val, str):
-            try:
-                row[key] = json.loads(val)
-            except (json.JSONDecodeError, TypeError):
-                row[key] = []
-    return row
 
 router = APIRouter(prefix="/api/patients", tags=["patients"])
 
@@ -60,7 +46,6 @@ async def get_profile(patient_id: str) -> PatientProfile:
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
 
-    _fix_json_strings(patient)
     assessment = get_latest_assessment(patient_id)
     readings = get_readings_for_patient(patient_id, limit=50)
     notes = get_caregiver_notes(patient_id)
