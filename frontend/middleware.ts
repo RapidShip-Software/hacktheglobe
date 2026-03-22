@@ -7,6 +7,7 @@ function middleware(request: NextRequest) {
   // Allow login page, API routes, and static assets
   if (
     pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||

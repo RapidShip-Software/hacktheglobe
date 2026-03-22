@@ -4,6 +4,8 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 const LandingScene3D = dynamic(
   () => import("@/components/landing/landing-scene-3d").then((m) => m.LandingScene3D),
@@ -27,19 +29,36 @@ function LoginPage() {
     setError("");
     setIsLoading(true);
 
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
+    const trimmedEmail = email.toLowerCase().trim();
 
-    const user = USERS[email.toLowerCase().trim()];
-    if (!user || user.password !== password) {
-      setError("Invalid email or password. Please try again.");
-      setIsLoading(false);
+    // Try hardcoded demo accounts first
+    const demoUser = USERS[trimmedEmail];
+    if (demoUser && demoUser.password === password) {
+      document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({ email: trimmedEmail, name: demoUser.name, role: demoUser.role }))};path=/;max-age=86400`;
+      router.push("/");
       return;
     }
 
-    // Set session cookie
-    document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({ email: email.toLowerCase().trim(), name: user.name, role: user.role }))};path=/;max-age=86400`;
-    router.push("/");
+    // Try Supabase Auth
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
+
+      if (authError || !data.user) {
+        setError("Invalid email or password. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      const userName = data.user.user_metadata?.full_name || trimmedEmail.split("@")[0];
+      document.cookie = `canopy_user=${encodeURIComponent(JSON.stringify({ email: trimmedEmail, name: userName, role: "patient" }))};path=/;max-age=86400`;
+      router.push("/");
+    } catch {
+      setError("Invalid email or password. Please try again.");
+      setIsLoading(false);
+    }
   }, [email, password, router]);
 
   return (
@@ -161,8 +180,15 @@ function LoginPage() {
           </div>
         </div>
 
+        <p className="mt-6 text-center text-sm text-white/70">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-emerald-300 font-semibold hover:text-emerald-200 transition-colors">
+            Sign up
+          </Link>
+        </p>
+
         {/* Footer */}
-        <p className="text-center text-xs text-white/50 mt-6">
+        <p className="text-center text-xs text-white/50 mt-4">
           Hack the Globe 2026 &middot; Health &amp; Humanity &middot; BCG Toronto
         </p>
       </motion.div>

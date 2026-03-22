@@ -11,6 +11,7 @@ import { CaregiverNotes } from "@/components/caregiver/caregiver-notes";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 import { api } from "@/lib/api";
+import { getCanopyUser } from "@/lib/auth";
 import { subscribeToTable } from "@/lib/supabase";
 import type { Assessment, CaregiverNote } from "@/lib/types";
 
@@ -67,6 +68,7 @@ function CaregiverPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
+  const patientName = "Margaret";
 
   const handleBack = useCallback(() => {
     setIsExiting(true);

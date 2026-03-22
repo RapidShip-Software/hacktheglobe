@@ -11,6 +11,7 @@ import { BpEntryFlow } from "@/components/garden/bp-entry-flow";
 import { BlurFade } from "@/components/shared/blur-fade";
 import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 import { api } from "@/lib/api";
+import { getCanopyUser } from "@/lib/auth";
 import { subscribeToTable } from "@/lib/supabase";
 import type { Contact, Medication, GardenState } from "@/lib/types";
 
@@ -41,6 +42,7 @@ function GardenPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
+  const userName = getCanopyUser()?.name?.split(" ")[0] || "Margaret";
 
   const handleBack = useCallback(() => {
     setIsExiting(true);
@@ -53,7 +55,7 @@ function GardenPage() {
     nudge: true,
   });
   const [showBpEntry, setShowBpEntry] = useState(false);
-  const [nudgeText, setNudgeText] = useState("Good morning Margaret! Your garden looks lovely today.");
+  const [nudgeText, setNudgeText] = useState(`Good morning ${userName}! Your garden looks lovely today.`);
   const [mobilePanel, setMobilePanel] = useState<"none" | "tasks" | "contacts">("none");
   const [animalMsg, setAnimalMsg] = useState<string | null>(null);
 
@@ -149,7 +151,7 @@ function GardenPage() {
 
   const handleBpSubmit = useCallback(async (systolic: number, diastolic: number) => {
     markDone("bp");
-    setNudgeText(`Blood pressure logged: ${systolic}/${diastolic}. Thank you, Margaret!`);
+    setNudgeText(`Blood pressure logged: ${systolic}/${diastolic}. Thank you, ${userName}!`);
     if (PATIENT_ID) {
       try {
         await api.postReading({ patient_id: PATIENT_ID, type: "bp", value: { systolic, diastolic } });
@@ -354,7 +356,7 @@ function GardenPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-xs text-emerald-300/80">Every task is done. Margaret is doing great!</p>
+                <p className="text-xs text-emerald-300/80">Every task is done. {userName} is doing great!</p>
               )}
             </motion.div>
           )}
@@ -468,7 +470,7 @@ function GardenPage() {
 
 
       {/* AI Chat (triggered by tapping the flower) */}
-      <GardenGate patientName="Margaret" externalOpen={showFlowerChat} onClose={() => setShowFlowerChat(false)} />
+      <GardenGate patientName={userName} externalOpen={showFlowerChat} onClose={() => setShowFlowerChat(false)} />
 
       {/* Animal speech bubble */}
       <AnimatePresence>
