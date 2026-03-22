@@ -21,7 +21,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.FogExp2(0x87ceeb, 0.008);
+    scene.fog = new THREE.FogExp2(0x87ceeb, 0.004);
 
     // Camera: aerial view, will orbit. Wider FOV on portrait/mobile to show all islands
     const isPortrait = container.clientHeight > container.clientWidth;
@@ -795,15 +795,15 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     scene.add(clinicalIslandGroup);
 
     // === SUN ===
-    const sunPos = new THREE.Vector3(20, 45, -15);
-    const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
+    const sunPos = new THREE.Vector3(30, 12, -25);
+    const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
     sunMesh.position.copy(sunPos);
     addOutline(sunMesh, 0.02);
     scene.add(sunMesh);
-    const glow1 = new THREE.Mesh(new THREE.SphereGeometry(4.0, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff4b0, transparent: true, opacity: 0.25 }));
+    const glow1 = new THREE.Mesh(new THREE.SphereGeometry(6.0, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfff4b0, transparent: true, opacity: 0.25 }));
     glow1.position.copy(sunPos);
     scene.add(glow1);
-    const glow2 = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfffde7, transparent: true, opacity: 0.1 }));
+    const glow2 = new THREE.Mesh(new THREE.SphereGeometry(9, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfffde7, transparent: true, opacity: 0.12 }));
     glow2.position.copy(sunPos);
     scene.add(glow2);
     // Sun rays (grouped with sun so they orbit together)
@@ -1390,10 +1390,10 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
         camera.lookAt(0, 1, 0);
       }
 
-      // Sun orbits opposite to camera
-      const sunAngle = time * ORBIT_SPEED + Math.PI;
-      const sunOrbitR = 35;
-      const sunY = 45;
+      // Sun orbits at horizon level, visible from the elevated camera
+      const sunAngle = time * ORBIT_SPEED * 0.3;
+      const sunOrbitR = 50;
+      const sunY = 12;
       sunMesh.position.set(Math.cos(sunAngle) * sunOrbitR, sunY, Math.sin(sunAngle) * sunOrbitR);
       glow1.position.copy(sunMesh.position);
       glow2.position.copy(sunMesh.position);
