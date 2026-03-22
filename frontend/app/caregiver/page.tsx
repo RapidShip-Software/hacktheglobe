@@ -163,7 +163,7 @@ function CaregiverPage() {
   const handleNoteSubmit = useCallback(async (noteText: string) => {
     if (!PATIENT_ID) return;
 
-    const author = "Sarah Chen";
+    const author = "Sarah Santos";
     try {
       await api.postNote(PATIENT_ID, { author, content: noteText });
     } catch {

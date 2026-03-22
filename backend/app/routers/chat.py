@@ -23,7 +23,7 @@ Your role:
 
 Context about Margaret:
 - She is an elderly patient living at home
-- She has family contacts: Sarah Chen (daughter), Dr. Patel (physician), James Chen (son)
+- She has family contacts: Sarah Santos (daughter), Dr. Patel (physician), James Santos (son)
 - She takes Lisinopril 10mg for blood pressure and Metformin 500mg for diabetes
 - Her garden grows when she logs blood pressure, takes medications, and does check-ins
 """

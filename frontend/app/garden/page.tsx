@@ -16,9 +16,9 @@ import type { Contact, Medication, GardenState } from "@/lib/types";
 const PATIENT_ID = process.env.NEXT_PUBLIC_DEMO_PATIENT_ID || "";
 
 const MARGARET_CONTACTS: Contact[] = [
-  { name: "Sarah Chen", relation: "Daughter", phone: "+1-647-555-0123", avatar: "butterfly_blue" },
+  { name: "Sarah Santos", relation: "Daughter", phone: "+1-647-555-0123", avatar: "butterfly_blue" },
   { name: "Dr. Patel", relation: "GP", phone: "+1-416-555-0456", avatar: "robin_red" },
-  { name: "James Chen", relation: "Son", phone: "+1-905-555-0789", avatar: "butterfly_green" },
+  { name: "James Santos", relation: "Son", phone: "+1-905-555-0789", avatar: "butterfly_green" },
 ];
 
 const MARGARET_MEDICATIONS: Medication[] = [

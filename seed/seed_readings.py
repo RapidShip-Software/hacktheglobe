@@ -1,4 +1,4 @@
-"""Seed 7 days of realistic readings for Margaret Chen."""
+"""Seed 7 days of realistic readings for Margaret Santos."""
 import os
 import sys
 import json
@@ -21,9 +21,9 @@ def seed_readings() -> None:
     client = create_client(url, key)
 
     # Find Margaret
-    result = client.table("patients").select("id").eq("name", "Margaret Chen").execute()
+    result = client.table("patients").select("id").eq("name", "Margaret Santos").execute()
     if not result.data:
-        print("Error: Margaret Chen not found. Run seed_margaret.py first.")
+        print("Error: Margaret Santos not found. Run seed_margaret.py first.")
         sys.exit(1)
 
     patient_id = result.data[0]["id"]
@@ -127,7 +127,7 @@ def seed_readings() -> None:
 
     # Insert all readings
     client.table("readings").insert(readings).execute()
-    print(f"Seeded {len(readings)} readings for Margaret Chen (patient_id: {patient_id})")
+    print(f"Seeded {len(readings)} readings for Margaret Santos (patient_id: {patient_id})")
 
 
 if __name__ == "__main__":
