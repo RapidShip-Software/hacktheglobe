@@ -82,7 +82,7 @@ hacktheglobe/
 │   │   ├── garden/             # GardenScene3D, Butterfly, GardenGate (AI chat)
 │   │   ├── nest/               # NestScene3D (tree, nest, cat, lighthouse)
 │   │   ├── landing/            # LandingScene3D (4-island scene, ships, fish, whale, dolphins)
-│   │   ├── team/               # TeamScene3D (nighttime campfire island)
+│   │   ├── team/               # TeamScene3D (campfire island, day/sunset/night)
 │   │   ├── caregiver/          # DailySignal, HistoryView, Notes
 │   │   ├── clinical/           # ClinicalScene3D, PatientList, AlertCard, RiskTimeline
 │   │   └── shared/             # BlurFade, ErrorBoundary, TimeToggle
@@ -173,9 +173,9 @@ All interfaces feature immersive Three.js 3D scenes with cel-shaded (black outli
 - **Login Page** - Full 3D scene with orbiting islands behind a glassmorphism login card
 - **Landing Page** - Four islands on a cel-shaded ocean: garden (flowers, animals, deer, rabbits, butterflies), nest (tree with nest on branch, cat, matcha cup, birdies, lighthouse), clinic (hospital with chimney smoke, fountain, people), and team (campfire with flickering flames, log seats, purple flag). Ocean life: humpback whale, jumping dolphins, sunfish (mola mola), swimming fish. Sailing ships, airplanes. Sun orbits opposite the camera. Day/sunset/night mode toggle.
 - **The Garden** - Health-reactive island scene with surrounding ocean. Sky changes with health (clear/cloudy/stormy). Central flower opens AI chat with voice (TTS/STT). Flying 3D butterflies, canopy tree branches framing the view, fireflies, pond with lily pads, wooden bench, lantern, stepping stones. Random animal speech bubbles ("The rabbits think you're doing great!"). Day/sunset/night mode.
-- **The Nest** - Island with a large tree, small nest with eggs on a branch, grey cat with swaying tail and green eyes, matcha cup with animated steam, 3 perched colourful birdies, scattered twigs, lighthouse. Camera slowly orbits. Day/sunset/night mode.
+- **The Nest** - Island with a large tree, small nest with eggs on a branch, grey cat with swaying tail and green eyes, matcha cup with animated steam, 4 flying birds orbiting the island, 1 perched bird on tree branch, scattered twigs, lighthouse. Camera slowly orbits. Day/sunset/night mode.
 - **The Clinic** - Cozy interior (wood floor, cream walls, glowing windows with light shafts, reception desk, waiting chairs, pendant lamps, potted plants). Glassmorphism dashboard overlay. Day/sunset/night mode.
-- **The Team** - Nighttime campfire island with flickering fire, floating embers, log seats, stars, moon, dark tree silhouettes. Purple flag with Canopy icon. Camera orbits the campfire.
+- **The Team** - Campfire island with tall flickering fire, floating embers, log seats, dark tree silhouettes. Purple flag with waving animation. Day/sunset/night mode toggle. Camera orbits the campfire.
 - **Fly-To Transitions** - All cards trigger cinematic camera fly-to animations toward their island. Back buttons on each page trigger reverse fly-back to orbit.
 
 ## Key Features
