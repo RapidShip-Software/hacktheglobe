@@ -225,7 +225,7 @@ function CaregiverPage() {
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-8">
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-900/40 backdrop-blur-sm text-amber-100 text-xs font-semibold mb-3 border border-amber-400/20"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-800/90 backdrop-blur-sm text-amber-100 text-sm font-semibold mb-3 border border-amber-700/50"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -235,7 +235,7 @@ function CaregiverPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-1 drop-shadow-lg">
               The Nest
             </h1>
-            <p className="text-white/70 drop-shadow">
+            <p className="text-white/90 drop-shadow">
               Looking over Margaret. Real-time wellness updates for your peace of mind.
             </p>
           </div>
@@ -245,9 +245,9 @@ function CaregiverPage() {
         <BlurFade delay={0.2} inView>
           <div className="mb-8">
             {loading ? (
-              <div className="p-8 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center">
+              <div className="p-8 rounded-2xl bg-white/95 border border-slate-200 shadow-lg text-center">
                 <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin mx-auto mb-3" />
-                <p className="text-sm text-white/60">Loading latest update...</p>
+                <p className="text-sm text-slate-500">Loading latest update...</p>
               </div>
             ) : (
               <DailySignal
@@ -265,33 +265,33 @@ function CaregiverPage() {
           <div className="grid grid-cols-3 gap-3 mb-8">
             <motion.a
               href="tel:+1-647-555-0123"
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/95 border border-slate-200 shadow-md text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <Phone className="w-6 h-6 mx-auto mb-1 text-emerald-500" />
-              <span className="text-sm font-medium text-white">Call Mum</span>
+              <span className="text-sm font-medium text-slate-800">Call Mum</span>
             </motion.a>
             <motion.button
               onClick={scrollToNotes}
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/95 border border-slate-200 shadow-md text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <MessageSquarePlus className="w-6 h-6 mx-auto mb-1 text-blue-500" />
-              <span className="text-sm font-medium text-white">Add Note</span>
+              <span className="text-sm font-medium text-slate-800">Add Note</span>
             </motion.button>
             <motion.button
               onClick={scrollToHistory}
-              className="relative overflow-hidden p-4 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 text-center group hover:shadow-lg transition-shadow"
+              className="relative overflow-hidden p-4 rounded-2xl bg-white/95 border border-slate-200 shadow-md text-center group hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-violet-500 opacity-0 group-hover:opacity-10 transition-opacity" />
               <History className="w-6 h-6 mx-auto mb-1 text-purple-500" />
-              <span className="text-sm font-medium text-white">View History</span>
+              <span className="text-sm font-medium text-slate-800">View History</span>
             </motion.button>
           </div>
         </BlurFade>
@@ -305,11 +305,11 @@ function CaregiverPage() {
                 {notes.map((n, i) => (
                   <motion.div
                     key={`${n.created_at}-${i}`}
-                    className="p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 text-sm text-white/80"
+                    className="p-3 rounded-xl bg-white/95 border border-slate-200 text-sm text-slate-800"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <span className="text-xs text-amber-300 font-medium">
+                    <span className="text-xs text-amber-600 font-medium">
                       {n.author}, {formatTimestamp(n.created_at)}
                     </span>
                     <p className="mt-1">{n.content}</p>

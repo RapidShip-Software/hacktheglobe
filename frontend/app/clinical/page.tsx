@@ -148,7 +148,7 @@ function ClinicalPage() {
       <div className="absolute top-4 md:top-6 right-4 md:right-6 z-20">
         <button
           onClick={handleHome}
-          className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-lg cursor-pointer hover:bg-white/80 active:scale-95 transition-all"
+          className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/95 border border-slate-200 shadow-lg cursor-pointer hover:bg-white active:scale-95 transition-all"
         >
           <Home className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
         </button>
@@ -168,7 +168,7 @@ function ClinicalPage() {
 
       <div className="relative z-10 flex flex-col md:flex-row h-screen">
         {/* Patient list - full width on mobile (only when no patient selected), sidebar on desktop */}
-        <div className={`bg-white/85 backdrop-blur-md ${patient ? "hidden md:block" : "block"}`}>
+        <div className={`bg-white/95 backdrop-blur-md ${patient ? "hidden md:block" : "block"}`}>
           <PatientList
             patients={patients}
             selectedId={selectedId}
@@ -177,7 +177,7 @@ function ClinicalPage() {
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white/75 backdrop-blur-sm">
+        <div className="flex-1 overflow-y-auto bg-white/95 backdrop-blur-sm">
           {/* Mobile back to list button */}
           {patient && (
             <div className="md:hidden p-3 border-b border-gray-100">
