@@ -166,7 +166,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
     const terracottaTex = makeTerracottaTexture();
 
     // === WATER PLANE (large, beneath everything) ===
-    const waterGeo = new THREE.CircleGeometry(80, 32);
+    const waterGeo = new THREE.CircleGeometry(200, 64);
     const waterMat = new THREE.MeshPhongMaterial({
       map: waterTex,
       color: 0x4a90d9,
