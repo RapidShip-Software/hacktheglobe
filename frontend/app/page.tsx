@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { BlurFade } from "@/components/shared/blur-fade";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 
 type FlyTarget = "garden" | "nest" | "clinical" | "team";
 type FlyToFn = (target: FlyTarget) => Promise<void>;
@@ -106,7 +107,9 @@ function HomePageInner() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Garden Scene Background */}
-      <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} timeOfDay={timeOfDay} />
+      <ErrorBoundary autoRetry maxRetries={3}>
+        <LandingScene3D flyToRef={flyToRef} initialFlyFrom={initialFlyFrom} timeOfDay={timeOfDay} />
+      </ErrorBoundary>
 
       {/* Time of day toggle */}
       <button

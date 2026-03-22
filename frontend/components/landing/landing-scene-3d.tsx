@@ -172,7 +172,7 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       color: 0x4a90d9,
       shininess: 80,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.7,
     });
     const water = new THREE.Mesh(waterGeo, waterMat);
     water.rotation.x = -Math.PI / 2;
@@ -1318,6 +1318,77 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       birds.push(b); scene.add(b);
     });
 
+    // === AIRPLANES flying across the sky ===
+    const airplanes: THREE.Group[] = [];
+    function makeAirplane(bodyColor: number, wingColor: number, size: number): THREE.Group {
+      const plane = new THREE.Group();
+      // Fuselage
+      const fuselage = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12 * size, 0.15 * size, 1.8 * size, 8),
+        new THREE.MeshPhongMaterial({ color: bodyColor, shininess: 90 })
+      );
+      fuselage.rotation.z = Math.PI / 2;
+      addOutline(fuselage, 0.02);
+      plane.add(fuselage);
+      // Nose cone
+      const nose = new THREE.Mesh(
+        new THREE.ConeGeometry(0.12 * size, 0.4 * size, 8),
+        new THREE.MeshPhongMaterial({ color: 0xcccccc, shininess: 100 })
+      );
+      nose.rotation.z = -Math.PI / 2;
+      nose.position.x = 1.1 * size;
+      plane.add(nose);
+      // Main wings
+      const wingGeo = new THREE.BoxGeometry(0.6 * size, 0.03 * size, 2.2 * size);
+      const wingMat = new THREE.MeshPhongMaterial({ color: wingColor, shininess: 60 });
+      const wings = new THREE.Mesh(wingGeo, wingMat);
+      wings.position.set(-0.1 * size, 0, 0);
+      addOutline(wings, 0.02);
+      plane.add(wings);
+      // Tail fin (vertical)
+      const tailFin = new THREE.Mesh(
+        new THREE.BoxGeometry(0.3 * size, 0.4 * size, 0.03 * size),
+        new THREE.MeshPhongMaterial({ color: wingColor, shininess: 60 })
+      );
+      tailFin.position.set(-0.85 * size, 0.2 * size, 0);
+      plane.add(tailFin);
+      // Tail wings (horizontal)
+      const tailWings = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25 * size, 0.02 * size, 0.8 * size),
+        wingMat
+      );
+      tailWings.position.set(-0.8 * size, 0.05 * size, 0);
+      plane.add(tailWings);
+      // Engine pods under wings
+      [-0.6, 0.6].forEach((zOff) => {
+        const engine = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.06 * size, 0.07 * size, 0.3 * size, 6),
+          new THREE.MeshPhongMaterial({ color: 0x555555, shininess: 40 })
+        );
+        engine.rotation.z = Math.PI / 2;
+        engine.position.set(0.05 * size, -0.12 * size, zOff * size);
+        plane.add(engine);
+      });
+      return plane;
+    }
+
+    const planeConfigs = [
+      { x: -50, z: 10, y: 18, speed: 0.06, heading: 0.3, bodyColor: 0xe74c3c, wingColor: 0xc0392b, size: 1.0 },
+      { x: 40, z: -20, y: 22, speed: 0.045, heading: 2.8, bodyColor: 0x3498db, wingColor: 0x2980b9, size: 0.9 },
+      { x: 20, z: 45, y: 16, speed: 0.055, heading: 3.8, bodyColor: 0xf1c40f, wingColor: 0xf39c12, size: 0.85 },
+      { x: -35, z: -30, y: 20, speed: 0.04, heading: 0.9, bodyColor: 0x2ecc71, wingColor: 0x27ae60, size: 0.95 },
+    ];
+    planeConfigs.forEach((cfg) => {
+      const ap = makeAirplane(cfg.bodyColor, cfg.wingColor, cfg.size);
+      ap.position.set(cfg.x, cfg.y, cfg.z);
+      ap.rotation.y = cfg.heading;
+      // Slight bank for realism
+      ap.rotation.z = 0.05;
+      ap.userData = { ...cfg };
+      airplanes.push(ap);
+      scene.add(ap);
+    });
+
     // === CLOUDS (orbiting around the islands) ===
     const clouds: THREE.Group[] = [];
     const cloudOrbitData = [
@@ -1339,6 +1410,155 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
       const angle = cd.phase;
       g.position.set(Math.cos(angle) * cd.radius, cd.y, Math.sin(angle) * cd.radius);
       clouds.push(g); scene.add(g);
+    });
+
+    // === SAILING SHIPS on the water ===
+    const ships: THREE.Group[] = [];
+    function makeShip(color: number, size: number): THREE.Group {
+      const ship = new THREE.Group();
+      // Hull
+      const hullShape = new THREE.Shape();
+      hullShape.moveTo(-1.2 * size, 0);
+      hullShape.lineTo(-1.0 * size, -0.4 * size);
+      hullShape.lineTo(1.0 * size, -0.4 * size);
+      hullShape.lineTo(1.4 * size, 0);
+      hullShape.lineTo(-1.2 * size, 0);
+      const hullGeo = new THREE.ExtrudeGeometry(hullShape, { depth: 0.6 * size, bevelEnabled: false });
+      const hull = new THREE.Mesh(hullGeo, new THREE.MeshPhongMaterial({ color, shininess: 60 }));
+      hull.rotation.y = Math.PI / 2;
+      hull.position.set(0, 0, -0.3 * size);
+      addOutline(hull, 0.03);
+      ship.add(hull);
+      // Deck
+      const deck = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5 * size, 0.15 * size, 0.5 * size),
+        new THREE.MeshLambertMaterial({ color: 0x8B6914 })
+      );
+      deck.position.set(-0.2 * size, 0.07 * size, 0);
+      ship.add(deck);
+      // Mast
+      const mast = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03 * size, 0.04 * size, 1.8 * size, 6),
+        new THREE.MeshLambertMaterial({ color: 0x5C3A1E })
+      );
+      mast.position.set(0, 0.9 * size, 0);
+      ship.add(mast);
+      // Sail
+      const sailShape = new THREE.Shape();
+      sailShape.moveTo(0, 0);
+      sailShape.lineTo(0.8 * size, 0.3 * size);
+      sailShape.lineTo(0, 1.2 * size);
+      sailShape.lineTo(0, 0);
+      const sailGeo = new THREE.ShapeGeometry(sailShape);
+      const sail = new THREE.Mesh(sailGeo, new THREE.MeshLambertMaterial({ color: 0xFFF8F0, side: THREE.DoubleSide }));
+      sail.position.set(0.05 * size, 0.2 * size, 0);
+      sail.userData.isSail = true;
+      ship.add(sail);
+      // Flag on top
+      const flag = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.3 * size, 0.15 * size),
+        new THREE.MeshLambertMaterial({ color: 0xe74c3c, side: THREE.DoubleSide })
+      );
+      flag.position.set(0.2 * size, 1.7 * size, 0);
+      flag.userData.isFlag = true;
+      ship.add(flag);
+      return ship;
+    }
+
+    const shipConfigs = [
+      { x: 25, z: 10, angle: 0.8, speed: 0.12, color: 0x8B4513, size: 1.0 },
+      { x: -30, z: 5, angle: 4.5, speed: 0.06, color: 0x1a5276, size: 1.1 },
+      { x: -20, z: -18, angle: 2.2, speed: 0.08, color: 0x2c3e50, size: 0.8 },
+      { x: 15, z: -25, angle: 1.5, speed: 0.1, color: 0x7f1d1d, size: 0.9 },
+    ];
+    shipConfigs.forEach((cfg) => {
+      const ship = makeShip(cfg.color, cfg.size);
+      ship.position.set(cfg.x, -0.35, cfg.z);
+      ship.rotation.y = cfg.angle;
+      ship.userData = { ...cfg, origX: cfg.x, origZ: cfg.z };
+      ships.push(ship);
+      scene.add(ship);
+    });
+
+    // === FISH swimming in the water ===
+    const fishGroup: THREE.Group[] = [];
+    function makeFish(bodyColor: number, tailColor: number, s: number): THREE.Group {
+      const fish = new THREE.Group();
+      // Body (elongated sphere)
+      const body = new THREE.Mesh(
+        new THREE.SphereGeometry(0.3 * s, 8, 6),
+        new THREE.MeshPhongMaterial({ color: bodyColor, emissive: bodyColor, emissiveIntensity: 0.3, shininess: 80 })
+      );
+      body.scale.set(1.8, 1, 0.8);
+      fish.add(body);
+      // Tail fin
+      const tailShape = new THREE.Shape();
+      tailShape.moveTo(0, 0);
+      tailShape.lineTo(-0.35 * s, 0.25 * s);
+      tailShape.lineTo(-0.35 * s, -0.25 * s);
+      tailShape.lineTo(0, 0);
+      const tail = new THREE.Mesh(
+        new THREE.ShapeGeometry(tailShape),
+        new THREE.MeshLambertMaterial({ color: tailColor, side: THREE.DoubleSide })
+      );
+      tail.position.set(-0.5 * s, 0, 0);
+      tail.userData.isTail = true;
+      fish.add(tail);
+      // Eye
+      const eye = new THREE.Mesh(
+        new THREE.SphereGeometry(0.05 * s, 6, 6),
+        new THREE.MeshBasicMaterial({ color: 0x111111 })
+      );
+      eye.position.set(0.35 * s, 0.08 * s, 0.15 * s);
+      fish.add(eye);
+      // Dorsal fin
+      const dorsalShape = new THREE.Shape();
+      dorsalShape.moveTo(0, 0);
+      dorsalShape.lineTo(-0.1 * s, 0.2 * s);
+      dorsalShape.lineTo(-0.25 * s, 0);
+      const dorsal = new THREE.Mesh(
+        new THREE.ShapeGeometry(dorsalShape),
+        new THREE.MeshLambertMaterial({ color: tailColor, side: THREE.DoubleSide })
+      );
+      dorsal.position.set(0, 0.2 * s, 0);
+      dorsal.rotation.y = Math.PI / 2;
+      fish.add(dorsal);
+      return fish;
+    }
+
+    const fishConfigs = [
+      { x: 22, z: -5, speed: 0.04, color: 0xff6b35, tail: 0xff8c42, size: 1.0, depth: -0.85, jumper: false },
+      { x: -18, z: 12, speed: 0.03, color: 0x3498db, tail: 0x2980b9, size: 0.7, depth: -0.95, jumper: false },
+      { x: 28, z: 20, speed: 0.035, color: 0xe67e22, tail: 0xd35400, size: 0.9, depth: -0.8, jumper: true },
+      { x: -25, z: -8, speed: 0.045, color: 0x1abc9c, tail: 0x16a085, size: 0.6, depth: -1.0, jumper: false },
+      { x: 10, z: 25, speed: 0.03, color: 0xf39c12, tail: 0xe67e22, size: 0.8, depth: -0.9, jumper: false },
+      { x: -12, z: -22, speed: 0.05, color: 0x9b59b6, tail: 0x8e44ad, size: 0.65, depth: -0.75, jumper: true },
+      { x: 30, z: -15, speed: 0.038, color: 0xe74c3c, tail: 0xc0392b, size: 0.85, depth: -0.88, jumper: false },
+      { x: -30, z: -20, speed: 0.042, color: 0x2ecc71, tail: 0x27ae60, size: 0.75, depth: -0.92, jumper: true },
+      { x: 18, z: -28, speed: 0.032, color: 0xf1c40f, tail: 0xf39c12, size: 0.6, depth: -0.82, jumper: false },
+      { x: -15, z: 28, speed: 0.048, color: 0xe91e63, tail: 0xc2185b, size: 0.7, depth: -0.78, jumper: false },
+      { x: 35, z: 5, speed: 0.03, color: 0x00bcd4, tail: 0x0097a7, size: 0.9, depth: -0.95, jumper: true },
+      { x: -8, z: -30, speed: 0.055, color: 0xff5722, tail: 0xe64a19, size: 0.55, depth: -0.85, jumper: false },
+    ];
+    fishConfigs.forEach((cfg, i) => {
+      const fish = makeFish(cfg.color, cfg.tail, cfg.size);
+      fish.position.set(cfg.x, cfg.depth, cfg.z);
+      // Wandering AI: heading, turn timer, speed, jump state
+      fish.userData = {
+        heading: (i * 1.3) % (Math.PI * 2),
+        speed: cfg.speed,
+        depth: cfg.depth,
+        turnTimer: i * 30,
+        turnInterval: 120 + i * 40,
+        turnAmount: 0,
+        boundary: 35,
+        jumper: cfg.jumper,
+        jumpPhase: -1, // -1 = not jumping, 0+ = jump progress
+        jumpCooldown: 200 + i * 80, // frames until next jump
+        jumpTimer: i * 60, // stagger initial jumps
+      };
+      fishGroup.push(fish);
+      scene.add(fish);
     });
 
     // === CENTRAL CANOPY TREE (the "Canopy" tree - tallest, center of island) ===
@@ -1556,6 +1776,119 @@ function LandingScene3D({ flyToRef, initialFlyFrom, timeOfDay = "day" }: Landing
           if (child.userData?.isButterfly) {
             const flapSpeed = child.userData.upper ? 8 : 9;
             child.rotation.z = Math.sin(time * flapSpeed + phase) * 0.7 * child.userData.side;
+          }
+        });
+      });
+
+      // Animate airplanes — fly across the sky, loop around
+      airplanes.forEach((ap) => {
+        const d = ap.userData;
+        ap.position.x += Math.cos(d.heading) * d.speed;
+        ap.position.z += Math.sin(d.heading) * d.speed;
+        // Gentle altitude variation
+        ap.position.y = d.y + Math.sin(time * 0.5 + d.x) * 0.3;
+        // Slight wing wobble
+        ap.rotation.z = 0.05 + Math.sin(time * 1.5 + d.x) * 0.02;
+        // Wrap around when out of bounds
+        if (ap.position.x > 55) ap.position.x = -55;
+        if (ap.position.x < -55) ap.position.x = 55;
+        if (ap.position.z > 55) ap.position.z = -55;
+        if (ap.position.z < -55) ap.position.z = 55;
+      });
+
+      // Animate ships — gentle circular sailing with bobbing
+      ships.forEach((ship) => {
+        const d = ship.userData;
+        const a = d.angle + time * d.speed * 0.3;
+        ship.position.x = d.origX + Math.cos(a) * 3;
+        ship.position.z = d.origZ + Math.sin(a) * 3;
+        ship.position.y = -0.35 + Math.sin(time * 1.5 + d.origX) * 0.08;
+        ship.rotation.y = a + Math.PI / 2;
+        ship.rotation.z = Math.sin(time * 2 + d.origX) * 0.04; // gentle roll
+        // Flap the flag
+        ship.children.forEach((child) => {
+          if (child.userData?.isFlag) {
+            child.rotation.y = Math.sin(time * 4 + d.origX) * 0.3;
+          }
+        });
+      });
+
+      // Animate fish — natural wandering with steering
+      fishGroup.forEach((fish) => {
+        const d = fish.userData;
+        d.turnTimer++;
+
+        // Occasionally change direction (gentle random turns)
+        if (d.turnTimer >= d.turnInterval) {
+          d.turnTimer = 0;
+          d.turnAmount = (Math.random() - 0.5) * 0.04; // gentle turn rate
+          d.turnInterval = 80 + Math.random() * 120; // vary next turn time
+        }
+
+        // Apply gradual turning
+        d.heading += d.turnAmount;
+
+        // Steer away from boundaries (islands at center, edge of water)
+        const distFromCenter = Math.sqrt(fish.position.x * fish.position.x + fish.position.z * fish.position.z);
+        if (distFromCenter > d.boundary) {
+          // Turn toward center
+          const toCenter = Math.atan2(-fish.position.z, -fish.position.x);
+          const diff = toCenter - d.heading;
+          d.heading += Math.sin(diff) * 0.05;
+        }
+        if (distFromCenter < 12) {
+          // Too close to islands, steer away
+          const awayFromCenter = Math.atan2(fish.position.z, fish.position.x);
+          const diff = awayFromCenter - d.heading;
+          d.heading += Math.sin(diff) * 0.06;
+        }
+
+        // Move forward in heading direction
+        fish.position.x += Math.cos(d.heading) * d.speed;
+        fish.position.z += Math.sin(d.heading) * d.speed;
+
+        // Jumping behavior
+        if (d.jumper) {
+          d.jumpTimer++;
+          if (d.jumpPhase < 0 && d.jumpTimer >= d.jumpCooldown) {
+            // Start a jump
+            d.jumpPhase = 0;
+            d.jumpTimer = 0;
+            d.jumpCooldown = 180 + Math.random() * 250; // randomize next jump
+          }
+          if (d.jumpPhase >= 0) {
+            d.jumpPhase += 0.03; // jump speed
+            if (d.jumpPhase > Math.PI) {
+              // Jump complete, back underwater
+              d.jumpPhase = -1;
+              fish.position.y = d.depth;
+              fish.rotation.x = 0;
+            } else {
+              // Parabolic arc: sin(0→PI) goes 0→1→0
+              const jumpHeight = 2.5;
+              const arc = Math.sin(d.jumpPhase);
+              fish.position.y = d.depth + arc * jumpHeight;
+              // Tilt forward on the way up, backward on the way down
+              fish.rotation.x = Math.cos(d.jumpPhase) * 0.8;
+            }
+          } else {
+            // Normal bobbing when not jumping
+            fish.position.y = d.depth + Math.sin(time * 1.5 + fish.position.x * 0.5) * 0.04;
+            fish.rotation.x = 0;
+          }
+        } else {
+          // Non-jumpers just bob gently
+          fish.position.y = d.depth + Math.sin(time * 1.5 + fish.position.x * 0.5) * 0.04;
+        }
+
+        // Face the direction of travel
+        fish.rotation.y = d.heading + Math.PI;
+
+        // Natural tail wag (faster when jumping)
+        const tailSpeed = d.jumpPhase >= 0 ? 16 : 10;
+        fish.children.forEach((child) => {
+          if (child.userData?.isTail) {
+            child.rotation.y = Math.sin(time * tailSpeed + fish.position.x) * 0.35;
           }
         });
       });
