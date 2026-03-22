@@ -28,12 +28,12 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
   };
 
   const isStacked = position === "stacked";
-  const svgSize = isStacked ? { width: 70, height: 58 } : { width: 90, height: 75 };
+  const svgSize = isStacked ? { width: 50, height: 42 } : { width: 90, height: 75 };
 
   return (
     <>
       <motion.button
-        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/20 backdrop-blur-2xl backdrop-saturate-150 rounded-[2rem] px-4 py-2.5 border border-white/40 shadow-xl w-48" : "flex-col items-center gap-1"} cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/20 backdrop-blur-2xl backdrop-saturate-150 rounded-xl px-3 py-2 border border-white/40 shadow-xl w-40" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => setShowModal(true)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
