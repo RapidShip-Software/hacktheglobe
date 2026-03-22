@@ -190,6 +190,7 @@ function NestScene3D() {
     nestGroup.position.set(3.5, 6.8, 0.8);
     nestTreeGroup.add(nestGroup);
 
+    nestTreeGroup.scale.set(1.3, 1.3, 1.3);
     nestTreeGroup.position.set(2, 0, 3);
     scene.add(nestTreeGroup);
 

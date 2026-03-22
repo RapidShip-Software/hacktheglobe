@@ -236,84 +236,120 @@ function LandingScene3D({ flyToRef, initialFlyFrom }: LandingScene3DProps) {
     nestBeach.position.y = -0.5;
     nestIslandGroup.add(nestBeach);
 
-    // === BIG NEST on the island ===
-    const bigNestGroup = new THREE.Group();
-    const nestRadius = 3.5;
-
-    // Nest bowl (woven twigs ring)
-    const bigNestBowl = new THREE.Mesh(
-      new THREE.TorusGeometry(nestRadius, 0.9, 10, 20),
-      new THREE.MeshLambertMaterial({ color: 0x8B6914 })
-    );
-    bigNestBowl.rotation.x = -Math.PI / 2;
-    addOutline(bigNestBowl, 0.03);
-    bigNestGroup.add(bigNestBowl);
-
-    // Nest inner (soft bedding)
-    const nestInner = new THREE.Mesh(
-      new THREE.CircleGeometry(nestRadius - 0.5, 20),
-      new THREE.MeshLambertMaterial({ color: 0x6B4E2A })
-    );
-    nestInner.rotation.x = -Math.PI / 2;
-    nestInner.position.y = -0.15;
-    bigNestGroup.add(nestInner);
-
-    // Second layer of straw inside
-    const strawMat = new THREE.MeshLambertMaterial({ color: 0xC4A050 });
-    const nestInner2 = new THREE.Mesh(
-      new THREE.CircleGeometry(nestRadius - 1.0, 16),
-      strawMat
-    );
-    nestInner2.rotation.x = -Math.PI / 2;
-    nestInner2.position.y = -0.08;
-    bigNestGroup.add(nestInner2);
-
-    // Twigs layered around the nest for texture
-    for (let i = 0; i < 35; i++) {
-      const angle = (i / 35) * Math.PI * 2;
-      const twigLen = 1.8 + Math.random() * 1.2;
-      const twig = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.05, 0.08, twigLen, 4),
-        new THREE.MeshLambertMaterial({ color: 0x7A5C2E + Math.floor(Math.random() * 0x202020) })
-      );
-      twig.position.set(
-        Math.cos(angle) * (nestRadius - 0.3),
-        0.3 + Math.random() * 0.3,
-        Math.sin(angle) * (nestRadius - 0.3)
-      );
-      twig.rotation.z = (Math.random() - 0.5) * 0.6;
-      twig.rotation.y = angle + Math.random();
-      bigNestGroup.add(twig);
-    }
-
-    // Eggs in nest
-    const nestEggMat = new THREE.MeshPhongMaterial({ color: 0xF5F0E8, shininess: 30 });
-    for (let i = 0; i < 4; i++) {
-      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), nestEggMat);
+    // === NEST TREE (large tree with nest on branch) ===
+    const nestTreeG = new THREE.Group();
+    const nestBarkMat = new THREE.MeshLambertMaterial({ color: 0x5C3A1E });
+    // Trunk
+    const nestTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, 7, 7), nestBarkMat);
+    nestTrunk.position.y = 3.5;
+    nestTrunk.castShadow = true;
+    addOutline(nestTrunk, 0.03);
+    nestTreeG.add(nestTrunk);
+    // Branch for nest
+    const nestBranch = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 4, 5), nestBarkMat);
+    nestBranch.position.set(1.5, 6, 0.3);
+    nestBranch.rotation.z = -Math.PI / 3;
+    addOutline(nestBranch, 0.03);
+    nestTreeG.add(nestBranch);
+    // Foliage
+    const nestFoliageMat = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+    [{ x: 0, y: 8, z: 0, r: 1.8 }, { x: 1.2, y: 8.5, z: 0.8, r: 1.5 }, { x: -1, y: 7.8, z: -0.3, r: 1.4 }, { x: 0.3, y: 9, z: -0.3, r: 1.2 }].forEach((cp) => {
+      const f = new THREE.Mesh(new THREE.SphereGeometry(cp.r, 7, 6), nestFoliageMat);
+      f.position.set(cp.x, cp.y, cp.z);
+      f.castShadow = true;
+      addOutline(f, 0.03);
+      nestTreeG.add(f);
+    });
+    // Small nest on branch
+    const smallNest = new THREE.Group();
+    const sNestBowl = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.18, 8, 10), new THREE.MeshLambertMaterial({ color: 0x8B6914 }));
+    sNestBowl.rotation.x = -Math.PI / 2;
+    addOutline(sNestBowl, 0.04);
+    smallNest.add(sNestBowl);
+    const sNestInner = new THREE.Mesh(new THREE.CircleGeometry(0.5, 10), new THREE.MeshLambertMaterial({ color: 0x6B4E2A }));
+    sNestInner.rotation.x = -Math.PI / 2;
+    sNestInner.position.y = -0.04;
+    smallNest.add(sNestInner);
+    for (let i = 0; i < 3; i++) {
+      const egg = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 5), new THREE.MeshPhongMaterial({ color: 0xF5F0E8, shininess: 30 }));
       egg.scale.set(0.8, 1.0, 0.8);
-      egg.position.set(
-        Math.cos(i * 1.6 + 0.3) * 1.0,
-        0.2,
-        Math.sin(i * 1.6 + 0.3) * 1.0
-      );
-      addOutline(egg, 0.04);
-      bigNestGroup.add(egg);
+      egg.position.set(Math.cos(i * 2.1) * 0.2, 0.04, Math.sin(i * 2.1) * 0.2);
+      addOutline(egg, 0.05);
+      smallNest.add(egg);
+    }
+    smallNest.position.set(3, 5.8, 0.6);
+    nestTreeG.add(smallNest);
+    nestTreeG.position.set(1, 0, 1);
+    nestTreeG.scale.set(1.4, 1.4, 1.4);
+    nestIslandGroup.add(nestTreeG);
+
+    // Scattered twigs on ground
+    for (let i = 0; i < 10; i++) {
+      const tw = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.035, 0.6 + Math.random() * 0.4, 4), new THREE.MeshLambertMaterial({ color: 0x7A5C2E }));
+      const twx = (Math.random() - 0.5) * 5 + 1;
+      const twz = (Math.random() - 0.5) * 5 + 1;
+      if (Math.sqrt(twx * twx + twz * twz) > NEST_ISLAND_RADIUS - 2) continue;
+      tw.position.set(twx, 0.04, twz);
+      tw.rotation.x = Math.PI / 2;
+      tw.rotation.z = Math.random() * Math.PI;
+      nestIslandGroup.add(tw);
     }
 
-    // Speckles on eggs
-    const speckleMat = new THREE.MeshLambertMaterial({ color: 0xC4A882 });
-    for (let i = 0; i < 15; i++) {
-      const speck = new THREE.Mesh(new THREE.SphereGeometry(0.08, 4, 3), speckleMat);
-      speck.position.set(
-        Math.cos(i * 0.42) * 1.1 + (Math.random() - 0.5) * 0.5,
-        0.45,
-        Math.sin(i * 0.42) * 1.1 + (Math.random() - 0.5) * 0.5
-      );
-      bigNestGroup.add(speck);
-    }
+    // Matcha cup
+    const matchaCup = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.16, 0.28, 8), new THREE.MeshPhongMaterial({ color: 0xf5f0e0, shininess: 40 }));
+    matchaCup.position.set(3.5, 0.14, 3);
+    addOutline(matchaCup, 0.04);
+    nestIslandGroup.add(matchaCup);
+    const matchaLiquid = new THREE.Mesh(new THREE.CircleGeometry(0.18, 8), new THREE.MeshPhongMaterial({ color: 0x7ab648, shininess: 60 }));
+    matchaLiquid.rotation.x = -Math.PI / 2;
+    matchaLiquid.position.set(3.5, 0.28, 3);
+    nestIslandGroup.add(matchaLiquid);
 
-    bigNestGroup.position.set(1, 1.5, 0.5);
-    nestIslandGroup.add(bigNestGroup);
+    // Cat
+    const catG = new THREE.Group();
+    const catMat = new THREE.MeshLambertMaterial({ color: 0x444444 });
+    const catBody = new THREE.Mesh(new THREE.SphereGeometry(0.25, 7, 6), catMat);
+    catBody.position.y = 0.25;
+    catBody.scale.set(0.8, 0.7, 1.1);
+    addOutline(catBody, 0.04);
+    catG.add(catBody);
+    const catHead = new THREE.Mesh(new THREE.SphereGeometry(0.17, 7, 6), catMat);
+    catHead.position.set(0, 0.45, 0.15);
+    addOutline(catHead, 0.04);
+    catG.add(catHead);
+    for (const side of [-1, 1]) {
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.1, 4), catMat);
+      ear.position.set(side * 0.1, 0.6, 0.13);
+      addOutline(ear, 0.05);
+      catG.add(ear);
+    }
+    catG.position.set(4, 0, 2);
+    catG.rotation.y = -0.8;
+    nestIslandGroup.add(catG);
+
+    // Birdies on ground near nest island
+    function nestBirdie(x: number, z: number, col: number, facing: number) {
+      const g = new THREE.Group();
+      const bm = new THREE.MeshLambertMaterial({ color: col });
+      const bd = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 5), bm);
+      bd.scale.set(0.8, 0.9, 1.1);
+      addOutline(bd, 0.04);
+      g.add(bd);
+      const hd = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 5), bm);
+      hd.position.set(0, 0.1, 0.07);
+      addOutline(hd, 0.04);
+      g.add(hd);
+      const bk = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.05, 4), new THREE.MeshLambertMaterial({ color: 0xffa000 }));
+      bk.position.set(0, 0.09, 0.14);
+      bk.rotation.x = Math.PI / 2;
+      g.add(bk);
+      g.position.set(x, 0.12, z);
+      g.rotation.y = facing;
+      return g;
+    }
+    nestIslandGroup.add(nestBirdie(3, 3.5, 0xe74c3c, -0.5));
+    nestIslandGroup.add(nestBirdie(-2, 2, 0x3498db, 0.8));
+    nestIslandGroup.add(nestBirdie(2, -3, 0xf1c40f, -1.2));
 
     // === LIGHTHOUSE on the island ===
     const lighthouseGroup = new THREE.Group();
