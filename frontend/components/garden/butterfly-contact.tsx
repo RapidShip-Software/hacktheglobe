@@ -28,12 +28,12 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
   };
 
   const isStacked = position === "stacked";
-  const svgSize = isStacked ? { width: 110, height: 92 } : { width: 90, height: 75 };
+  const svgSize = isStacked ? { width: 70, height: 58 } : { width: 90, height: 75 };
 
   return (
     <>
       <motion.button
-        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-3 bg-white/15 backdrop-blur-xl rounded-2xl px-4 py-3 border border-white/20 shadow-lg w-56" : "flex-col items-center gap-1"} cursor-pointer group`}
+        className={`${isStacked ? "relative" : `absolute ${positionClasses[position]}`} z-20 flex ${isStacked ? "flex-row items-center gap-2 bg-white/15 backdrop-blur-xl rounded-xl px-3 py-2 border border-white/20 shadow-lg w-44" : "flex-col items-center gap-1"} cursor-pointer group`}
         onClick={() => setShowModal(true)}
         animate={isStacked ? {} : { y: [0, -8, 0, -4, 0] }}
         transition={isStacked ? {} : {
@@ -146,9 +146,9 @@ function ButterflyContact({ contact, position }: ButterflyContactProps) {
         </svg>
 
         {/* Name label */}
-        <span className={`font-bold text-white whitespace-nowrap ${isStacked ? "text-base" : "text-base bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20"}`}>
+        <span className={`font-bold text-white whitespace-nowrap ${isStacked ? "text-sm" : "text-base bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20"}`}>
           {contact.name}
-          {isStacked && <span className="block text-xs font-normal text-white/50">{contact.relation}</span>}
+          {isStacked && <span className="block text-[10px] font-normal text-white/50">{contact.relation}</span>}
         </span>
       </motion.button>
 

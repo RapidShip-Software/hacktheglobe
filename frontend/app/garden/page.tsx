@@ -138,15 +138,15 @@ function GardenPage() {
   };
 
   const checklistContent = (
-    <div className="bg-white/15 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-4 md:p-5 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg md:text-xl font-bold text-white drop-shadow">Today&apos;s Tasks</h2>
-        <span className="text-sm font-semibold text-white/60 bg-white/10 px-3 py-1 rounded-full">
+    <div className="bg-white/15 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-3 md:p-4 flex flex-col max-h-[70vh] md:max-h-full md:h-full">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-base md:text-lg font-bold text-white drop-shadow">Today&apos;s Tasks</h2>
+        <span className="text-xs font-semibold text-white/60 bg-white/10 px-2.5 py-0.5 rounded-full">
           {completedCount}/{checklist.length}
         </span>
       </div>
 
-      <div className="w-full h-2 bg-white/10 rounded-full mb-4 overflow-hidden">
+      <div className="w-full h-1.5 bg-white/10 rounded-full mb-3 overflow-hidden">
         <motion.div
           className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
           animate={{ width: `${(completedCount / checklist.length) * 100}%` }}
@@ -154,14 +154,14 @@ function GardenPage() {
         />
       </div>
 
-      <div className="flex-1 space-y-2.5 overflow-y-auto">
+      <div className="flex-1 space-y-2 overflow-y-auto">
         {checklist.map((item, i) => {
           const Icon = iconMap[item.icon];
           return (
             <motion.button
               key={item.id}
               onClick={() => handleChecklistTap(item)}
-              className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left ${
+              className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl transition-all text-left ${
                 item.done
                   ? "bg-emerald-500/20 border border-emerald-400/30"
                   : "bg-white/10 border border-white/15 hover:bg-white/20 active:scale-[0.97]"
@@ -271,14 +271,14 @@ function GardenPage() {
       </motion.div>
 
       {/* === DESKTOP: Left Checklist Panel (hidden on mobile) === */}
-      <div className="hidden md:block absolute left-4 top-24 bottom-4 z-20 w-80">
+      <div className="hidden md:block absolute left-3 top-20 bottom-3 z-20 w-64 lg:w-72">
         <BlurFade delay={0.2} inView>
           {checklistContent}
         </BlurFade>
       </div>
 
       {/* === DESKTOP: Right Butterfly Contacts (hidden on mobile) === */}
-      <div className="hidden md:flex absolute right-4 top-24 z-20 flex-col gap-5 items-center">
+      <div className="hidden md:flex absolute right-3 top-20 z-20 flex-col gap-3 items-center">
         {MARGARET_CONTACTS.map((contact, i) => (
           <BlurFade key={contact.name} delay={0.4 + i * 0.1} inView>
             <ButterflyContact contact={contact} position="stacked" />
