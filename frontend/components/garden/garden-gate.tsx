@@ -48,7 +48,7 @@ function GardenGate({ patientName }: GardenGateProps) {
         >
           <div className="w-2 h-2 rounded-full bg-amber-300" />
         </motion.div>
-        <span className="text-sm font-bold text-amber-900 bg-white/50 backdrop-blur-sm rounded-full px-4 py-1 shadow-md">
+        <span className="text-base font-bold text-white bg-black/40 backdrop-blur-sm rounded-full px-5 py-2 shadow-lg border border-white/20">
           Help
         </span>
       </motion.button>

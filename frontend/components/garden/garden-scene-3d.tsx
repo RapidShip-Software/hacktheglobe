@@ -467,6 +467,7 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     }
 
     plantGroup.position.set(0, 0, 3);
+    plantGroup.scale.set(2.2, 2.2, 2.2);
     scene.add(plantGroup);
 
     // === ANIMALS ===
