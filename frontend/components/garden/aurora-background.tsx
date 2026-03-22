@@ -14,9 +14,10 @@ type AuroraBackgroundProps = {
   children: React.ReactNode;
   className?: string;
   health?: number;
+  timeOfDay?: "day" | "sunset" | "night";
 };
 
-function AuroraBackground({ skyState, children, className, health = 0.8 }: AuroraBackgroundProps) {
+function AuroraBackground({ skyState, children, className, health = 0.8, timeOfDay }: AuroraBackgroundProps) {
   return (
     <motion.main
       className={cn(
@@ -28,7 +29,7 @@ function AuroraBackground({ skyState, children, className, health = 0.8 }: Auror
       transition={{ duration: 1.2 }}
     >
       {/* 3D Garden Scene (pure Three.js, no R3F) */}
-      <GardenScene3D health={health} skyState={skyState} />
+      <GardenScene3D health={health} skyState={skyState} timeOfDay={timeOfDay} />
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col">

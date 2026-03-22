@@ -9,6 +9,7 @@ import { ButterflyContact } from "@/components/garden/butterfly-contact";
 import { GardenGate } from "@/components/garden/garden-gate";
 import { BpEntryFlow } from "@/components/garden/bp-entry-flow";
 import { BlurFade } from "@/components/shared/blur-fade";
+import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 import { api } from "@/lib/api";
 import { subscribeToTable } from "@/lib/supabase";
 import type { Contact, Medication, GardenState } from "@/lib/types";
@@ -39,6 +40,7 @@ type ChecklistItem = {
 function GardenPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
 
   const handleBack = useCallback(() => {
     setIsExiting(true);
@@ -53,6 +55,30 @@ function GardenPage() {
   const [showBpEntry, setShowBpEntry] = useState(false);
   const [nudgeText, setNudgeText] = useState("Good morning Margaret! Your garden looks lovely today.");
   const [mobilePanel, setMobilePanel] = useState<"none" | "tasks" | "contacts">("none");
+  const [animalMsg, setAnimalMsg] = useState<string | null>(null);
+
+  // Random animal comments
+  useEffect(() => {
+    const messages = [
+      "🐰 The rabbits think you're doing great today!",
+      "🦌 The deer says: take a deep breath and enjoy the view.",
+      "🐦 A little bird told me you're wonderful!",
+      "🦋 The butterflies are dancing just for you!",
+      "🐰 Hop hop! Don't forget to stay hydrated!",
+      "🦌 The deer is proud of you for taking your meds!",
+      "🐦 Tweet tweet! Your garden loves your care!",
+      "🌸 The flowers say thank you for checking in!",
+      "🐰 A bunny left you a smile by the path!",
+      "🦋 Even the butterflies take breaks. You should too!",
+    ];
+    const show = () => {
+      setAnimalMsg(messages[Math.floor(Math.random() * messages.length)]);
+      setTimeout(() => setAnimalMsg(null), 5000);
+    };
+    const interval = setInterval(show, 25000 + Math.random() * 15000);
+    const firstTimeout = setTimeout(show, 8000);
+    return () => { clearInterval(interval); clearTimeout(firstTimeout); };
+  }, []);
   const [activeContact, setActiveContact] = useState<Contact | null>(null);
 
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
@@ -215,7 +241,7 @@ function GardenPage() {
   );
 
   return (
-    <AuroraBackground skyState={gardenState.sky} health={gardenState.plant_health}>
+    <AuroraBackground skyState={gardenState.sky} health={gardenState.plant_health} timeOfDay={timeOfDay}>
       {/* Back button + Garden logo */}
       <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20 flex items-center gap-3">
         <button
@@ -229,6 +255,9 @@ function GardenPage() {
           <span className="text-sm md:text-base font-bold text-slate-800 hidden sm:inline">The Garden</span>
         </div>
       </div>
+
+      {/* Time of day toggle */}
+      <TimeToggle timeOfDay={timeOfDay} onChange={setTimeOfDay} />
 
       {/* Exit fade overlay */}
       <AnimatePresence>
@@ -443,6 +472,23 @@ function GardenPage() {
 
       {/* AI Chat (triggered by tapping the flower) */}
       <GardenGate patientName="Margaret" externalOpen={showFlowerChat} onClose={() => setShowFlowerChat(false)} />
+
+      {/* Animal speech bubble */}
+      <AnimatePresence>
+        {animalMsg && (
+          <motion.div
+            className="absolute bottom-28 md:bottom-32 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+            initial={{ opacity: 0, y: 15, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.9 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="bg-white/25 backdrop-blur-2xl rounded-2xl px-5 py-3 border border-white/40 shadow-xl max-w-xs">
+              <p className="text-sm font-bold text-white drop-shadow-md text-center">{animalMsg}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Grass / ground */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-green-600/30 via-green-500/15 to-transparent pointer-events-none" />

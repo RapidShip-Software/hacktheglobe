@@ -9,6 +9,7 @@ import { DailySignal } from "@/components/caregiver/daily-signal";
 import { HistoryView, type HistoryItem } from "@/components/caregiver/history-view";
 import { CaregiverNotes } from "@/components/caregiver/caregiver-notes";
 import { BlurFade } from "@/components/shared/blur-fade";
+import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 import { api } from "@/lib/api";
 import { subscribeToTable } from "@/lib/supabase";
 import type { Assessment, CaregiverNote } from "@/lib/types";
@@ -65,6 +66,7 @@ function assessmentToHistoryItem(a: Assessment): HistoryItem {
 function CaregiverPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
 
   const handleBack = useCallback(() => {
     setIsExiting(true);
@@ -196,7 +198,10 @@ function CaregiverPage() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Nest Scene Background */}
-      <NestScene3D />
+      <NestScene3D timeOfDay={timeOfDay} />
+
+      {/* Time of day toggle */}
+      <TimeToggle timeOfDay={timeOfDay} onChange={setTimeOfDay} />
 
       {/* Back button */}
       <div className="absolute top-4 md:top-6 left-4 md:left-6 z-20">

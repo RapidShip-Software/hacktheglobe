@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function ClinicalScene3D() {
+type TimeOfDay = "day" | "sunset" | "night";
+
+function ClinicalScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -11,9 +13,10 @@ function ClinicalScene3D() {
     const container = containerRef.current;
     if (!container) return;
 
+    const bgCol = timeOfDay === "sunset" ? 0xffe0c0 : timeOfDay === "night" ? 0x1a1a2e : 0xfff3e0;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xfff3e0);
-    scene.fog = new THREE.Fog(0xfff3e0, 20, 45);
+    scene.background = new THREE.Color(bgCol);
+    scene.fog = new THREE.Fog(bgCol, 20, 45);
 
     // Fixed camera looking into cozy reception
     const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
@@ -32,9 +35,14 @@ function ClinicalScene3D() {
     container.appendChild(renderer.domElement);
 
     // === LIGHTING (warm, cozy) ===
-    scene.add(new THREE.AmbientLight(0xfff8e1, 0.6));
+    const cAmbCol = timeOfDay === "sunset" ? 0xffbe8a : timeOfDay === "night" ? 0x202040 : 0xfff8e1;
+    const cAmbInt = timeOfDay === "night" ? 0.25 : timeOfDay === "sunset" ? 0.5 : 0.6;
+    scene.add(new THREE.AmbientLight(cAmbCol, cAmbInt));
+    renderer.toneMappingExposure = timeOfDay === "night" ? 0.6 : timeOfDay === "sunset" ? 1.0 : 1.3;
 
-    const windowLight = new THREE.DirectionalLight(0xfff4e0, 1.6);
+    const wLightCol = timeOfDay === "sunset" ? 0xff8040 : timeOfDay === "night" ? 0x4060aa : 0xfff4e0;
+    const wLightInt = timeOfDay === "night" ? 0.5 : timeOfDay === "sunset" ? 1.2 : 1.6;
+    const windowLight = new THREE.DirectionalLight(wLightCol, wLightInt);
     windowLight.position.set(-8, 10, 5);
     windowLight.castShadow = true;
     windowLight.shadow.mapSize.set(512, 512);

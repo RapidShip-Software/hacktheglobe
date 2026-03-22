@@ -3,9 +3,10 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-type GardenScene3DProps = { health: number; skyState: "clear" | "cloudy" | "stormy" };
+type TimeOfDay = "day" | "sunset" | "night";
+type GardenScene3DProps = { health: number; skyState: "clear" | "cloudy" | "stormy"; timeOfDay?: TimeOfDay };
 
-function GardenScene3D({ health, skyState }: GardenScene3DProps) {
+function GardenScene3D({ health, skyState, timeOfDay = "day" }: GardenScene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -19,7 +20,8 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     const rand = seededRandom;
 
     const scene = new THREE.Scene();
-    const skyColor = skyState === "clear" ? 0x87ceeb : skyState === "cloudy" ? 0xb0c4de : 0x708090;
+    const daySkyColor = skyState === "clear" ? 0x87ceeb : skyState === "cloudy" ? 0xb0c4de : 0x708090;
+    const skyColor = timeOfDay === "sunset" ? 0xff8c5a : timeOfDay === "night" ? 0x0a0e2a : daySkyColor;
     scene.background = new THREE.Color(skyColor);
     scene.fog = new THREE.Fog(skyColor, 25, 60);
 
@@ -39,8 +41,13 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     container.appendChild(renderer.domElement);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xfff8e1, 0.65));
-    const sunLight = new THREE.DirectionalLight(0xfff4e0, 1.8);
+    const ambCol = timeOfDay === "sunset" ? 0xffbe8a : timeOfDay === "night" ? 0x303860 : 0xfff8e1;
+    const ambInt = timeOfDay === "night" ? 0.3 : timeOfDay === "sunset" ? 0.5 : 0.65;
+    scene.add(new THREE.AmbientLight(ambCol, ambInt));
+    const sunCol = timeOfDay === "sunset" ? 0xff6030 : timeOfDay === "night" ? 0x6080cc : 0xfff4e0;
+    const sunInt = timeOfDay === "night" ? 0.4 : timeOfDay === "sunset" ? 1.2 : 1.8;
+    renderer.toneMappingExposure = timeOfDay === "night" ? 0.7 : timeOfDay === "sunset" ? 1.1 : 1.3;
+    const sunLight = new THREE.DirectionalLight(sunCol, sunInt);
     sunLight.position.set(8, 15, 5);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(1024, 1024);
@@ -169,20 +176,127 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     const barkTex = makeBarkTexture();
     const terracottaTex = makeTerracottaTexture();
 
-    // === GROUND ===
-    const groundGeo = new THREE.PlaneGeometry(100, 100, 30, 30);
-    const gPos = groundGeo.attributes.position;
-    for (let i = 0; i < gPos.count; i++) gPos.setZ(i, Math.sin(gPos.getX(i) * 0.15) * 0.25 + Math.cos(gPos.getY(i) * 0.12) * 0.2);
-    groundGeo.computeVertexNormals();
-    const ground = new THREE.Mesh(groundGeo, new THREE.MeshLambertMaterial({ map: grassTex, color: 0x3da55c }));
-    ground.rotation.x = -Math.PI / 2;
+    // === WATER (ocean around the island) ===
+    function makeWaterTex() {
+      const c = document.createElement("canvas"); c.width = 256; c.height = 256;
+      const ctx = c.getContext("2d")!;
+      const grad = ctx.createLinearGradient(0, 0, 256, 256);
+      grad.addColorStop(0, "#3b82f6"); grad.addColorStop(0.5, "#60a5fa"); grad.addColorStop(1, "#3b82f6");
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, 256, 256);
+      for (let i = 0; i < 150; i++) {
+        ctx.strokeStyle = `rgba(255,255,255,${0.05 + Math.random() * 0.1})`;
+        ctx.lineWidth = 0.5 + Math.random();
+        const x = Math.random() * 256, y = Math.random() * 256;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 5 + Math.random() * 15, y + (Math.random() - 0.5) * 2); ctx.stroke();
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 4);
+      return tex;
+    }
+    const waterTex = makeWaterTex();
+    const waterMat = new THREE.MeshPhongMaterial({ map: waterTex, color: 0x4a90d9, shininess: 80, transparent: true, opacity: 0.8 });
+    const water = new THREE.Mesh(new THREE.CircleGeometry(60, 32), waterMat);
+    water.rotation.x = -Math.PI / 2;
+    water.position.y = -0.8;
+    scene.add(water);
+
+    // === ISLAND (circular ground) ===
+    const ISLAND_R = 18;
+    const islandGeo = new THREE.CylinderGeometry(ISLAND_R, ISLAND_R - 1, 1.8, 32, 4);
+    const iPos = islandGeo.attributes.position;
+    for (let i = 0; i < iPos.count; i++) {
+      const y = iPos.getY(i);
+      if (y < -0.3) {
+        const x = iPos.getX(i), z = iPos.getZ(i);
+        const dist = Math.sqrt(x * x + z * z);
+        if (dist > ISLAND_R * 0.6) iPos.setY(i, y - (dist / ISLAND_R) * 0.5);
+      }
+    }
+    islandGeo.computeVertexNormals();
+    const ground = new THREE.Mesh(islandGeo, new THREE.MeshLambertMaterial({ map: grassTex, color: 0x3da55c }));
+    ground.position.y = -0.3;
     ground.receiveShadow = true;
     scene.add(ground);
 
+    // Beach ring
+    const beachRing = new THREE.Mesh(
+      new THREE.TorusGeometry(ISLAND_R - 0.3, 0.8, 8, 32),
+      new THREE.MeshLambertMaterial({ color: 0xe8d5a3 })
+    );
+    beachRing.rotation.x = -Math.PI / 2;
+    beachRing.position.y = -0.6;
+    scene.add(beachRing);
+
+    // === SMALL POND on the island ===
+    const pond = new THREE.Mesh(
+      new THREE.CircleGeometry(1.8, 16),
+      new THREE.MeshPhongMaterial({ color: 0x4a90d9, shininess: 100, transparent: true, opacity: 0.7 })
+    );
+    pond.rotation.x = -Math.PI / 2;
+    pond.position.set(-6, 0.05, -3);
+    scene.add(pond);
+    // Lily pads
+    for (let i = 0; i < 3; i++) {
+      const lily = new THREE.Mesh(new THREE.CircleGeometry(0.25 + rand() * 0.15, 8), new THREE.MeshLambertMaterial({ color: 0x22c55e }));
+      lily.rotation.x = -Math.PI / 2;
+      lily.position.set(-6 + (rand() - 0.5) * 2.5, 0.07, -3 + (rand() - 0.5) * 2.5);
+      scene.add(lily);
+    }
+
     // Grass path (dirt texture)
     const path = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 16), new THREE.MeshLambertMaterial({ map: dirtTex, color: 0xd4b07a }));
-    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.03, 2); path.receiveShadow = true;
+    path.rotation.x = -Math.PI / 2; path.position.set(0, 0.06, 2); path.receiveShadow = true;
     scene.add(path);
+
+    // === COZY ELEMENTS ===
+    // Bench near the path
+    const benchGroup = new THREE.Group();
+    const benchWood = new THREE.MeshLambertMaterial({ color: 0x8B5E3C });
+    // Seat
+    const benchSeat = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.08, 0.4), benchWood);
+    benchSeat.position.y = 0.45;
+    benchGroup.add(benchSeat);
+    // Back
+    const benchBack = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 0.06), benchWood);
+    benchBack.position.set(0, 0.65, -0.17);
+    benchGroup.add(benchBack);
+    // Legs
+    for (const sx of [-0.5, 0.5]) {
+      for (const sz of [-0.15, 0.15]) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 4), benchWood);
+        leg.position.set(sx, 0.225, sz);
+        benchGroup.add(leg);
+      }
+    }
+    benchGroup.position.set(3, 0, 5);
+    benchGroup.rotation.y = -0.4;
+    scene.add(benchGroup);
+
+    // Lantern on the ground
+    const lanternGroup = new THREE.Group();
+    const lanternBase = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.05, 6), new THREE.MeshLambertMaterial({ color: 0x333333 }));
+    lanternBase.position.y = 0.025;
+    lanternGroup.add(lanternBase);
+    const lanternBody = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.2, 6), new THREE.MeshPhongMaterial({ color: 0xfff9c4, transparent: true, opacity: 0.6, emissive: 0xfff176, emissiveIntensity: 0.4 }));
+    lanternBody.position.y = 0.15;
+    lanternGroup.add(lanternBody);
+    const lanternTop = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.06, 6), new THREE.MeshLambertMaterial({ color: 0x333333 }));
+    lanternTop.position.y = 0.28;
+    lanternGroup.add(lanternTop);
+    lanternGroup.position.set(3.8, 0, 4.5);
+    scene.add(lanternGroup);
+
+    // Stepping stones on the path
+    for (let i = 0; i < 6; i++) {
+      const stone = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.25 + rand() * 0.1, 0.3 + rand() * 0.1, 0.06, 7),
+        new THREE.MeshLambertMaterial({ color: 0x999999 })
+      );
+      stone.position.set((rand() - 0.5) * 0.8, 0.05, -3 + i * 2.5);
+      stone.rotation.y = rand() * Math.PI;
+      scene.add(stone);
+    }
 
     // === HELPERS ===
     function makeMesh(geo: THREE.BufferGeometry, mat: THREE.Material, px: number, py: number, pz: number, shadow = false, outline = false) {
@@ -840,6 +954,11 @@ function GardenScene3D({ health, skyState }: GardenScene3DProps) {
     function animate() {
       frameRef.current = requestAnimationFrame(animate);
       time += 0.01;
+
+      // Water animation
+      waterTex.offset.x = time * 0.012;
+      waterTex.offset.y = time * 0.008;
+
       clouds.forEach((c, i) => { c.position.x += cloudData[i].sp; if (c.position.x > 25) c.position.x = -25; });
       // Birds flying + wing flap
       birds.forEach((b) => {

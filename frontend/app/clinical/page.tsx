@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { PatientList } from "@/components/clinical/patient-list";
 import { AlertCard } from "@/components/clinical/alert-card";
 import { PatientProfile } from "@/components/clinical/patient-profile";
+import { TimeToggle, type TimeOfDay } from "@/components/shared/time-toggle";
 
 const ClinicalScene3D = dynamic(
   () => import("@/components/clinical/clinical-scene-3d").then((m) => m.ClinicalScene3D),
@@ -21,6 +22,7 @@ import type { Patient, Assessment, Reading, CaregiverNote, ClinicalAlert } from 
 function ClinicalPage() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("day");
 
   const handleHome = useCallback(() => {
     setIsExiting(true);
@@ -142,10 +144,13 @@ function ClinicalPage() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       {/* 3D Cozy Clinic Background */}
-      <ClinicalScene3D />
+      <ClinicalScene3D timeOfDay={timeOfDay} />
+
+      {/* Time of day toggle */}
+      <TimeToggle timeOfDay={timeOfDay} onChange={setTimeOfDay} />
 
       {/* Home button */}
-      <div className="absolute top-4 md:top-6 right-4 md:right-6 z-20">
+      <div className="absolute top-4 md:top-6 right-16 md:right-20 z-20">
         <button
           onClick={handleHome}
           className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/95 border border-slate-200 shadow-lg cursor-pointer hover:bg-white active:scale-95 transition-all"

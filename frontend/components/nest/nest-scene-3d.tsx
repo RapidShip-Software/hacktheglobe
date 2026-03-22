@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-function NestScene3D() {
+type TimeOfDay = "day" | "sunset" | "night";
+
+function NestScene3D({ timeOfDay = "day" }: { timeOfDay?: TimeOfDay }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>(0);
 
@@ -11,9 +13,10 @@ function NestScene3D() {
     const container = containerRef.current;
     if (!container) return;
 
+    const skyCol = timeOfDay === "sunset" ? 0xff8c5a : timeOfDay === "night" ? 0x0a0e2a : 0x87ceeb;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.FogExp2(0x87ceeb, 0.006);
+    scene.background = new THREE.Color(skyCol);
+    scene.fog = new THREE.FogExp2(skyCol, 0.006);
 
     // Camera: elevated 3/4 view looking at the island and nest
     const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 300);
@@ -30,8 +33,13 @@ function NestScene3D() {
     container.appendChild(renderer.domElement);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xfff8e1, 0.7));
-    const sunLight = new THREE.DirectionalLight(0xfff4e0, 1.4);
+    const nAmbCol = timeOfDay === "sunset" ? 0xffbe8a : timeOfDay === "night" ? 0x303860 : 0xfff8e1;
+    const nAmbInt = timeOfDay === "night" ? 0.3 : timeOfDay === "sunset" ? 0.5 : 0.7;
+    scene.add(new THREE.AmbientLight(nAmbCol, nAmbInt));
+    renderer.toneMappingExposure = timeOfDay === "night" ? 0.7 : timeOfDay === "sunset" ? 1.1 : 1.3;
+    const nSunCol = timeOfDay === "sunset" ? 0xff6030 : timeOfDay === "night" ? 0x6080cc : 0xfff4e0;
+    const nSunInt = timeOfDay === "night" ? 0.4 : timeOfDay === "sunset" ? 1.0 : 1.4;
+    const sunLight = new THREE.DirectionalLight(nSunCol, nSunInt);
     sunLight.position.set(10, 25, 8);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(1024, 1024);
