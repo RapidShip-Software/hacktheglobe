@@ -111,7 +111,7 @@ function HomePageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <img src="/logo-heart.png" alt="Canopy" className="h-20 sm:h-24 md:h-28 drop-shadow-xl" />
+            <img src="/logo-heart.png" alt="Canopy" className="h-24 drop-shadow-xl" />
             <span
               className="font-bold tracking-wide ml-3"
               style={{
