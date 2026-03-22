@@ -111,15 +111,10 @@ function HomePageInner() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Image as base for the heart icon */}
-            <img src="/logo.png" alt="" className="h-32 sm:h-40 md:h-48 lg:h-56 drop-shadow-xl" aria-hidden="true" />
-            {/* Crisp text overlay, positioned over the "Canopy" text in the image */}
+            <img src="/logo-heart.png" alt="Canopy" className="h-28 sm:h-36 md:h-44 lg:h-52 drop-shadow-xl" />
             <span
-              className="absolute select-none pointer-events-none font-display font-semibold tracking-wide"
+              className="font-semibold tracking-wide ml-4"
               style={{
-                right: "2%",
-                top: "50%",
-                transform: "translateY(-50%)",
                 fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
                 color: "#4db8a4",
                 textShadow: "0 2px 8px rgba(0,0,0,0.15)",
